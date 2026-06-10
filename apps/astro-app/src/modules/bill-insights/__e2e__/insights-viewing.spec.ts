@@ -2,81 +2,34 @@ import { test, expect, type Page } from "@playwright/test";
 import { interpreter } from "@/__e2e__/interpreter";
 import { loginAs } from "@/__e2e__/auth";
 import { getById } from "@/__e2e__/data-e2e";
-import type { InsightsResponse } from "../domain/insights";
+import {
+  buildInsight,
+  emptyInsightsResponse,
+  insights,
+  insightsResponse,
+} from "./mocks";
 
 const INSIGHTS_URL = "**/api/bills/insights";
 
-const richInsights: { data: InsightsResponse } = {
-  data: {
-    dataQuality: "full",
-    generatedAt: "2026-05-21T00:00:00Z",
-    insights: [
-      {
-        type: "spending-spike",
-        priority: 1,
-        title: "Utilities Spending Spike",
-        description:
-          "Your Utilities spending jumped from $50/mo to $120/mo this month.",
-        category: "Utilities",
-        iconHint: "alert-triangle",
-        sentiment: "warning",
-        comparison: {
-          label: "Utilities",
-          currentValue: 120,
-          previousValue: 50,
-          changePercent: 140,
-          unit: "currency",
-        },
-      },
-      {
-        type: "new-category",
-        priority: 3,
-        title: "New Category Detected",
-        description:
-          "You started spending in Pets — 2 bills totalling $85 in the last 2 months.",
-        category: "Pets",
-        iconHint: "plus-circle",
-        sentiment: "neutral",
-      },
-      {
-        type: "top-spending-category",
-        priority: 5,
-        title: "Top Spending: Housing",
-        description:
-          "Housing accounts for 45% of your monthly spending at $1,200/mo.",
-        category: "Housing",
-        iconHint: "bar-chart",
-        sentiment: "neutral",
-      },
-    ],
-  },
+const richInsights = {
+  data: insightsResponse(
+    insights({ type: "spending-spike", category: "Utilities" })
+      .append(buildInsight({ type: "new-category", category: "Pets" }))
+      .append(
+        buildInsight({ type: "top-spending-category", category: "Housing" }),
+      )
+      .build(),
+  ),
 };
 
-const limitedInsights: { data: InsightsResponse } = {
-  data: {
-    dataQuality: "limited",
-    generatedAt: "2026-05-21T00:00:00Z",
-    insights: [
-      {
-        type: "top-spending-category",
-        priority: 5,
-        title: "Top Spending: Utilities",
-        description: "Utilities is your biggest expense at $600/mo.",
-        category: "Utilities",
-        iconHint: "bar-chart",
-        sentiment: "neutral",
-      },
-    ],
-  },
+const limitedInsights = {
+  data: insightsResponse(
+    insights({ type: "top-spending-category", category: "Utilities" }).build(),
+    "limited",
+  ),
 };
 
-const emptyInsights: { data: InsightsResponse } = {
-  data: {
-    dataQuality: "full",
-    generatedAt: "2026-05-21T00:00:00Z",
-    insights: [],
-  },
-};
+const emptyInsights = { data: emptyInsightsResponse() };
 
 const commands = {
   "mock rich insights API": async (page: Page) => {

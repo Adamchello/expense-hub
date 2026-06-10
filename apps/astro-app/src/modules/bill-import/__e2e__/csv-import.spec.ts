@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { interpreter } from "@/__e2e__/interpreter";
 import { loginAs } from "@/__e2e__/auth";
 import { getById } from "@/__e2e__/data-e2e";
+import { billRows, toCsv } from "./mocks";
 
 const commands = {
   "navigate to dashboard": async (page: Page) => {
@@ -14,12 +15,24 @@ const commands = {
   },
 
   "upload valid CSV file": async (page: Page) => {
-    const csv = [
-      "amount,date,provider,description",
-      "125.50,2024-01-15,Electric Company,Monthly bill",
-      "45.00,2024-01-20,Netflix,Subscription",
-      "89.99,2024-02-01,Water Utility,Quarterly",
-    ].join("\n");
+    const csv = toCsv(
+      billRows()
+        .append(
+          {
+            amount: "45.00",
+            date: "2024-01-20",
+            provider: "Netflix",
+            description: "Subscription",
+          },
+          {
+            amount: "89.99",
+            date: "2024-02-01",
+            provider: "Water Utility",
+            description: "Quarterly",
+          },
+        )
+        .build(),
+    );
 
     const fileChooserPromise = page.waitForEvent("filechooser");
     await getById(page, "bill-import.dropzone").click();

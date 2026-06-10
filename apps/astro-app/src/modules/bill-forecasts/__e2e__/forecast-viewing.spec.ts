@@ -3,10 +3,41 @@ import { interpreter } from "@/__e2e__/interpreter";
 import { loginAs } from "@/__e2e__/auth";
 import { getById } from "@/__e2e__/data-e2e";
 import {
-  fullForecast,
-  limitedForecast,
-  emptyForecast,
-} from "../__tests__/fixtures";
+  buildCategorySummary,
+  categorySummaries,
+  emptyForecastResponse,
+  forecastResponse,
+  monthlyTotals,
+} from "./mocks";
+
+const fullForecast = forecastResponse({
+  yearlyProjection: 18600,
+  monthlyTotals: monthlyTotals({ month: "2026-06" })
+    .append({
+      month: "2026-07",
+      total: 1580,
+      confidence: { low: 1420, high: 1740 },
+    })
+    .append({
+      month: "2026-08",
+      total: 1600,
+      confidence: { low: 1450, high: 1750 },
+    })
+    .build(),
+  categorySummaries: categorySummaries({ category: "Utilities" })
+    .append(buildCategorySummary({ category: "Housing", trend: "decreasing" }))
+    .append(buildCategorySummary({ category: "Subscriptions" }))
+    .build(),
+});
+
+const limitedForecast = forecastResponse({
+  yearlyProjection: 7200,
+  dataQuality: "limited",
+  monthlyTotals: monthlyTotals({ month: "2026-06", total: 600 }).build(),
+  categorySummaries: categorySummaries({ category: "Utilities" }).build(),
+});
+
+const emptyForecast = emptyForecastResponse();
 
 const FORECAST_URL = "**/api/bills/forecast";
 
