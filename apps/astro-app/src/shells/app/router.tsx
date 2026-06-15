@@ -1,4 +1,5 @@
 import { DashboardContent } from "./dashboard-content";
+import { SettingsPage } from "./settings-page";
 import {
   createRouter,
   createRoute,
@@ -25,7 +26,15 @@ const dashboardRoute = createRoute({
   },
 });
 
-const routeTree = rootRoute.addChildren([dashboardRoute]);
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/settings",
+  component: () => {
+    return <SettingsPage />;
+  },
+});
+
+const routeTree = rootRoute.addChildren([dashboardRoute, settingsRoute]);
 
 const router = createRouter({
   routeTree,

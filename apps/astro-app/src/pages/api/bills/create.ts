@@ -35,10 +35,21 @@ export const POST: APIRoute = async (context) => {
     const { amount, date, providerName, description, category } =
       validationResult.data;
 
+    const { data: settings, error: settingsError } = await supabase
+      .from("account_settings")
+      .select("active_profile_id")
+      .eq("account_id", user.id)
+      .maybeSingle();
+
+    if (settingsError || !settings?.active_profile_id) {
+      return ApiError("No active profile selected", 409);
+    }
+
     const { data, error } = await supabase
       .from("bills")
       .insert({
         user_id: user.id,
+        profile_id: settings.active_profile_id,
         amount: amount,
         date: date,
         provider_name: providerName,

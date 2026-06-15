@@ -16,10 +16,21 @@ export const GET: APIRoute = async (context) => {
   }
 
   try {
+    const { data: settings, error: settingsError } = await supabase
+      .from("account_settings")
+      .select("active_profile_id")
+      .eq("account_id", user.id)
+      .maybeSingle();
+
+    if (settingsError || !settings?.active_profile_id) {
+      return ApiError("No active profile selected", 409);
+    }
+
     const { data, error } = await supabase
       .from("bills")
       .select("*")
       .eq("user_id", user.id)
+      .eq("profile_id", settings.active_profile_id)
       .order("date", { ascending: false })
       .order("created_at", { ascending: false });
 

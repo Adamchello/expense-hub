@@ -9,6 +9,7 @@ import { BillInsights } from "@/modules/bill-insights/presentation/bill-insights
 import { DashboardOverview } from "@/modules/bill-management/presentation/dashboard-overview";
 import { useBills } from "@/modules/bill-management/core/store";
 import { BillImport } from "@/modules/bill-import/presentation/bill-import";
+import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
 import { useAuth } from "@/kernel/auth/use-auth";
 import { Upload } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -34,14 +35,17 @@ export function DashboardContent() {
             We are happy to see you here
           </p>
         </div>
-        <form action="/api/auth/signout">
-          <button
-            type="submit"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Sign out
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <ProfileSwitcher />
+          <form action="/api/auth/signout">
+            <button
+              type="submit"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="mb-6 flex gap-3">

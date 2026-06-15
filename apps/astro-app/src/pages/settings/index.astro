@@ -1,0 +1,10 @@
+---
+import { AppShell } from "@/shells/app/shell"
+import AppLayout from "@/kernel/layouts/layout.astro"
+
+export const prerender = true
+---
+
+<AppLayout title="Settings">
+  <AppShell client:load />
+</AppLayout>
