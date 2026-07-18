@@ -94,6 +94,7 @@ export function useRenameProfile() {
 
 function invalidateProfileScopedQueries() {
   queryClient.invalidateQueries({ queryKey: ["bills"] });
+  queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
 }
 
 export function useDeleteProfile() {

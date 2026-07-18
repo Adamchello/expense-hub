@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BillHistory } from "@/modules/bill-management/presentation/bill-history";
 import { DashboardOverview } from "@/modules/bill-management/presentation/dashboard-overview";
+import { RecurringBills } from "@/modules/recurring-bills/presentation/recurring-bills";
+import { UpcomingReminders } from "@/modules/recurring-bills/presentation/upcoming-reminders";
 import { useBills } from "@/modules/bill-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
 import { ProfilesSection } from "@/modules/multi-profile-account/presentation/profiles-section";
@@ -16,6 +18,7 @@ import {
   Menu,
   Plus,
   Receipt,
+  Repeat,
   Settings,
   Wallet2,
   X,
@@ -28,6 +31,7 @@ const NAV_GROUPS = [
     tabs: [
       { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { value: "history", label: "History", icon: Receipt },
+      { value: "recurring", label: "Recurring", icon: Repeat },
     ],
   },
   {
@@ -39,6 +43,7 @@ const NAV_GROUPS = [
 const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   history: "Bill History",
+  recurring: "Recurring Bills",
   settings: "Settings",
 };
 
@@ -196,7 +201,10 @@ export function DashboardContent() {
             )}
 
             <TabsContent value="dashboard" className="mt-0">
-              <DashboardOverview bills={query.data || []} />
+              <div className="flex flex-col gap-6">
+                <UpcomingReminders />
+                <DashboardOverview bills={query.data || []} />
+              </div>
             </TabsContent>
             <TabsContent value="history" className="mt-0">
               {query.isLoading ? (
@@ -209,6 +217,9 @@ export function DashboardContent() {
                   onRefresh={() => query.refetch()}
                 />
               )}
+            </TabsContent>
+            <TabsContent value="recurring" className="mt-0">
+              <RecurringBills />
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <div className="max-w-2xl">

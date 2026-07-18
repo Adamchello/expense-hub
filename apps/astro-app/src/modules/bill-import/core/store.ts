@@ -133,6 +133,18 @@ export function useImportStore(existingBills: Bill[] | undefined) {
     setRows((prev) => prev.filter((row) => row.id !== id));
   }, []);
 
+  const removeErrorRows = useCallback(() => {
+    setRows((prev) => prev.filter((row) => row.errors.length === 0));
+  }, []);
+
+  const removeDuplicateRows = useCallback(() => {
+    setRows((prev) => prev.filter((row) => !row.isDuplicate));
+  }, []);
+
+  const setCategoryForAll = useCallback((category: Category) => {
+    setRows((prev) => prev.map((row) => ({ ...row, category })));
+  }, []);
+
   const handleFinalize = useCallback(
     (onSuccess: (imported: number) => void) => {
       const validRows = rows.filter((row) => row.errors.length === 0);
@@ -170,6 +182,9 @@ export function useImportStore(existingBills: Bill[] | undefined) {
     updateRow,
     updateCategory,
     removeRow,
+    removeErrorRows,
+    removeDuplicateRows,
+    setCategoryForAll,
     handleFinalize,
     resetState,
   };

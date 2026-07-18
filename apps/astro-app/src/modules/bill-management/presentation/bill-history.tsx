@@ -20,8 +20,9 @@ import {
 import { getCategoryColor } from "@/shared/configuration/category";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { useDeleteBill } from "../core/store";
+import { exportBillsToCsv, exportBillsToExcel } from "../core/export";
 import { EditBillDialog } from "./edit-bill-dialog";
-import { Pencil, Trash2 } from "lucide-react";
+import { Download, Pencil, Trash2 } from "lucide-react";
 
 const ALL = "all";
 
@@ -94,16 +95,34 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-2xl font-semibold">Bill History</h2>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportBillsToCsv(bills)}
           >
-            Refresh
-          </button>
-        )}
+            <Download className="size-3.5" />
+            CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportBillsToExcel(bills)}
+          >
+            <Download className="size-3.5" />
+            Excel
+          </Button>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Refresh
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filters */}

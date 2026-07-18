@@ -12,6 +12,7 @@ import { FileDropZone } from "./import/file-drop-zone";
 import { ImportStats } from "./import/import-stats";
 import { ImportTable } from "./import/import-table";
 import { ImportErrors } from "./import/import-errors";
+import { BulkActions } from "./import/bulk-actions";
 import { useBills } from "@/modules/bill-management/core/store";
 import { useImportStore } from "../core/store";
 
@@ -65,6 +66,13 @@ export function BillImportBody({ active, onDone }: BillImportBodyProps) {
               valid={store.validRows}
               errors={store.errorRows}
               duplicates={store.duplicateRows}
+            />
+            <BulkActions
+              errorCount={store.errorRows}
+              duplicateCount={store.duplicateRows}
+              onRemoveErrorRows={store.removeErrorRows}
+              onRemoveDuplicateRows={store.removeDuplicateRows}
+              onSetCategoryForAll={store.setCategoryForAll}
             />
             <div className="flex-1 min-h-0 ">
               <ImportTable
