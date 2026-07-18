@@ -94,8 +94,6 @@ export function useRenameProfile() {
 
 function invalidateProfileScopedQueries() {
   queryClient.invalidateQueries({ queryKey: ["bills"] });
-  queryClient.invalidateQueries({ queryKey: ["insights"] });
-  queryClient.invalidateQueries({ queryKey: ["forecasts"] });
 }
 
 export function useDeleteProfile() {

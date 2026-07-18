@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BillHistory } from "@/modules/bill-management/presentation/bill-history";
-import { BillForecasts } from "@/modules/bill-forecasts/presentation/bill-forecasts";
-import { BillInsights } from "@/modules/bill-insights/presentation/bill-insights";
 import { DashboardOverview } from "@/modules/bill-management/presentation/dashboard-overview";
 import { useBills } from "@/modules/bill-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
@@ -19,8 +17,6 @@ import {
   Plus,
   Receipt,
   Settings,
-  Sparkles,
-  TrendingUp,
   Wallet2,
   X,
 } from "lucide-react";
@@ -32,8 +28,6 @@ const NAV_GROUPS = [
     tabs: [
       { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { value: "history", label: "History", icon: Receipt },
-      { value: "forecasts", label: "Forecasts", icon: TrendingUp },
-      { value: "insights", label: "Insights", icon: Sparkles },
     ],
   },
   {
@@ -45,8 +39,6 @@ const NAV_GROUPS = [
 const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   history: "Bill History",
-  forecasts: "Forecasts",
-  insights: "Insights",
   settings: "Settings",
 };
 
@@ -217,12 +209,6 @@ export function DashboardContent() {
                   onRefresh={() => query.refetch()}
                 />
               )}
-            </TabsContent>
-            <TabsContent value="forecasts" className="mt-0">
-              <BillForecasts />
-            </TabsContent>
-            <TabsContent value="insights" className="mt-0">
-              <BillInsights />
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <div className="max-w-2xl">

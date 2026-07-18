@@ -1,13 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
-import { BILL_INSIGHTS_E2E } from "@/modules/bill-insights/__e2e__/selectors";
-import { BILL_FORECASTS_E2E } from "@/modules/bill-forecasts/__e2e__/selectors";
 import { BILL_IMPORT_E2E } from "@/modules/bill-import/__e2e__/selectors";
 
-const ALL_E2E = [
-  ...BILL_INSIGHTS_E2E,
-  ...BILL_FORECASTS_E2E,
-  ...BILL_IMPORT_E2E,
-] as const;
+const ALL_E2E = [...BILL_IMPORT_E2E] as const;
 
 export type DataE2E = (typeof ALL_E2E)[number];
 
