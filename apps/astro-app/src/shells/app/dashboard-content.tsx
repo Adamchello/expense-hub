@@ -7,6 +7,8 @@ import { DashboardOverview } from "@/modules/bill-management/presentation/dashbo
 import { RecurringBills } from "@/modules/recurring-bills/presentation/recurring-bills";
 import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
 import { BillPlanning } from "@/modules/bill-planning/presentation/bill-planning";
+import { CategoriesSection } from "@/modules/category-management/presentation/categories-section";
+import { MerchantsSection } from "@/modules/merchant-management/presentation/merchants-section";
 import { UpcomingReminders } from "@/modules/recurring-bills/presentation/upcoming-reminders";
 import { useBills } from "@/modules/bill-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
@@ -242,8 +244,10 @@ export function DashboardContent() {
               )}
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
-              <div className="max-w-2xl">
+              <div className="flex max-w-2xl flex-col gap-6">
                 <ProfilesSection />
+                <CategoriesSection />
+                <MerchantsSection />
               </div>
             </TabsContent>
           </div>

@@ -74,3 +74,26 @@ export const logRecurringBill = async (id: string, signal?: AbortSignal) => {
   if (!response.ok) throw new Error(data.error || "Failed to log bill");
   return data;
 };
+
+export const skipRecurringBill = async (id: string, signal?: AbortSignal) => {
+  const response = await fetch(`/api/recurring/${id}/skip`, {
+    method: "POST",
+    signal,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to skip bill");
+  return data;
+};
+
+export const getRecurringEvents = async (
+  from: string,
+  to: string,
+  signal?: AbortSignal,
+): Promise<import("../domain/recurring-bill").RecurringBillEvent[]> => {
+  const response = await fetch(`/api/recurring/events?from=${from}&to=${to}`, {
+    signal,
+  });
+  if (!response.ok) throw new Error("Failed to fetch occurrence events");
+  const data = await response.json();
+  return data.data || [];
+};

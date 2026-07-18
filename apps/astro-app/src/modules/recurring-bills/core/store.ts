@@ -7,6 +7,8 @@ import {
   updateRecurringBill,
   deleteRecurringBill,
   logRecurringBill,
+  skipRecurringBill,
+  getRecurringEvents,
 } from "../integration/repository";
 
 const invalidateRecurring = () => {
@@ -63,7 +65,31 @@ export function useLogRecurringBill() {
       onSuccess: () => {
         invalidateRecurring();
         queryClient.invalidateQueries({ queryKey: ["bills"] });
+        queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
       },
+    },
+    queryClient,
+  );
+}
+
+export function useSkipRecurringBill() {
+  return useMutation(
+    {
+      mutationFn: (id: string) => skipRecurringBill(id),
+      onSuccess: () => {
+        invalidateRecurring();
+        queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
+      },
+    },
+    queryClient,
+  );
+}
+
+export function useRecurringEvents(from: string, to: string) {
+  return useQuery(
+    {
+      queryKey: ["recurring-events", from, to],
+      queryFn: ({ signal }) => getRecurringEvents(from, to, signal),
     },
     queryClient,
   );

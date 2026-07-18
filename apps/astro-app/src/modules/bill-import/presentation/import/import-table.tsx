@@ -12,7 +12,7 @@ import {
 import { Trash2 } from "lucide-react";
 import type { ParsedBillRow } from "../../domain/bill-import";
 import type { Category } from "../../domain/bill-import";
-import { CATEGORIES, CATEGORY_COLORS } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 
 interface ImportTableProps {
   rows: ParsedBillRow[];
@@ -27,6 +27,8 @@ export function ImportTable({
   onUpdateCategory,
   onRemoveRow,
 }: ImportTableProps) {
+  const { flat: allCategories, badgeClassFor } = useCategoryOptions();
+
   return (
     <div
       data-e2e="bill-import.table"
@@ -100,10 +102,10 @@ export function ImportTable({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map((cat) => (
+                    {allCategories.map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         <span
-                          className={`px-2 py-0.5 rounded text-xs ${CATEGORY_COLORS[cat]}`}
+                          className={`px-2 py-0.5 rounded text-xs ${badgeClassFor(cat)}`}
                         >
                           {cat}
                         </span>

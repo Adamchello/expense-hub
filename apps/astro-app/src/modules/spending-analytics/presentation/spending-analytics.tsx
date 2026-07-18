@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCategoryColor } from "@/shared/configuration/category";
 import { formatCurrency } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { Bill } from "@/modules/bill-management/domain/bill";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
+import { CategoryDonut } from "./category-donut";
 import {
   averageMonthlySpending,
   categoryComparisons,
@@ -37,6 +38,7 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
   const [distributionScope, setDistributionScope] = useState<"month" | "all">(
     "month",
   );
+  const { badgeClassFor, hexFor } = useCategoryOptions();
 
   if (bills.length === 0) {
     return (
@@ -63,6 +65,28 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
   const biggest = totalsByCategory(bills, currentMonth)[0];
   const comparisons = categoryComparisons(bills, currentMonth, lastMonth);
   const summaries = spendingSummaries(bills, currentMonth);
+
+  // Donut: at most 8 slices, remainder folds into "Other".
+  const distributionTotal = distribution.reduce((sum, e) => sum + e.total, 0);
+  const topSlices = distribution.slice(0, 8).map((entry) => ({
+    name: entry.category,
+    value: entry.total,
+    share: entry.share,
+    hex: hexFor(entry.category),
+  }));
+  const restTotal = distribution.slice(8).reduce((sum, e) => sum + e.total, 0);
+  const donutSlices =
+    restTotal > 0
+      ? [
+          ...topSlices,
+          {
+            name: "Other",
+            value: restTotal,
+            share: Math.round((restTotal / distributionTotal) * 1000) / 10,
+            hex: "#9ca3af",
+          },
+        ]
+      : topSlices;
 
   return (
     <div className="flex flex-col gap-6">
@@ -170,31 +194,44 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
                 No bills in this period.
               </p>
             ) : (
-              <ul className="flex flex-col gap-3">
-                {distribution.map((entry) => (
-                  <li key={entry.category}>
-                    <div className="flex items-center justify-between gap-2 text-sm">
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                          getCategoryColor(entry.category),
-                        )}
-                      >
-                        {entry.category}
-                      </span>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {formatCurrency(entry.total)} · {entry.share}%
-                      </span>
-                    </div>
-                    <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{ width: `${entry.share}%` }}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+                <CategoryDonut slices={donutSlices} total={distributionTotal} />
+                <ul className="flex w-full flex-col gap-3">
+                  {distribution.map((entry) => (
+                    <li key={entry.category}>
+                      <div className="flex items-center justify-between gap-2 text-sm">
+                        <span className="flex items-center gap-1.5">
+                          <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: hexFor(entry.category) }}
+                            aria-hidden="true"
+                          />
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                              badgeClassFor(entry.category),
+                            )}
+                          >
+                            {entry.category}
+                          </span>
+                        </span>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {formatCurrency(entry.total)} · {entry.share}%
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${entry.share}%`,
+                            backgroundColor: hexFor(entry.category),
+                          }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -229,7 +266,7 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
                         <span
                           className={cn(
                             "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                            getCategoryColor(comparison.category),
+                            badgeClassFor(comparison.category),
                           )}
                         >
                           {comparison.category}

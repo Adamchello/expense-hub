@@ -3,6 +3,7 @@
 import { useRecurringBills } from "@/modules/recurring-bills/core/store";
 import { BillCalendar } from "./bill-calendar";
 import { CashflowTimeline } from "./cashflow-timeline";
+import { MonthlyChecklist } from "./monthly-checklist";
 import { UpcomingMonth } from "./upcoming-month";
 
 export function BillPlanning() {
@@ -43,6 +44,7 @@ export function BillPlanning() {
 
   return (
     <div className="flex flex-col gap-6">
+      <MonthlyChecklist recurringBills={recurringBills} />
       <BillCalendar recurringBills={recurringBills} />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <UpcomingMonth recurringBills={recurringBills} />

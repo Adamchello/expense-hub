@@ -6,6 +6,7 @@ import {
   createBill,
   updateBill,
   deleteBill,
+  bulkDeleteBills,
   suggestCategoryApi,
 } from "../integration/repository";
 
@@ -49,6 +50,18 @@ export function useDeleteBill() {
   return useMutation(
     {
       mutationFn: (id: string) => deleteBill(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["bills"] });
+      },
+    },
+    queryClient,
+  );
+}
+
+export function useBulkDeleteBills() {
+  return useMutation(
+    {
+      mutationFn: (ids: string[]) => bulkDeleteBills(ids),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["bills"] });
       },

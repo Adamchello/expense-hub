@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CATEGORIES } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { Category } from "@/shared/domain/category";
 import {
   FREQUENCIES,
@@ -66,9 +66,10 @@ export function RecurringBillDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing]);
 
-  const categoryOptions = CATEGORIES.includes(category as Category)
-    ? CATEGORIES
-    : [category as Category, ...CATEGORIES];
+  const { flat: allCategories } = useCategoryOptions();
+  const categoryOptions = allCategories.includes(category)
+    ? allCategories
+    : [category, ...allCategories];
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

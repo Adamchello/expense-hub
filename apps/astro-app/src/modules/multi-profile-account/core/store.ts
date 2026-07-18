@@ -95,6 +95,8 @@ export function useRenameProfile() {
 function invalidateProfileScopedQueries() {
   queryClient.invalidateQueries({ queryKey: ["bills"] });
   queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
+  queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
+  queryClient.invalidateQueries({ queryKey: ["custom-categories"] });
 }
 
 export function useDeleteProfile() {

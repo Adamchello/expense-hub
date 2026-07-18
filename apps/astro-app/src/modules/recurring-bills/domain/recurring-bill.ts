@@ -12,6 +12,15 @@ export interface RecurringBill {
   created_at: string;
 }
 
+export interface RecurringBillEvent {
+  id: string;
+  recurring_id: string;
+  due_date: string;
+  status: "paid" | "skipped";
+  bill_id: string | null;
+  created_at: string;
+}
+
 export interface RecurringBillFormData {
   amount: number;
   providerName: string;

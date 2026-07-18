@@ -20,14 +20,15 @@ import {
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateBill } from "../core/store";
-import { CATEGORY_GROUPS } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 
 interface FormState {
   amount: string;
   date: string;
   providerName: string;
   description: string;
-  category: Category | undefined;
+  /** Built-in or custom category name. */
+  category: string | undefined;
 }
 
 const getInitialFormState = (bill?: Bill | null): FormState =>
@@ -88,6 +89,7 @@ export function BillFormBody({
   );
   const [showMore, setShowMore] = useState(isEdit);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const { groups: categoryGroups } = useCategoryOptions();
 
   useEffect(() => {
     if (active) {
@@ -108,7 +110,7 @@ export function BillFormBody({
       return;
     }
 
-    const category = formState.category || "Uncategorized";
+    const category = (formState.category || "Uncategorized") as Category;
 
     onSubmit({
       amount: amountNum,
@@ -222,7 +224,7 @@ export function BillFormBody({
             className="w-(--radix-popover-trigger-width) min-w-80 p-3"
           >
             <div className="flex flex-col gap-3">
-              {CATEGORY_GROUPS.map((group) => (
+              {categoryGroups.map((group) => (
                 <div key={group.label} className="flex flex-col gap-1.5">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {group.label}

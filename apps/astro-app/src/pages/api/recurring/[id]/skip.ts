@@ -5,8 +5,8 @@ import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
 import { advanceDueDate, type Frequency } from "@/shared/domain/recurrence";
 
 /**
- * Logs one occurrence of a recurring bill: creates a regular bill from the
- * template and advances the template's next due date by its frequency.
+ * Skips the current occurrence of a recurring bill: records a "skipped" event
+ * and advances the next due date without creating a bill.
  */
 export const POST: APIRoute = async (context) => {
   const supabase = createSupabaseServerClient(context);
@@ -46,32 +46,6 @@ export const POST: APIRoute = async (context) => {
       return ApiError("Recurring bill not found", 404);
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    // A bill logged ahead of schedule is dated today, not in the future.
-    const billDate =
-      template.next_due_date <= today ? template.next_due_date : today;
-
-    const { data: bill, error: billError } = await supabase
-      .from("bills")
-      .insert({
-        user_id: user.id,
-        profile_id: template.profile_id,
-        amount: template.amount,
-        date: billDate,
-        provider_name: template.provider_name,
-        description: template.description,
-        category: template.category,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (billError) {
-      console.error("Error logging recurring bill:", billError);
-      return ApiError("Failed to log bill", 500, billError.message);
-    }
-
-    // Record the occurrence outcome; non-fatal, the bill itself is the source of truth.
     const { error: eventError } = await supabase
       .from("recurring_bill_events")
       .insert({
@@ -79,12 +53,12 @@ export const POST: APIRoute = async (context) => {
         profile_id: template.profile_id,
         recurring_id: id,
         due_date: template.next_due_date,
-        status: "paid",
-        bill_id: bill.id,
+        status: "skipped",
       });
 
     if (eventError) {
-      console.error("Error recording paid event:", eventError);
+      console.error("Error recording skip:", eventError);
+      return ApiError("Failed to skip bill", 500, eventError.message);
     }
 
     const { data: updated, error: updateError } = await supabase
@@ -103,13 +77,13 @@ export const POST: APIRoute = async (context) => {
     if (updateError) {
       console.error("Error advancing recurring bill:", updateError);
       return ApiError(
-        "Bill was logged but the next due date could not be advanced",
+        "Skip was recorded but the next due date could not be advanced",
         500,
         updateError.message,
       );
     }
 
-    return ApiResponse({ bill, recurring: updated }, 201, "Bill logged");
+    return ApiResponse({ recurring: updated }, 200, "Occurrence skipped");
   } catch (error) {
     console.error("Unexpected error:", error);
     return ApiError("Internal server error", 500);

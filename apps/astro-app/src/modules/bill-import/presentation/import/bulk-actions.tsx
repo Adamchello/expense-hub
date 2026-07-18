@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CATEGORIES } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { Category } from "../../domain/bill-import";
 import { CopyX, Tags, Trash2 } from "lucide-react";
 
@@ -28,6 +28,8 @@ export function BulkActions({
   onRemoveDuplicateRows,
   onSetCategoryForAll,
 }: BulkActionsProps) {
+  const { flat: allCategories } = useCategoryOptions();
+
   return (
     <div
       data-e2e="bill-import.bulk-actions"
@@ -51,7 +53,7 @@ export function BulkActions({
           <SelectValue placeholder="Set category for all" />
         </SelectTrigger>
         <SelectContent>
-          {CATEGORIES.map((category) => (
+          {allCategories.map((category) => (
             <SelectItem key={category} value={category}>
               {category}
             </SelectItem>
