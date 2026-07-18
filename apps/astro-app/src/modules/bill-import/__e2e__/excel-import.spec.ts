@@ -9,7 +9,8 @@ const commands = {
   },
 
   "open import panel": async (page: Page) => {
-    await page.getByRole("button", { name: /import/i }).click();
+    await page.getByRole("button", { name: /add bill/i }).click();
+    await page.getByRole("tab", { name: /import file/i }).click();
     await expect(getById(page, "bill-import.title")).toHaveText("Import Bills");
   },
 

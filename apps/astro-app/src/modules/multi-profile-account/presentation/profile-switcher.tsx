@@ -1,20 +1,26 @@
 "use client";
 
-import { Link } from "@tanstack/react-router";
-import { Settings, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import {
   useActiveProfile,
   useProfiles,
   useSwitchActiveProfile,
 } from "../core/store";
+
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "?";
 
 export function ProfileSwitcher() {
   const profilesQuery = useProfiles();
@@ -22,6 +28,9 @@ export function ProfileSwitcher() {
   const switchMutation = useSwitchActiveProfile();
 
   const profiles = profilesQuery.data ?? [];
+  const activeProfile = profiles.find(
+    (profile) => profile.id === activeProfileId,
+  );
 
   if (isLoading) {
     return (
@@ -38,14 +47,19 @@ export function ProfileSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-2" data-testid="profile-switcher">
+    <div data-testid="profile-switcher">
       <Select
         value={activeProfileId ?? undefined}
         onValueChange={handleChange}
         disabled={switchMutation.isPending}
       >
-        <SelectTrigger className="w-[180px]" aria-label="Active profile">
-          <SelectValue placeholder="Select profile" />
+        <SelectTrigger
+          aria-label="Active profile"
+          className="h-auto w-full items-center gap-2.5 rounded-xl border-sidebar-border bg-card/60 p-2 text-left shadow-none transition-colors hover:bg-sidebar-accent/60"
+        >
+          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-sidebar-foreground ml-1">
+            {activeProfile?.name ?? "Select profile"}
+          </span>
         </SelectTrigger>
         <SelectContent>
           {profiles.map((profile) => (
@@ -55,11 +69,6 @@ export function ProfileSwitcher() {
           ))}
         </SelectContent>
       </Select>
-      <Button variant="ghost" size="icon" asChild aria-label="Manage profiles">
-        <Link to="/settings">
-          <Settings className="h-4 w-4" />
-        </Link>
-      </Button>
     </div>
   );
 }

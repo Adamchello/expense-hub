@@ -8,6 +8,13 @@ import "../styles/global.css"
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Testing</title>
+    <script is:inline>
+      const stored = localStorage.getItem("theme");
+      const dark = stored
+        ? stored === "dark"
+        : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.toggle("dark", dark);
+    </script>
   </head>
   <body>
     <slot />
