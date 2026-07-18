@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Bill } from "../domain/bill";
 import type { Category } from "../domain/category";
 import {
   Dialog,
@@ -19,23 +20,7 @@ import {
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateBill } from "../core/store";
-
-const CATEGORY_GROUPS: { label: string; categories: Category[] }[] = [
-  { label: "Home", categories: ["Utilities", "Housing"] },
-  {
-    label: "Everyday",
-    categories: ["Food", "Transportation", "Shopping", "Pets"],
-  },
-  {
-    label: "Health & Finance",
-    categories: ["Healthcare", "Insurance", "Loans"],
-  },
-  { label: "Leisure", categories: ["Entertainment", "Subscriptions"] },
-  {
-    label: "Other",
-    categories: ["Services", "Education", "Charity", "Uncategorized"],
-  },
-];
+import { CATEGORY_GROUPS } from "@/shared/configuration/category";
 
 interface FormState {
   amount: string;
@@ -45,87 +30,87 @@ interface FormState {
   category: Category | undefined;
 }
 
-const getInitialFormState = (): FormState => ({
-  amount: "",
-  date: new Date().toISOString().split("T")[0],
-  providerName: "",
-  description: "",
-  category: undefined,
-});
+const getInitialFormState = (bill?: Bill | null): FormState =>
+  bill
+    ? {
+        amount: String(bill.amount),
+        date: bill.date,
+        providerName: bill.provider_name,
+        description: bill.description ?? "",
+        category: bill.category,
+      }
+    : {
+        amount: "",
+        date: new Date().toISOString().split("T")[0],
+        providerName: "",
+        description: "",
+        category: undefined,
+      };
 
-interface BillEntryFormBodyProps {
+export interface BillSubmitData {
+  amount: number;
+  date: string;
+  providerName: string;
+  description: string | null;
+  category: Category;
+}
+
+interface BillFormBodyProps {
   /** When false the form resets (mirrors the old close-resets-form behavior). */
   active: boolean;
   onCancel: () => void;
+  onSubmit: (data: BillSubmitData) => void;
+  /** Prefills the form and expands the details section (edit mode). */
+  initialBill?: Bill | null;
+  error: unknown;
+  isPending: boolean;
+  successMessage?: string | null;
+  submitLabel: string;
+  pendingLabel: string;
+  errorFallback: string;
 }
 
-export function BillEntryFormBody({
+export function BillFormBody({
   active,
   onCancel,
-}: BillEntryFormBodyProps) {
-  const [formState, setFormState] = useState<FormState>(getInitialFormState);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showMore, setShowMore] = useState(false);
+  onSubmit,
+  initialBill,
+  error,
+  isPending,
+  successMessage,
+  submitLabel,
+  pendingLabel,
+  errorFallback,
+}: BillFormBodyProps) {
+  const isEdit = !!initialBill;
+  const [formState, setFormState] = useState<FormState>(() =>
+    getInitialFormState(initialBill),
+  );
+  const [showMore, setShowMore] = useState(isEdit);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-  const resetForm = useCallback(() => {
-    setFormState(getInitialFormState());
-    setSuccessMessage(null);
-    setShowMore(false);
-  }, []);
-
-  const { mutate: mutateCreateBill, reset, error, isPending } = useCreateBill();
-
-  // Override onSuccess behavior for form-specific needs
-  const handleMutate = useCallback(
-    (data: {
-      amount: number;
-      date: string;
-      providerName: string;
-      description: string | null;
-      category: Category;
-    }) => {
-      mutateCreateBill(data, {
-        onSuccess: () => {
-          setSuccessMessage("Bill saved successfully!");
-          resetForm();
-
-          setTimeout(() => {
-            setSuccessMessage(null);
-          }, 3000);
-        },
-        onError: (error) => {
-          console.error("Error submitting form:", error);
-        },
-      });
-    },
-    [mutateCreateBill, resetForm],
-  );
-
   useEffect(() => {
-    if (!active) {
-      resetForm();
-      reset();
+    if (active) {
+      setFormState(getInitialFormState(initialBill));
+      setShowMore(isEdit);
     }
-  }, [active, resetForm, reset]);
+  }, [active, initialBill, isEdit]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!formState.amount || !formState.date) {
-      reset();
       return;
     }
 
     const amountNum = parseFloat(formState.amount);
     if (isNaN(amountNum) || amountNum < 0) {
-      reset();
       return;
     }
 
     const category = formState.category || "Uncategorized";
 
-    handleMutate({
+    onSubmit({
       amount: amountNum,
       date: formState.date,
       // Provider is optional in the UI; the API requires a non-empty name,
@@ -157,10 +142,10 @@ export function BillEntryFormBody({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
-      {error && (
+      {error != null && (
         <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
           <p className="text-sm text-destructive">
-            {error instanceof Error ? error.message : "Failed to save bill"}
+            {error instanceof Error ? error.message : errorFallback}
           </p>
         </div>
       )}
@@ -201,7 +186,7 @@ export function BillEntryFormBody({
             value={formState.amount}
             onChange={(e) => updateField("amount", e.target.value)}
             required
-            aria-invalid={error && !formState.amount ? "true" : "false"}
+            aria-invalid={error != null && !formState.amount ? "true" : "false"}
             style={{ width: `${amountLength + 1}ch` }}
             className={cn(
               "max-w-full border-none bg-transparent text-center font-mono font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
@@ -314,7 +299,9 @@ export function BillEntryFormBody({
                 value={formState.date}
                 onChange={(e) => updateField("date", e.target.value)}
                 required
-                aria-invalid={error && !formState.date ? "true" : "false"}
+                aria-invalid={
+                  error != null && !formState.date ? "true" : "false"
+                }
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -356,10 +343,65 @@ export function BillEntryFormBody({
           className="flex-1"
           disabled={!isFormValid || isPending}
         >
-          {isPending ? "Saving..." : "Save Bill"}
+          {isPending ? pendingLabel : submitLabel}
         </Button>
       </div>
     </form>
+  );
+}
+
+interface BillEntryFormBodyProps {
+  /** When false the form resets (mirrors the old close-resets-form behavior). */
+  active: boolean;
+  onCancel: () => void;
+}
+
+export function BillEntryFormBody({
+  active,
+  onCancel,
+}: BillEntryFormBodyProps) {
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [formEpoch, setFormEpoch] = useState(0);
+
+  const { mutate: mutateCreateBill, reset, error, isPending } = useCreateBill();
+
+  useEffect(() => {
+    if (!active) {
+      setSuccessMessage(null);
+      reset();
+    }
+  }, [active, reset]);
+
+  const handleSubmit = (data: BillSubmitData) => {
+    mutateCreateBill(data, {
+      onSuccess: () => {
+        setSuccessMessage("Bill saved successfully!");
+        // Remount the form body so it returns to a pristine state.
+        setFormEpoch((prev) => prev + 1);
+
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
+      },
+      onError: (error) => {
+        console.error("Error submitting form:", error);
+      },
+    });
+  };
+
+  return (
+    <BillFormBody
+      key={formEpoch}
+      active={active}
+      onCancel={onCancel}
+      onSubmit={handleSubmit}
+      error={error}
+      isPending={isPending}
+      successMessage={successMessage}
+      submitLabel="Save Bill"
+      pendingLabel="Saving..."
+      errorFallback="Failed to save bill"
+    />
   );
 }
 

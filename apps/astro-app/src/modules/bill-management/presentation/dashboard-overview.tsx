@@ -1,11 +1,17 @@
 "use client";
 
-import { CATEGORY_COLORS } from "@/shared/configuration/category";
+import { getCategoryColor } from "@/shared/configuration/category";
 import { formatCurrency, formatDate } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { Bill } from "../domain/bill";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Receipt, Tags, Wallet, type LucideIcon } from "lucide-react";
+import {
+  CalendarRange,
+  Receipt,
+  Tags,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 
 // ── Component ───────────────────────────────────────────────────────────────
 
@@ -14,11 +20,15 @@ interface DashboardOverviewProps {
 }
 
 export function DashboardOverview({ bills }: DashboardOverviewProps) {
-  const recentBills = bills.slice(0, 3);
+  const recentBills = bills.slice(0, 5);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
+  const currentYear = new Date().toISOString().slice(0, 4);
   const thisMonthTotal = bills
     .filter((bill) => bill.date.startsWith(currentMonth))
+    .reduce((sum, bill) => sum + bill.amount, 0);
+  const thisYearTotal = bills
+    .filter((bill) => bill.date.startsWith(currentYear))
     .reduce((sum, bill) => sum + bill.amount, 0);
   const categoriesUsed = new Set(bills.map((bill) => bill.category)).size;
 
@@ -41,6 +51,12 @@ export function DashboardOverview({ bills }: DashboardOverviewProps) {
       icon: Wallet,
     },
     {
+      label: "This year",
+      value: formatCurrency(thisYearTotal),
+      sub: `in ${currentYear}`,
+      icon: CalendarRange,
+    },
+    {
       label: "Categories",
       value: String(categoriesUsed),
       sub: "in use",
@@ -51,7 +67,7 @@ export function DashboardOverview({ bills }: DashboardOverviewProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="gap-0 py-5">
             <CardContent className="px-5">
@@ -98,7 +114,7 @@ export function DashboardOverview({ bills }: DashboardOverviewProps) {
                       <span
                         className={cn(
                           "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                          CATEGORY_COLORS[bill.category],
+                          getCategoryColor(bill.category),
                         )}
                       >
                         {bill.category}

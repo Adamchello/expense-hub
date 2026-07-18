@@ -51,9 +51,9 @@ describe("Review Editing", () => {
     await user.clear(providerInput);
     await user.type(providerInput, "Netflix");
 
-    // After typing "Netflix", the category auto-updates to Subscriptions.
-    // Spotify also gets Subscriptions, so multiple elements expected.
-    const subscriptionTexts = screen.getAllByText("Subscriptions");
+    // After typing "Netflix", the category auto-updates to Streaming.
+    // Spotify also gets Streaming, so multiple elements expected.
+    const subscriptionTexts = screen.getAllByText("Streaming");
     // Before editing there was only 1 (Spotify). Now there should be 2 (Spotify + Netflix).
     expect(subscriptionTexts.length).toBe(2);
   });

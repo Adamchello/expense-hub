@@ -1,19 +1,5 @@
-export type Category =
-  | "Utilities"
-  | "Housing"
-  | "Food"
-  | "Transportation"
-  | "Subscriptions"
-  | "Healthcare"
-  | "Insurance"
-  | "Loans"
-  | "Entertainment"
-  | "Shopping"
-  | "Services"
-  | "Education"
-  | "Charity"
-  | "Pets"
-  | "Uncategorized";
+export type { Category } from "@/shared/domain/category";
+import type { Category } from "@/shared/domain/category";
 
 export interface ParsedBillRow {
   id: string;

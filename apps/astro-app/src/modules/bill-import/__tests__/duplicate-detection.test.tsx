@@ -22,7 +22,7 @@ const EXISTING_BILL = {
   date: PARSED_DATE,
   provider_name: "Netflix",
   description: null,
-  category: "Subscriptions",
+  category: "Streaming",
   created_at: "2024-01-01T00:00:00Z",
 };
 

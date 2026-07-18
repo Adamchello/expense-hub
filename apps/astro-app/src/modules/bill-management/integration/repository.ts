@@ -37,6 +37,38 @@ export const createBill = async (
   return data;
 };
 
+export const updateBill = async (
+  id: string,
+  formData: BillFormData,
+  signal?: AbortSignal,
+) => {
+  const response = await fetch(`/api/bills/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: formData.amount,
+      date: formData.date,
+      providerName: formData.providerName.trim(),
+      description: formData.description?.trim() || null,
+      category: formData.category,
+    }),
+    signal,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to update bill");
+  return data;
+};
+
+export const deleteBill = async (id: string, signal?: AbortSignal) => {
+  const response = await fetch(`/api/bills/${id}`, {
+    method: "DELETE",
+    signal,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Failed to delete bill");
+  return data;
+};
+
 export const suggestCategoryApi = async (
   providerName: string,
   signal?: AbortSignal,
