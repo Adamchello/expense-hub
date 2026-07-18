@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Bill } from "../domain/bill";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -22,7 +23,7 @@ import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { useDeleteBill } from "../core/store";
 import { exportBillsToCsv, exportBillsToExcel } from "../core/export";
 import { EditBillDialog } from "./edit-bill-dialog";
-import { Download, Pencil, Trash2 } from "lucide-react";
+import { Download, Pencil, Search, Trash2 } from "lucide-react";
 
 const ALL = "all";
 
@@ -34,6 +35,7 @@ interface BillHistoryProps {
 export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
   const [monthFilter, setMonthFilter] = useState<string>(ALL);
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [deletingBill, setDeletingBill] = useState<Bill | null>(null);
 
@@ -49,15 +51,18 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
     return [...categories].sort();
   }, [bills]);
 
-  const filteredBills = useMemo(
-    () =>
-      bills.filter(
-        (bill) =>
-          (monthFilter === ALL || bill.date.startsWith(monthFilter)) &&
-          (categoryFilter === ALL || bill.category === categoryFilter),
-      ),
-    [bills, monthFilter, categoryFilter],
-  );
+  const filteredBills = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return bills.filter(
+      (bill) =>
+        (monthFilter === ALL || bill.date.startsWith(monthFilter)) &&
+        (categoryFilter === ALL || bill.category === categoryFilter) &&
+        (term === "" ||
+          bill.provider_name.toLowerCase().includes(term) ||
+          (bill.description ?? "").toLowerCase().includes(term) ||
+          bill.category.toLowerCase().includes(term)),
+    );
+  }, [bills, monthFilter, categoryFilter, searchTerm]);
 
   // Group bills by date
   const groupedBills = useMemo(() => {
@@ -127,6 +132,17 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search payee, note or category"
+            aria-label="Search bills"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-64 pl-8"
+          />
+        </div>
         <Select value={monthFilter} onValueChange={setMonthFilter}>
           <SelectTrigger className="w-44" aria-label="Filter by month">
             <SelectValue placeholder="All months" />
@@ -155,13 +171,16 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
           </SelectContent>
         </Select>
 
-        {(monthFilter !== ALL || categoryFilter !== ALL) && (
+        {(monthFilter !== ALL ||
+          categoryFilter !== ALL ||
+          searchTerm !== "") && (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
               setMonthFilter(ALL);
               setCategoryFilter(ALL);
+              setSearchTerm("");
             }}
           >
             Clear filters

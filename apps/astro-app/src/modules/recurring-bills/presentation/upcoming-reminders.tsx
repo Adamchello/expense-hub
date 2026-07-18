@@ -29,6 +29,8 @@ export function UpcomingReminders() {
   // Reminders stay quiet unless something is actually coming up.
   if (query.isLoading || query.error || upcoming.length === 0) return null;
 
+  const estimatedTotal = upcoming.reduce((sum, bill) => sum + bill.amount, 0);
+
   return (
     <Card data-e2e="upcoming-reminders">
       <CardHeader>
@@ -38,6 +40,16 @@ export function UpcomingReminders() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        <p className="mb-3 rounded-lg bg-accent/60 px-3 py-2 text-sm">
+          You have{" "}
+          <span className="font-semibold">
+            {upcoming.length} {upcoming.length === 1 ? "bill" : "bills"}
+          </span>{" "}
+          due this week. Estimated:{" "}
+          <span className="font-mono font-semibold">
+            {formatCurrency(estimatedTotal)}
+          </span>
+        </p>
         <ul className="flex flex-col divide-y divide-border">
           {upcoming.map((bill) => {
             const days = daysUntil(today, bill.next_due_date);
