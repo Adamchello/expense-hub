@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BillHistory } from "@/modules/bill-management/presentation/bill-history";
 import { DashboardOverview } from "@/modules/bill-management/presentation/dashboard-overview";
 import { RecurringBills } from "@/modules/recurring-bills/presentation/recurring-bills";
+import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
 import { UpcomingReminders } from "@/modules/recurring-bills/presentation/upcoming-reminders";
 import { useBills } from "@/modules/bill-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
@@ -13,6 +14,7 @@ import { AddBillDialog } from "./add-bill-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/kernel/auth/use-auth";
 import {
+  ChartColumn,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -32,6 +34,7 @@ const NAV_GROUPS = [
       { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { value: "history", label: "History", icon: Receipt },
       { value: "recurring", label: "Recurring", icon: Repeat },
+      { value: "analytics", label: "Analytics", icon: ChartColumn },
     ],
   },
   {
@@ -44,6 +47,7 @@ const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   history: "Bill History",
   recurring: "Recurring Bills",
+  analytics: "Spending Analytics",
   settings: "Settings",
 };
 
@@ -220,6 +224,15 @@ export function DashboardContent() {
             </TabsContent>
             <TabsContent value="recurring" className="mt-0">
               <RecurringBills />
+            </TabsContent>
+            <TabsContent value="analytics" className="mt-0">
+              {query.isLoading ? (
+                <div className="rounded-xl bg-card p-8 text-center ring-1 ring-foreground/10">
+                  <p className="text-muted-foreground">Loading analytics...</p>
+                </div>
+              ) : (
+                <SpendingAnalytics bills={query.data || []} />
+              )}
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <div className="max-w-2xl">
