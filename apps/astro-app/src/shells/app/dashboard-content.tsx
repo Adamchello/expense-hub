@@ -227,6 +227,7 @@ export function DashboardContent() {
                   <DashboardOverview
                     bills={query.data || []}
                     onAddBill={openAddBill}
+                    onViewHistory={() => handleTabChange("history")}
                   />
                 </div>
               )}

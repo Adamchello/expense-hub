@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { SkeletonList } from "@/components/ui/skeleton";
+import { CardActionsMenu } from "@/components/ui/card-actions-menu";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   useLogRecurringBill,
 } from "../core/store";
 import { RecurringBillDialog } from "./recurring-bill-dialog";
-import { CalendarClock, Pencil, Plus, Receipt, Trash2 } from "lucide-react";
+import { Pencil, Plus, Receipt, Trash2 } from "lucide-react";
 
 export function dueLabel(nextDueDate: string, today: string): string {
   const days = daysUntil(today, nextDueDate);
@@ -91,78 +91,75 @@ export function RecurringBills() {
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {recurringBills.map((bill) => {
             const days = daysUntil(today, bill.next_due_date);
             const isDue = days <= 0;
             return (
-              <Card key={bill.id} className="py-0">
-                <CardContent className="flex flex-wrap items-center gap-4 p-4">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                    <CalendarClock className="size-4.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="truncate font-medium">
-                        {bill.provider_name}
-                      </h4>
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                          getCategoryColor(bill.category),
-                        )}
-                      >
-                        {bill.category}
-                      </span>
-                      <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                        {FREQUENCY_LABELS[bill.frequency]}
-                      </span>
-                    </div>
-                    <p
-                      className={cn(
-                        "mt-0.5 text-xs",
-                        isDue
-                          ? "font-medium text-destructive"
-                          : "text-muted-foreground",
-                      )}
-                      data-e2e="recurring-due-label"
-                    >
-                      {dueLabel(bill.next_due_date, today)}
-                    </p>
-                  </div>
-                  <p className="font-mono text-sm font-semibold tracking-tight">
+              <div
+                key={bill.id}
+                className="group rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent/50"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="min-w-0 truncate text-sm font-medium">
+                    {bill.provider_name}
+                  </h4>
+                  <CardActionsMenu
+                    label={`Actions for recurring bill ${bill.provider_name}`}
+                    actions={[
+                      {
+                        label: "Edit",
+                        icon: Pencil,
+                        onClick: () => openEdit(bill),
+                      },
+                      {
+                        label: "Delete",
+                        icon: Trash2,
+                        destructive: true,
+                        onClick: () => setDeleting(bill),
+                      },
+                    ]}
+                  />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                      getCategoryColor(bill.category),
+                    )}
+                  >
+                    {bill.category}
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {FREQUENCY_LABELS[bill.frequency]}
+                  </span>
+                </div>
+                <p
+                  className={cn(
+                    "mt-1 text-xs",
+                    isDue
+                      ? "font-medium text-destructive"
+                      : "text-muted-foreground",
+                  )}
+                  data-e2e="recurring-due-label"
+                >
+                  {dueLabel(bill.next_due_date, today)}
+                </p>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={logMutation.isPending}
+                    onClick={() => logMutation.mutate(bill.id)}
+                  >
+                    <Receipt className="size-3.5" />
+                    Log bill
+                  </Button>
+                  <p className="font-mono text-base font-semibold tracking-tight">
                     {formatCurrency(bill.amount)}
                   </p>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={logMutation.isPending}
-                      onClick={() => logMutation.mutate(bill.id)}
-                    >
-                      <Receipt className="size-3.5" />
-                      Log bill
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={`Edit recurring bill ${bill.provider_name}`}
-                      onClick={() => openEdit(bill)}
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={`Delete recurring bill ${bill.provider_name}`}
-                      className="text-muted-foreground hover:text-destructive"
-                      onClick={() => setDeleting(bill)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>

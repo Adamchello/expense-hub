@@ -7,6 +7,7 @@ import type { Bill } from "../domain/bill";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
   CalendarRange,
   FileSpreadsheet,
   Plus,
@@ -22,11 +23,14 @@ interface DashboardOverviewProps {
   bills: Bill[];
   /** Opens the add-bill dialog on the given tab (used by the empty state). */
   onAddBill?: (tab: "single" | "import") => void;
+  /** Navigates to the full Bill History tab. */
+  onViewHistory?: () => void;
 }
 
 export function DashboardOverview({
   bills,
   onAddBill,
+  onViewHistory,
 }: DashboardOverviewProps) {
   if (bills.length === 0) {
     return (
@@ -53,7 +57,7 @@ export function DashboardOverview({
     );
   }
 
-  const recentBills = bills.slice(0, 5);
+  const recentBills = bills.slice(0, 3);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const currentYear = new Date().toISOString().slice(0, 4);
@@ -125,8 +129,18 @@ export function DashboardOverview({
 
       {/* Recent Bills */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Recent Bills</CardTitle>
+          {bills.length > recentBills.length && (
+            <button
+              type="button"
+              onClick={() => onViewHistory?.()}
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View all {bills.length}
+              <ArrowRight className="size-3.5" />
+            </button>
+          )}
         </CardHeader>
         <CardContent>
           {recentBills.length === 0 ? (
@@ -134,39 +148,34 @@ export function DashboardOverview({
               <p className="text-muted-foreground">No bills yet</p>
             </div>
           ) : (
-            <ul className="flex flex-col divide-y divide-border">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {recentBills.map((bill) => (
-                <li
+                <div
                   key={bill.id}
-                  className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+                  className="rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent/50"
                 >
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                    <Receipt className="size-4.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="truncate text-sm font-medium text-foreground">
-                        {bill.provider_name}
-                      </h4>
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                          getCategoryColor(bill.category),
-                        )}
-                      >
-                        {bill.category}
-                      </span>
-                    </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                  <h4 className="truncate text-sm font-medium">
+                    {bill.provider_name}
+                  </h4>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                        getCategoryColor(bill.category),
+                      )}
+                    >
+                      {bill.category}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
                       {formatDate(bill.date)}
-                    </p>
+                    </span>
                   </div>
-                  <p className="font-mono text-sm font-semibold tracking-tight text-foreground">
+                  <p className="mt-2 text-right font-mono text-base font-semibold tracking-tight">
                     {formatCurrency(bill.amount)}
                   </p>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </CardContent>
       </Card>

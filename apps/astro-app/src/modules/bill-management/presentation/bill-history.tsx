@@ -18,11 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { CardActionsMenu } from "@/components/ui/card-actions-menu";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
@@ -32,14 +28,7 @@ import { useDeleteBill, useBulkDeleteBills } from "../core/store";
 import { createBill } from "../integration/repository";
 import { exportBillsToCsv, exportBillsToExcel } from "../core/export";
 import { EditBillDialog } from "./edit-bill-dialog";
-import {
-  ArrowUpDown,
-  Download,
-  MoreHorizontal,
-  Pencil,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { ArrowUpDown, Download, Pencil, Search, Trash2 } from "lucide-react";
 
 const ALL = "all";
 
@@ -220,40 +209,22 @@ export function BillHistory({ bills }: BillHistoryProps) {
           <h4 className="min-w-0 truncate text-sm font-medium">
             {bill.provider_name}
           </h4>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                aria-label={`Actions for bill from ${bill.provider_name}`}
-                onClick={(e) => e.stopPropagation()}
-                className="shrink-0 rounded-md p-1 text-muted-foreground opacity-100 transition-opacity hover:bg-accent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
-              >
-                <MoreHorizontal className="size-4" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-36 p-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => setEditingBill(bill)}
-              >
-                <Pencil className="size-3.5" />
-                Edit
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10"
-                onClick={() => setDeletingBill(bill)}
-              >
-                <Trash2 className="size-3.5" />
-                Delete
-              </button>
-            </PopoverContent>
-          </Popover>
+          <CardActionsMenu
+            label={`Actions for bill from ${bill.provider_name}`}
+            actions={[
+              {
+                label: "Edit",
+                icon: Pencil,
+                onClick: () => setEditingBill(bill),
+              },
+              {
+                label: "Delete",
+                icon: Trash2,
+                destructive: true,
+                onClick: () => setDeletingBill(bill),
+              },
+            ]}
+          />
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
           <span
