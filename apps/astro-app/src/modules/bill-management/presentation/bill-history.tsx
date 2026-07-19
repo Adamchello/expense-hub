@@ -18,6 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
 import { queryClient } from "@/lib/query-client";
@@ -26,7 +32,14 @@ import { useDeleteBill, useBulkDeleteBills } from "../core/store";
 import { createBill } from "../integration/repository";
 import { exportBillsToCsv, exportBillsToExcel } from "../core/export";
 import { EditBillDialog } from "./edit-bill-dialog";
-import { ArrowUpDown, Download, Pencil, Search, Trash2 } from "lucide-react";
+import {
+  ArrowUpDown,
+  Download,
+  MoreHorizontal,
+  Pencil,
+  Search,
+  Trash2,
+} from "lucide-react";
 
 const ALL = "all";
 
@@ -123,18 +136,6 @@ export function BillHistory({ bills }: BillHistoryProps) {
     });
   };
 
-  const allFilteredSelected =
-    filteredBills.length > 0 &&
-    filteredBills.every((bill) => selectedIds.has(bill.id));
-
-  const toggleSelectAll = () => {
-    setSelectedIds(
-      allFilteredSelected
-        ? new Set()
-        : new Set(filteredBills.map((bill) => bill.id)),
-    );
-  };
-
   // Undo re-creates the deleted bills from their client-side snapshots.
   const restoreBills = async (removed: Bill[]) => {
     try {
@@ -191,64 +192,92 @@ export function BillHistory({ bills }: BillHistoryProps) {
     );
   }
 
-  const renderBillRow = (bill: Bill) => (
-    <div
-      key={bill.id}
-      className="group rounded-lg border border-border bg-card p-4 hover:bg-accent/50 transition-colors"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-1 items-start gap-3">
-          <input
-            type="checkbox"
-            aria-label={`Select bill from ${bill.provider_name}`}
-            checked={selectedIds.has(bill.id)}
-            onChange={() => toggleSelected(bill.id)}
-            className="mt-1 size-4 shrink-0 accent-primary"
-          />
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-medium">{bill.provider_name}</h4>
-              <span
-                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClassFor(bill.category)}`}
+  // Clicking a card toggles selection; row actions live in the ⋯ menu.
+  const renderBillCard = (bill: Bill) => {
+    const isSelected = selectedIds.has(bill.id);
+    return (
+      <div
+        key={bill.id}
+        role="button"
+        tabIndex={0}
+        aria-pressed={isSelected}
+        aria-label={`Select bill from ${bill.provider_name}`}
+        onClick={() => toggleSelected(bill.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleSelected(bill.id);
+          }
+        }}
+        className={cn(
+          "group relative cursor-pointer rounded-lg border p-3 transition-colors",
+          isSelected
+            ? "border-primary/50 bg-primary/10 ring-1 ring-primary/50"
+            : "border-border bg-card hover:bg-accent/50",
+        )}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <h4 className="min-w-0 truncate text-sm font-medium">
+            {bill.provider_name}
+          </h4>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label={`Actions for bill from ${bill.provider_name}`}
+                onClick={(e) => e.stopPropagation()}
+                className="shrink-0 rounded-md p-1 text-muted-foreground opacity-100 transition-opacity hover:bg-accent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
               >
-                {bill.category}
-              </span>
-              {!isGroupedByDate && (
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(bill.date)}
-                </span>
-              )}
-            </div>
-            {bill.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {bill.description}
-              </p>
-            )}
-          </div>
+                <MoreHorizontal className="size-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-36 p-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                onClick={() => setEditingBill(bill)}
+              >
+                <Pencil className="size-3.5" />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10"
+                onClick={() => setDeletingBill(bill)}
+              >
+                <Trash2 className="size-3.5" />
+                Delete
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
-        <div className="flex items-center gap-1">
-          <p className="text-lg font-semibold">{formatCurrency(bill.amount)}</p>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Edit bill from ${bill.provider_name}`}
-            onClick={() => setEditingBill(bill)}
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span
+            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${badgeClassFor(bill.category)}`}
           >
-            <Pencil className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Delete bill from ${bill.provider_name}`}
-            className="text-muted-foreground hover:text-destructive"
-            onClick={() => setDeletingBill(bill)}
-          >
-            <Trash2 className="size-4" />
-          </Button>
+            {bill.category}
+          </span>
+          {!isGroupedByDate && (
+            <span className="text-[11px] text-muted-foreground">
+              {formatDate(bill.date)}
+            </span>
+          )}
         </div>
+        {bill.description && (
+          <p className="mt-1 truncate text-xs text-muted-foreground">
+            {bill.description}
+          </p>
+        )}
+        <p className="mt-2 text-right font-mono text-base font-semibold tracking-tight">
+          {formatCurrency(bill.amount)}
+        </p>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -353,39 +382,27 @@ export function BillHistory({ bills }: BillHistoryProps) {
         </div>
       </div>
 
-      {/* Selection toolbar */}
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <label className="flex items-center gap-2 text-muted-foreground">
-          <input
-            type="checkbox"
-            aria-label="Select all shown bills"
-            checked={allFilteredSelected}
-            onChange={toggleSelectAll}
-            className="size-4 accent-primary"
-          />
-          Select all shown
-        </label>
-        {selectedIds.size > 0 && (
-          <>
-            <span className="font-medium">{selectedIds.size} selected</span>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsBulkConfirmOpen(true)}
-            >
-              <Trash2 className="size-3.5" />
-              Delete selected
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedIds(new Set())}
-            >
-              Clear selection
-            </Button>
-          </>
-        )}
-      </div>
+      {/* Selection toolbar — appears once cards are selected by clicking them */}
+      {selectedIds.size > 0 && (
+        <div className="sticky top-16 z-20 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card/95 px-3 py-2 text-sm shadow-sm backdrop-blur">
+          <span className="font-medium">{selectedIds.size} selected</span>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsBulkConfirmOpen(true)}
+          >
+            <Trash2 className="size-3.5" />
+            Delete selected
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Clear selection
+          </Button>
+        </div>
+      )}
 
       {filteredBills.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
@@ -407,14 +424,16 @@ export function BillHistory({ bills }: BillHistoryProps) {
                   {groupedBills[date].length === 1 ? "bill" : "bills"}
                 </span>
               </div>
-              <div className="space-y-2">
-                {groupedBills[date].map(renderBillRow)}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {groupedBills[date].map(renderBillCard)}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="space-y-2">{filteredBills.map(renderBillRow)}</div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredBills.map(renderBillCard)}
+        </div>
       )}
 
       <EditBillDialog

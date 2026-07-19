@@ -151,8 +151,8 @@ export function DashboardContent() {
       orientation="vertical"
       className="flex min-h-screen w-full flex-row gap-0 bg-background"
     >
-      {/* Desktop sidebar */}
-      <aside className="hidden min-h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
+      {/* Desktop sidebar — pinned to the viewport, scrolls internally if needed */}
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar lg:flex">
         {sidebarContent}
       </aside>
 
