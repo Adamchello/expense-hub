@@ -1,6 +1,6 @@
 "use client";
 
-import { getCategoryColor } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { formatCurrency, formatDate } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { Bill } from "../domain/bill";
@@ -57,7 +57,8 @@ export function DashboardOverview({
     );
   }
 
-  const recentBills = bills.slice(0, 3);
+  const { washClassFor, textClassFor } = useCategoryOptions();
+  const recentBills = bills.slice(0, 4);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const currentYear = new Date().toISOString().slice(0, 4);
@@ -148,30 +149,33 @@ export function DashboardOverview({
               <p className="text-muted-foreground">No bills yet</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {recentBills.map((bill) => (
                 <div
                   key={bill.id}
-                  className="rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent/50"
+                  className={cn(
+                    "rounded-lg border p-3 transition-opacity hover:opacity-90",
+                    washClassFor(bill.category),
+                  )}
                 >
-                  <h4 className="truncate text-sm font-medium">
-                    {bill.provider_name}
-                  </h4>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    <span
-                      className={cn(
-                        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
-                        getCategoryColor(bill.category),
-                      )}
-                    >
-                      {bill.category}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {formatDate(bill.date)}
-                    </span>
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h4 className="min-w-0 truncate text-sm font-semibold">
+                      {bill.provider_name}
+                    </h4>
+                    <p className="shrink-0 font-mono text-sm font-semibold tracking-tight">
+                      {formatCurrency(bill.amount)}
+                    </p>
                   </div>
-                  <p className="mt-2 text-right font-mono text-base font-semibold tracking-tight">
-                    {formatCurrency(bill.amount)}
+                  <p
+                    className={cn(
+                      "mt-1 text-[11px] font-semibold",
+                      textClassFor(bill.category),
+                    )}
+                  >
+                    {bill.category}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    {formatDate(bill.date)}
                   </p>
                 </div>
               ))}

@@ -69,7 +69,7 @@ export function BillHistory({ bills }: BillHistoryProps) {
   const [deletingBill, setDeletingBill] = useState<Bill | null>(null);
   const [isBulkConfirmOpen, setIsBulkConfirmOpen] = useState(false);
 
-  const { badgeClassFor } = useCategoryOptions();
+  const { washClassFor, textClassFor } = useCategoryOptions();
   const deleteMutation = useDeleteBill();
   const bulkDeleteMutation = useBulkDeleteBills();
 
@@ -199,16 +199,18 @@ export function BillHistory({ bills }: BillHistoryProps) {
           }
         }}
         className={cn(
-          "group relative cursor-pointer rounded-lg border p-3 transition-colors",
-          isSelected
-            ? "border-primary/50 bg-primary/10 ring-1 ring-primary/50"
-            : "border-border bg-card hover:bg-accent/50",
+          "group relative cursor-pointer rounded-lg border p-3 transition-all hover:opacity-90",
+          washClassFor(bill.category),
+          isSelected && "ring-2 ring-primary",
         )}
       >
         <div className="flex items-start justify-between gap-2">
-          <h4 className="min-w-0 truncate text-sm font-medium">
+          <h4 className="min-w-0 flex-1 truncate text-sm font-semibold">
             {bill.provider_name}
           </h4>
+          <p className="shrink-0 font-mono text-sm font-semibold tracking-tight">
+            {formatCurrency(bill.amount)}
+          </p>
           <CardActionsMenu
             label={`Actions for bill from ${bill.provider_name}`}
             actions={[
@@ -226,26 +228,24 @@ export function BillHistory({ bills }: BillHistoryProps) {
             ]}
           />
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span
-            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${badgeClassFor(bill.category)}`}
-          >
-            {bill.category}
-          </span>
-          {!isGroupedByDate && (
-            <span className="text-[11px] text-muted-foreground">
-              {formatDate(bill.date)}
-            </span>
+        <p
+          className={cn(
+            "mt-1 text-[11px] font-semibold",
+            textClassFor(bill.category),
           )}
-        </div>
+        >
+          {bill.category}
+        </p>
+        {!isGroupedByDate && (
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {formatDate(bill.date)}
+          </p>
+        )}
         {bill.description && (
-          <p className="mt-1 truncate text-xs text-muted-foreground">
+          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
             {bill.description}
           </p>
         )}
-        <p className="mt-2 text-right font-mono text-base font-semibold tracking-tight">
-          {formatCurrency(bill.amount)}
-        </p>
       </div>
     );
   };

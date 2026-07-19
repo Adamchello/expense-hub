@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getCategoryColor } from "@/shared/configuration/category";
+import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { formatCurrency, formatDate } from "@/shared/format";
 import { FREQUENCY_LABELS, daysUntil } from "@/shared/domain/recurrence";
 import { cn } from "@/lib/utils";
@@ -41,6 +41,7 @@ export function RecurringBills() {
   const query = useRecurringBills();
   const deleteMutation = useDeleteRecurringBill();
   const logMutation = useLogRecurringBill();
+  const { washClassFor, textClassFor } = useCategoryOptions();
 
   const today = new Date().toISOString().slice(0, 10);
   const recurringBills = query.data ?? [];
@@ -98,12 +99,18 @@ export function RecurringBills() {
             return (
               <div
                 key={bill.id}
-                className="group rounded-lg border border-border bg-card p-3 transition-colors hover:bg-accent/50"
+                className={cn(
+                  "group rounded-lg border p-3 transition-opacity hover:opacity-90",
+                  washClassFor(bill.category),
+                )}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="min-w-0 truncate text-sm font-medium">
+                  <h4 className="min-w-0 flex-1 truncate text-sm font-semibold">
                     {bill.provider_name}
                   </h4>
+                  <p className="shrink-0 font-mono text-sm font-semibold tracking-tight">
+                    {formatCurrency(bill.amount)}
+                  </p>
                   <CardActionsMenu
                     label={`Actions for recurring bill ${bill.provider_name}`}
                     actions={[
@@ -121,31 +128,30 @@ export function RecurringBills() {
                     ]}
                   />
                 </div>
-                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  <span
-                    className={cn(
-                      "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
-                      getCategoryColor(bill.category),
-                    )}
-                  >
-                    {bill.category}
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {FREQUENCY_LABELS[bill.frequency]}
-                  </span>
-                </div>
                 <p
                   className={cn(
-                    "mt-1 text-xs",
+                    "mt-1 text-[11px] font-semibold",
+                    textClassFor(bill.category),
+                  )}
+                >
+                  {bill.category}
+                  <span className="font-medium text-muted-foreground">
+                    {" "}
+                    · {FREQUENCY_LABELS[bill.frequency]}
+                  </span>
+                </p>
+                <p
+                  className={cn(
+                    "mt-0.5 text-[11px]",
                     isDue
-                      ? "font-medium text-destructive"
+                      ? "font-semibold text-destructive"
                       : "text-muted-foreground",
                   )}
                   data-e2e="recurring-due-label"
                 >
                   {dueLabel(bill.next_due_date, today)}
                 </p>
-                <div className="mt-2 flex items-center justify-between gap-2">
+                <div className="mt-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -155,9 +161,6 @@ export function RecurringBills() {
                     <Receipt className="size-3.5" />
                     Log bill
                   </Button>
-                  <p className="font-mono text-base font-semibold tracking-tight">
-                    {formatCurrency(bill.amount)}
-                  </p>
                 </div>
               </div>
             );

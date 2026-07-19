@@ -41,6 +41,74 @@ export const CATEGORY_COLORS: Record<Category, string> = {
 export const getCategoryColor = (category: string): string =>
   CATEGORY_COLORS[category as Category] ?? DEFAULT_CATEGORY_COLOR;
 
+// ── Tinted-card treatment: full-card wash + colored label text ──────────────
+
+export const DEFAULT_CATEGORY_WASH = "bg-gray-500/10 border-gray-500/25";
+
+/** Card background/border wash per built-in category. */
+export const CATEGORY_WASH: Record<Category, string> = {
+  Rent: "bg-purple-500/10 border-purple-500/25",
+  Electricity: "bg-yellow-500/10 border-yellow-500/25",
+  Water: "bg-blue-500/10 border-blue-500/25",
+  Internet: "bg-cyan-500/10 border-cyan-500/25",
+  Groceries: "bg-green-500/10 border-green-500/25",
+  Fuel: "bg-orange-500/10 border-orange-500/25",
+  Insurance: "bg-indigo-500/10 border-indigo-500/25",
+  Medical: "bg-red-500/10 border-red-500/25",
+  Streaming: "bg-pink-500/10 border-pink-500/25",
+  Dining: "bg-amber-500/10 border-amber-500/25",
+  Entertainment: "bg-teal-500/10 border-teal-500/25",
+  Uncategorized: DEFAULT_CATEGORY_WASH,
+};
+
+export const PRESET_COLOR_WASH: Record<string, string> = {
+  gray: DEFAULT_CATEGORY_WASH,
+  red: "bg-red-500/10 border-red-500/25",
+  orange: "bg-orange-500/10 border-orange-500/25",
+  amber: "bg-amber-500/10 border-amber-500/25",
+  yellow: "bg-yellow-500/10 border-yellow-500/25",
+  green: "bg-green-500/10 border-green-500/25",
+  teal: "bg-teal-500/10 border-teal-500/25",
+  cyan: "bg-cyan-500/10 border-cyan-500/25",
+  blue: "bg-blue-500/10 border-blue-500/25",
+  indigo: "bg-indigo-500/10 border-indigo-500/25",
+  purple: "bg-purple-500/10 border-purple-500/25",
+  pink: "bg-pink-500/10 border-pink-500/25",
+};
+
+export const DEFAULT_CATEGORY_TEXT = "text-gray-600 dark:text-gray-400";
+
+/** Colored label text per built-in category. */
+export const CATEGORY_TEXT: Record<Category, string> = {
+  Rent: "text-purple-600 dark:text-purple-400",
+  Electricity: "text-yellow-600 dark:text-yellow-400",
+  Water: "text-blue-600 dark:text-blue-400",
+  Internet: "text-cyan-600 dark:text-cyan-400",
+  Groceries: "text-green-600 dark:text-green-400",
+  Fuel: "text-orange-600 dark:text-orange-400",
+  Insurance: "text-indigo-600 dark:text-indigo-400",
+  Medical: "text-red-600 dark:text-red-400",
+  Streaming: "text-pink-600 dark:text-pink-400",
+  Dining: "text-amber-600 dark:text-amber-400",
+  Entertainment: "text-teal-600 dark:text-teal-400",
+  Uncategorized: DEFAULT_CATEGORY_TEXT,
+};
+
+export const PRESET_COLOR_TEXT: Record<string, string> = {
+  gray: DEFAULT_CATEGORY_TEXT,
+  red: "text-red-600 dark:text-red-400",
+  orange: "text-orange-600 dark:text-orange-400",
+  amber: "text-amber-600 dark:text-amber-400",
+  yellow: "text-yellow-600 dark:text-yellow-400",
+  green: "text-green-600 dark:text-green-400",
+  teal: "text-teal-600 dark:text-teal-400",
+  cyan: "text-cyan-600 dark:text-cyan-400",
+  blue: "text-blue-600 dark:text-blue-400",
+  indigo: "text-indigo-600 dark:text-indigo-400",
+  purple: "text-purple-600 dark:text-purple-400",
+  pink: "text-pink-600 dark:text-pink-400",
+};
+
 /** Badge classes for each custom-category color preset. */
 export const PRESET_COLOR_CLASSES: Record<string, string> = {
   gray: DEFAULT_CATEGORY_COLOR,
