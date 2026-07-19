@@ -19,6 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CardActionsMenu } from "@/components/ui/card-actions-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
@@ -98,19 +103,20 @@ export function BillHistory({ bills }: BillHistoryProps) {
       .sort(SORT_COMPARATORS[sortOrder]);
   }, [bills, monthFilter, categoryFilter, searchTerm, sortOrder]);
 
-  const isGroupedByDate = sortOrder === "date-desc" || sortOrder === "date-asc";
+  const isGroupedByMonth =
+    sortOrder === "date-desc" || sortOrder === "date-asc";
 
   const groupedBills = useMemo(() => {
     const groups: Record<string, Bill[]> = {};
     filteredBills.forEach((bill) => {
-      (groups[bill.date] ??= []).push(bill);
+      (groups[bill.date.slice(0, 7)] ??= []).push(bill);
     });
     return groups;
   }, [filteredBills]);
 
-  const sortedDates = useMemo(() => {
-    const dates = Object.keys(groupedBills);
-    return sortOrder === "date-asc" ? dates.sort() : dates.sort().reverse();
+  const sortedMonths = useMemo(() => {
+    const months = Object.keys(groupedBills);
+    return sortOrder === "date-asc" ? months.sort() : months.sort().reverse();
   }, [groupedBills, sortOrder]);
 
   const toggleSelected = (id: string) => {
@@ -236,11 +242,9 @@ export function BillHistory({ bills }: BillHistoryProps) {
         >
           {bill.category}
         </p>
-        {!isGroupedByDate && (
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {formatDate(bill.date)}
-          </p>
-        )}
+        <p className="mt-0.5 text-[11px] text-muted-foreground">
+          {formatDate(bill.date)}
+        </p>
         {bill.description && (
           <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
             {bill.description}
@@ -327,29 +331,39 @@ export function BillHistory({ bills }: BillHistoryProps) {
             Clear filters
           </Button>
         )}
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              exportBillsToCsv(bills);
-              toast("Exported bills as CSV");
-            }}
-          >
-            <Download className="size-3.5" />
-            CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              exportBillsToExcel(bills);
-              toast("Exported bills as Excel");
-            }}
-          >
-            <Download className="size-3.5" />
-            Excel
-          </Button>
+        <div className="ml-auto">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="size-3.5" />
+                Export
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-40 p-1">
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                onClick={() => {
+                  exportBillsToCsv(bills);
+                  toast("Exported bills as CSV");
+                }}
+              >
+                <Download className="size-3.5" />
+                CSV
+              </button>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                onClick={() => {
+                  exportBillsToExcel(bills);
+                  toast("Exported bills as Excel");
+                }}
+              >
+                <Download className="size-3.5" />
+                Excel
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -381,22 +395,22 @@ export function BillHistory({ bills }: BillHistoryProps) {
             No bills match the selected filters.
           </p>
         </div>
-      ) : isGroupedByDate ? (
+      ) : isGroupedByMonth ? (
         <div className="space-y-6">
-          {sortedDates.map((date) => (
-            <div key={date} className="space-y-3">
+          {sortedMonths.map((month) => (
+            <div key={month} className="space-y-3">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-medium text-muted-foreground">
-                  {formatDate(date)}
+                  {formatMonth(month)}
                 </h3>
                 <Separator className="flex-1" />
                 <span className="text-xs text-muted-foreground">
-                  {groupedBills[date].length}{" "}
-                  {groupedBills[date].length === 1 ? "bill" : "bills"}
+                  {groupedBills[month].length}{" "}
+                  {groupedBills[month].length === 1 ? "bill" : "bills"}
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {groupedBills[date].map(renderBillCard)}
+                {groupedBills[month].map(renderBillCard)}
               </div>
             </div>
           ))}

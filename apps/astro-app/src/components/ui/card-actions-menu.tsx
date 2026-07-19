@@ -22,8 +22,9 @@ interface CardActionsMenuProps {
 }
 
 /**
- * The ⋯ menu used by card grids: hidden until the card is hovered on
- * pointer devices, always visible on touch. Clicks never bubble to the card.
+ * The ⋯ menu used by card grids. On pointer devices the trigger takes no
+ * space until the card is hovered (content shifts left to reveal it); on
+ * touch it is always visible. Clicks never bubble to the card.
  */
 export function CardActionsMenu({ label, actions }: CardActionsMenuProps) {
   return (
@@ -33,7 +34,7 @@ export function CardActionsMenu({ label, actions }: CardActionsMenuProps) {
           type="button"
           aria-label={label}
           onClick={(e) => e.stopPropagation()}
-          className="shrink-0 rounded-md p-1 text-muted-foreground opacity-100 transition-opacity hover:bg-accent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+          className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground sm:hidden sm:group-hover:block sm:group-focus-within:block sm:data-[state=open]:block"
         >
           <MoreHorizontal className="size-4" />
         </button>

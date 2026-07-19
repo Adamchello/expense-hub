@@ -7,9 +7,6 @@ import {
   createRecurringBill,
   updateRecurringBill,
   deleteRecurringBill,
-  logRecurringBill,
-  skipRecurringBill,
-  getRecurringEvents,
 } from "../integration/repository";
 
 const invalidateRecurring = () => {
@@ -20,7 +17,14 @@ export function useRecurringBills(options?: { enabled?: boolean }) {
   return useQuery(
     {
       queryKey: ["recurring-bills"],
-      queryFn: ({ signal }) => getRecurringBills(signal),
+      queryFn: async ({ signal }) => {
+        const result = await getRecurringBills(signal);
+        // The server may have auto-logged due occurrences as real bills.
+        if (result.materialized > 0) {
+          queryClient.invalidateQueries({ queryKey: ["bills"] });
+        }
+        return result.bills;
+      },
       enabled: options?.enabled,
     },
     queryClient,
@@ -63,45 +67,6 @@ export function useDeleteRecurringBill() {
         invalidateRecurring();
         toast("Recurring bill deleted");
       },
-    },
-    queryClient,
-  );
-}
-
-export function useLogRecurringBill() {
-  return useMutation(
-    {
-      mutationFn: (id: string) => logRecurringBill(id),
-      onSuccess: () => {
-        invalidateRecurring();
-        queryClient.invalidateQueries({ queryKey: ["bills"] });
-        queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
-        toast("Bill logged to history");
-      },
-    },
-    queryClient,
-  );
-}
-
-export function useSkipRecurringBill() {
-  return useMutation(
-    {
-      mutationFn: (id: string) => skipRecurringBill(id),
-      onSuccess: () => {
-        invalidateRecurring();
-        queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
-        toast("Occurrence skipped");
-      },
-    },
-    queryClient,
-  );
-}
-
-export function useRecurringEvents(from: string, to: string) {
-  return useQuery(
-    {
-      queryKey: ["recurring-events", from, to],
-      queryFn: ({ signal }) => getRecurringEvents(from, to, signal),
     },
     queryClient,
   );

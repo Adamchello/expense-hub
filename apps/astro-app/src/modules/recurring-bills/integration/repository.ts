@@ -12,13 +12,22 @@ const toPayload = (formData: RecurringBillFormData) => ({
   nextDueDate: formData.nextDueDate,
 });
 
+export interface RecurringBillsResult {
+  bills: RecurringBill[];
+  /** How many due occurrences the server just auto-logged as bills. */
+  materialized: number;
+}
+
 export const getRecurringBills = async (
   signal?: AbortSignal,
-): Promise<RecurringBill[]> => {
+): Promise<RecurringBillsResult> => {
   const response = await fetch("/api/recurring", { signal });
   if (!response.ok) throw new Error("Failed to fetch recurring bills");
   const data = await response.json();
-  return data.data || [];
+  return {
+    bills: data.data?.bills || [],
+    materialized: data.data?.materialized ?? 0,
+  };
 };
 
 export const createRecurringBill = async (
@@ -63,37 +72,4 @@ export const deleteRecurringBill = async (id: string, signal?: AbortSignal) => {
   if (!response.ok)
     throw new Error(data.error || "Failed to delete recurring bill");
   return data;
-};
-
-export const logRecurringBill = async (id: string, signal?: AbortSignal) => {
-  const response = await fetch(`/api/recurring/${id}/log`, {
-    method: "POST",
-    signal,
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to log bill");
-  return data;
-};
-
-export const skipRecurringBill = async (id: string, signal?: AbortSignal) => {
-  const response = await fetch(`/api/recurring/${id}/skip`, {
-    method: "POST",
-    signal,
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to skip bill");
-  return data;
-};
-
-export const getRecurringEvents = async (
-  from: string,
-  to: string,
-  signal?: AbortSignal,
-): Promise<import("../domain/recurring-bill").RecurringBillEvent[]> => {
-  const response = await fetch(`/api/recurring/events?from=${from}&to=${to}`, {
-    signal,
-  });
-  if (!response.ok) throw new Error("Failed to fetch occurrence events");
-  const data = await response.json();
-  return data.data || [];
 };

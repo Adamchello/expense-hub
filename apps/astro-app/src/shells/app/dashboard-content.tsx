@@ -9,7 +9,8 @@ import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spe
 import { BillPlanning } from "@/modules/bill-planning/presentation/bill-planning";
 import { CategoriesSection } from "@/modules/category-management/presentation/categories-section";
 import { MerchantsSection } from "@/modules/merchant-management/presentation/merchants-section";
-import { UpcomingReminders } from "@/modules/recurring-bills/presentation/upcoming-reminders";
+import { IncomingPayments } from "@/modules/bill-planning/presentation/incoming-payments";
+import { TopCategoriesCard } from "@/modules/spending-analytics/presentation/top-categories-card";
 import { useBills } from "@/modules/bill-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
 import { ProfilesSection } from "@/modules/multi-profile-account/presentation/profiles-section";
@@ -223,12 +224,17 @@ export function DashboardContent() {
                 <SkeletonList rows={4} />
               ) : (
                 <div className="flex flex-col gap-6">
-                  <UpcomingReminders />
                   <DashboardOverview
                     bills={query.data || []}
                     onAddBill={openAddBill}
                     onViewHistory={() => handleTabChange("history")}
                   />
+                  {(query.data?.length ?? 0) > 0 && (
+                    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                      <IncomingPayments />
+                      <TopCategoriesCard bills={query.data || []} />
+                    </div>
+                  )}
                 </div>
               )}
             </TabsContent>

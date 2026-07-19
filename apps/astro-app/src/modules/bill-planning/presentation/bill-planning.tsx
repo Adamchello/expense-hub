@@ -3,8 +3,6 @@
 import { SkeletonList } from "@/components/ui/skeleton";
 import { useRecurringBills } from "@/modules/recurring-bills/core/store";
 import { BillCalendar } from "./bill-calendar";
-import { CashflowTimeline } from "./cashflow-timeline";
-import { MonthlyChecklist } from "./monthly-checklist";
 import { UpcomingMonth } from "./upcoming-month";
 
 export function BillPlanning() {
@@ -33,7 +31,7 @@ export function BillPlanning() {
       <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
         <p className="text-muted-foreground">
           Planning is built from your recurring bills. Add recurring bills to
-          see the calendar, expected totals, and cash flow timeline.
+          see the calendar and expected monthly totals.
         </p>
       </div>
     );
@@ -41,12 +39,8 @@ export function BillPlanning() {
 
   return (
     <div className="flex flex-col gap-6">
-      <MonthlyChecklist recurringBills={recurringBills} />
       <BillCalendar recurringBills={recurringBills} />
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <UpcomingMonth recurringBills={recurringBills} />
-        <CashflowTimeline recurringBills={recurringBills} />
-      </div>
+      <UpcomingMonth recurringBills={recurringBills} />
     </div>
   );
 }
