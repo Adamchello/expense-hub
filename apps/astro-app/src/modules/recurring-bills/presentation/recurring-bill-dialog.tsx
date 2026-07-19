@@ -17,13 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
+import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
 import type { Category } from "@/shared/domain/category";
 import {
   FREQUENCIES,
   FREQUENCY_LABELS,
   type Frequency,
 } from "@/shared/domain/recurrence";
+import { cn } from "@/lib/utils";
 import type { RecurringBill } from "../domain/recurring-bill";
 import { useCreateRecurringBill, useUpdateRecurringBill } from "../core/store";
 
@@ -44,7 +45,7 @@ export function RecurringBillDialog({
   const [amount, setAmount] = useState("");
   const [providerName, setProviderName] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<string>("Uncategorized");
+  const [category, setCategory] = useState<string | undefined>(undefined);
   const [frequency, setFrequency] = useState<Frequency>("monthly");
   const [nextDueDate, setNextDueDate] = useState(todayIso);
 
@@ -57,7 +58,7 @@ export function RecurringBillDialog({
       setAmount(editing ? String(editing.amount) : "");
       setProviderName(editing?.provider_name ?? "");
       setDescription(editing?.description ?? "");
-      setCategory(editing?.category ?? "Uncategorized");
+      setCategory(editing?.category ?? undefined);
       setFrequency(editing?.frequency ?? "monthly");
       setNextDueDate(editing?.next_due_date ?? todayIso());
       createMutation.reset();
@@ -65,11 +66,6 @@ export function RecurringBillDialog({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing]);
-
-  const { flat: allCategories } = useCategoryOptions();
-  const categoryOptions = allCategories.includes(category)
-    ? allCategories
-    : [category, ...allCategories];
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -82,7 +78,7 @@ export function RecurringBillDialog({
       amount: amountNum,
       providerName: providerName.trim(),
       description: description.trim() || null,
-      category: category as Category,
+      category: (category ?? "Uncategorized") as Category,
       frequency,
       nextDueDate,
     };
@@ -96,6 +92,17 @@ export function RecurringBillDialog({
     }
   };
 
+  const isFormValid = amount && providerName.trim() && nextDueDate;
+
+  // Mirror the add-bill hero: scale the amount down as it grows.
+  const amountLength = Math.max(amount.length, 4);
+  const amountSizeClass =
+    amountLength <= 7
+      ? "text-5xl"
+      : amountLength <= 10
+        ? "text-4xl"
+        : "text-3xl";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -104,7 +111,7 @@ export function RecurringBillDialog({
             {editing ? "Edit Recurring Bill" : "New Recurring Bill"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
           {mutation.error != null && (
             <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
               <p className="text-sm text-destructive">
@@ -114,6 +121,51 @@ export function RecurringBillDialog({
               </p>
             </div>
           )}
+
+          {/* Hero amount */}
+          <div className="flex flex-col items-center gap-1 pt-2">
+            <label
+              htmlFor="recurring-amount"
+              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+            >
+              How much each time?
+            </label>
+            <div className="flex w-full min-w-0 items-baseline justify-center">
+              <span
+                className={cn(
+                  "shrink-0 font-mono font-semibold text-muted-foreground",
+                  amountLength <= 7 ? "text-3xl" : "text-2xl",
+                )}
+              >
+                $
+              </span>
+              <input
+                id="recurring-amount"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                autoFocus
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                style={{ width: `${amountLength + 1}ch` }}
+                className={cn(
+                  "max-w-full border-none bg-transparent text-center font-mono font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                  amountSizeClass,
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Category — same picker as the add-bill form */}
+          <div className="flex flex-col gap-1.5">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              What is it for?
+            </p>
+            <CategoryPickerPopover value={category} onSelect={setCategory} />
+          </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="recurring-provider" className="text-sm font-medium">
@@ -130,22 +182,6 @@ export function RecurringBillDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="recurring-amount" className="text-sm font-medium">
-                Amount
-              </label>
-              <Input
-                id="recurring-amount"
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
-            </div>
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="recurring-frequency"
@@ -164,29 +200,6 @@ export function RecurringBillDialog({
                   {FREQUENCIES.map((option) => (
                     <SelectItem key={option} value={option}>
                       {FREQUENCY_LABELS[option]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="recurring-category"
-                className="text-sm font-medium"
-              >
-                Category
-              </label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger id="recurring-category" className="w-full">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -227,7 +240,7 @@ export function RecurringBillDialog({
             />
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2">
             <Button
               type="button"
               variant="ghost"
@@ -238,8 +251,9 @@ export function RecurringBillDialog({
             </Button>
             <Button
               type="submit"
+              size="lg"
               className="flex-1"
-              disabled={mutation.isPending}
+              disabled={!isFormValid || mutation.isPending}
             >
               {mutation.isPending
                 ? "Saving..."

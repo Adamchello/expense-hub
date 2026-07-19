@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 import type { RecurringBillFormData } from "../domain/recurring-bill";
 import {
   getRecurringBills,
@@ -31,7 +32,10 @@ export function useCreateRecurringBill() {
     {
       mutationFn: (formData: RecurringBillFormData) =>
         createRecurringBill(formData),
-      onSuccess: invalidateRecurring,
+      onSuccess: () => {
+        invalidateRecurring();
+        toast("Recurring bill created");
+      },
     },
     queryClient,
   );
@@ -42,7 +46,10 @@ export function useUpdateRecurringBill() {
     {
       mutationFn: (input: { id: string; formData: RecurringBillFormData }) =>
         updateRecurringBill(input.id, input.formData),
-      onSuccess: invalidateRecurring,
+      onSuccess: () => {
+        invalidateRecurring();
+        toast("Recurring bill updated");
+      },
     },
     queryClient,
   );
@@ -52,7 +59,10 @@ export function useDeleteRecurringBill() {
   return useMutation(
     {
       mutationFn: (id: string) => deleteRecurringBill(id),
-      onSuccess: invalidateRecurring,
+      onSuccess: () => {
+        invalidateRecurring();
+        toast("Recurring bill deleted");
+      },
     },
     queryClient,
   );
@@ -66,6 +76,7 @@ export function useLogRecurringBill() {
         invalidateRecurring();
         queryClient.invalidateQueries({ queryKey: ["bills"] });
         queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
+        toast("Bill logged to history");
       },
     },
     queryClient,
@@ -79,6 +90,7 @@ export function useSkipRecurringBill() {
       onSuccess: () => {
         invalidateRecurring();
         queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
+        toast("Occurrence skipped");
       },
     },
     queryClient,

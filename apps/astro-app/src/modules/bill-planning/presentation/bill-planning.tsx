@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonList } from "@/components/ui/skeleton";
 import { useRecurringBills } from "@/modules/recurring-bills/core/store";
 import { BillCalendar } from "./bill-calendar";
 import { CashflowTimeline } from "./cashflow-timeline";
@@ -10,11 +11,7 @@ export function BillPlanning() {
   const query = useRecurringBills();
 
   if (query.isLoading) {
-    return (
-      <div className="rounded-lg border border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">Loading planning view...</p>
-      </div>
-    );
+    return <SkeletonList rows={4} />;
   }
 
   if (query.error) {

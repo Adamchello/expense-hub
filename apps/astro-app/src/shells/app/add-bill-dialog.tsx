@@ -15,14 +15,20 @@ import { cn } from "@/lib/utils";
 interface AddBillDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Tab the dialog opens on; resets when closed. */
+  initialTab?: "single" | "import";
 }
 
-export function AddBillDialog({ open, onOpenChange }: AddBillDialogProps) {
-  const [tab, setTab] = useState("single");
+export function AddBillDialog({
+  open,
+  onOpenChange,
+  initialTab = "single",
+}: AddBillDialogProps) {
+  const [tab, setTab] = useState<string>(initialTab);
 
   useEffect(() => {
-    if (!open) setTab("single");
-  }, [open]);
+    if (open) setTab(initialTab);
+  }, [open, initialTab]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

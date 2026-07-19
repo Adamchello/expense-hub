@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 import type { BillFormData } from "../integration/repository";
 import {
   getBills,
@@ -40,6 +41,7 @@ export function useUpdateBill() {
         updateBill(input.id, input.formData),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["bills"] });
+        toast("Bill updated");
       },
     },
     queryClient,

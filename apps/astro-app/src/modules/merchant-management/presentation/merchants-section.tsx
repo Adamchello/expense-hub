@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/shared/format";
 import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 import { useBills } from "@/modules/bill-management/core/store";
 import { Check, Pencil, X } from "lucide-react";
 
@@ -34,10 +35,14 @@ export function MerchantsSection() {
   const mutation = useMutation(
     {
       mutationFn: renameMerchant,
-      onSuccess: () => {
+      onSuccess: (data, input) => {
         queryClient.invalidateQueries({ queryKey: ["bills"] });
         queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
         setEditing(null);
+        const updated =
+          (data?.data?.bills_updated ?? 0) +
+          (data?.data?.recurring_updated ?? 0);
+        toast(`Renamed to "${input.to}" across ${updated} records`);
       },
     },
     queryClient,

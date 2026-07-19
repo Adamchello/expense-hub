@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SkeletonList } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -63,8 +64,7 @@ export function RecurringBills() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Recurring Bills</h2>
+      <div className="flex justify-end">
         <Button onClick={openCreate}>
           <Plus className="size-4" />
           New Recurring Bill
@@ -82,9 +82,7 @@ export function RecurringBills() {
       )}
 
       {query.isLoading ? (
-        <div className="rounded-lg border border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">Loading recurring bills...</p>
-        </div>
+        <SkeletonList rows={3} />
       ) : recurringBills.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
           <p className="text-muted-foreground">

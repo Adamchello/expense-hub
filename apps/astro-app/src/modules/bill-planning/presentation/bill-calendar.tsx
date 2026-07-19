@@ -92,8 +92,18 @@ export function BillCalendar({ recurringBills }: BillCalendarProps) {
             return (
               <div
                 key={date}
+                title={
+                  occurrences.length > 0
+                    ? occurrences
+                        .map(
+                          (occurrence) =>
+                            `${occurrence.recurring.provider_name} — ${formatCurrency(occurrence.recurring.amount)}`,
+                        )
+                        .join("\n")
+                    : undefined
+                }
                 className={cn(
-                  "min-h-16 rounded-lg border p-1.5",
+                  "min-h-10 rounded-lg border p-1 sm:min-h-16 sm:p-1.5",
                   occurrences.length > 0
                     ? "border-border bg-accent/40"
                     : "border-transparent",
@@ -110,7 +120,23 @@ export function BillCalendar({ recurringBills }: BillCalendarProps) {
                 >
                   {day}
                 </p>
-                <div className="mt-0.5 flex flex-col gap-0.5">
+                {/* Compact dots on phones… */}
+                <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden">
+                  {occurrences.slice(0, 3).map((occurrence) => (
+                    <span
+                      key={occurrence.recurring.id}
+                      className="size-1.5 rounded-full bg-primary"
+                      aria-label={occurrence.recurring.provider_name}
+                    />
+                  ))}
+                  {occurrences.length > 3 && (
+                    <span className="text-[9px] leading-none text-muted-foreground">
+                      +{occurrences.length - 3}
+                    </span>
+                  )}
+                </div>
+                {/* …named chips on larger screens */}
+                <div className="mt-0.5 hidden flex-col gap-0.5 sm:flex">
                   {occurrences.slice(0, 3).map((occurrence) => (
                     <p
                       key={occurrence.recurring.id}

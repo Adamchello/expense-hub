@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 import {
   getCustomCategories,
   createCustomCategory,
@@ -26,7 +27,10 @@ export function useCreateCustomCategory() {
     {
       mutationFn: (input: { name: string; color: string }) =>
         createCustomCategory(input),
-      onSuccess: invalidate,
+      onSuccess: (_, input) => {
+        invalidate();
+        toast(`Category "${input.name}" added`);
+      },
     },
     queryClient,
   );
@@ -36,7 +40,10 @@ export function useDeleteCustomCategory() {
   return useMutation(
     {
       mutationFn: (id: string) => deleteCustomCategory(id),
-      onSuccess: invalidate,
+      onSuccess: () => {
+        invalidate();
+        toast("Category deleted");
+      },
     },
     queryClient,
   );

@@ -4,11 +4,6 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import type { Bill } from "../domain/bill";
 import type { Category } from "../domain/category";
 import {
@@ -17,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChevronDown, ChevronsUpDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateBill } from "../core/store";
-import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
+import { suggestCategory } from "../core/category-suggestion";
+import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
 
 interface FormState {
   amount: string;
@@ -88,15 +84,28 @@ export function BillFormBody({
     getInitialFormState(initialBill),
   );
   const [showMore, setShowMore] = useState(isEdit);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const { groups: categoryGroups } = useCategoryOptions();
+  // Once the user picks a category themselves, payee typing stops overriding it.
+  const [categoryTouched, setCategoryTouched] = useState(isEdit);
 
   useEffect(() => {
     if (active) {
       setFormState(getInitialFormState(initialBill));
       setShowMore(isEdit);
+      setCategoryTouched(isEdit);
     }
   }, [active, initialBill, isEdit]);
+
+  const handleProviderChange = (value: string) => {
+    setFormState((prev) => {
+      const suggestion = suggestCategory(value);
+      const shouldSuggest = !categoryTouched && suggestion !== "Uncategorized";
+      return {
+        ...prev,
+        providerName: value,
+        category: shouldSuggest ? suggestion : prev.category,
+      };
+    });
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -203,58 +212,13 @@ export function BillFormBody({
         <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           What was it for?
         </p>
-        <Popover modal open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              aria-label="Category"
-              className={cn(
-                "flex h-11 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50",
-                formState.category
-                  ? "text-foreground"
-                  : "text-muted-foreground",
-              )}
-            >
-              {formState.category ?? "Choose a category"}
-              <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="center"
-            className="w-(--radix-popover-trigger-width) min-w-80 p-3"
-          >
-            <div className="flex flex-col gap-3">
-              {categoryGroups.map((group) => (
-                <div key={group.label} className="flex flex-col gap-1.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {group.label}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {group.categories.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        aria-pressed={formState.category === category}
-                        onClick={() => {
-                          updateField("category", category);
-                          setIsCategoryOpen(false);
-                        }}
-                        className={cn(
-                          "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                          formState.category === category
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                        )}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+        <CategoryPickerPopover
+          value={formState.category}
+          onSelect={(category) => {
+            updateField("category", category);
+            setCategoryTouched(true);
+          }}
+        />
       </div>
 
       {/* Details — provider, date, note, tucked away */}
@@ -287,8 +251,18 @@ export function BillFormBody({
                 type="text"
                 placeholder="e.g. Electric Company"
                 value={formState.providerName}
-                onChange={(e) => updateField("providerName", e.target.value)}
+                onChange={(e) => handleProviderChange(e.target.value)}
               />
+              {!categoryTouched &&
+                formState.category &&
+                formState.category !== "Uncategorized" && (
+                  <p className="text-xs text-muted-foreground">
+                    Suggested category:{" "}
+                    <span className="font-medium text-foreground">
+                      {formState.category}
+                    </span>
+                  </p>
+                )}
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="date" className="text-sm font-medium">

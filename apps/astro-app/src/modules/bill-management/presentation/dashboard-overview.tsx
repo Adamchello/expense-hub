@@ -5,8 +5,11 @@ import { formatCurrency, formatDate } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { Bill } from "../domain/bill";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   CalendarRange,
+  FileSpreadsheet,
+  Plus,
   Receipt,
   Tags,
   Wallet,
@@ -17,9 +20,39 @@ import {
 
 interface DashboardOverviewProps {
   bills: Bill[];
+  /** Opens the add-bill dialog on the given tab (used by the empty state). */
+  onAddBill?: (tab: "single" | "import") => void;
 }
 
-export function DashboardOverview({ bills }: DashboardOverviewProps) {
+export function DashboardOverview({
+  bills,
+  onAddBill,
+}: DashboardOverviewProps) {
+  if (bills.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
+        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
+          <Receipt className="size-6" />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold">Track your first bill</h3>
+        <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+          Record bills in seconds, or bring years of history over from your
+          spreadsheet — totals, history and analytics build up from there.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <Button onClick={() => onAddBill?.("single")}>
+            <Plus className="size-4" />
+            Add your first bill
+          </Button>
+          <Button variant="outline" onClick={() => onAddBill?.("import")}>
+            <FileSpreadsheet className="size-4" />
+            Import from spreadsheet
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const recentBills = bills.slice(0, 5);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -67,20 +100,24 @@ export function DashboardOverview({ bills }: DashboardOverviewProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label} className="gap-0 py-5">
-            <CardContent className="px-5">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+          <Card key={stat.label} className="gap-0 py-4">
+            <CardContent className="flex items-center gap-3 px-4">
+              <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
                 <stat.icon className="size-4.5" />
               </div>
-              <p className="mt-4 text-sm font-medium text-muted-foreground">
-                {stat.label}
-              </p>
-              <p className="mt-1 font-mono text-2xl font-semibold tracking-tight text-foreground">
-                {stat.value}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{stat.sub}</p>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
+                  {stat.label}
+                </p>
+                <p className="mt-0.5 truncate font-mono text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
+                  {stat.value}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {stat.sub}
+                </p>
+              </div>
             </CardContent>
           </Card>
         ))}

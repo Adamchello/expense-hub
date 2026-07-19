@@ -19,8 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
+import { toast } from "@/lib/toast";
+import { queryClient } from "@/lib/query-client";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { useDeleteBill, useBulkDeleteBills } from "../core/store";
+import { createBill } from "../integration/repository";
 import { exportBillsToCsv, exportBillsToExcel } from "../core/export";
 import { EditBillDialog } from "./edit-bill-dialog";
 import { ArrowUpDown, Download, Pencil, Search, Trash2 } from "lucide-react";
@@ -52,10 +55,9 @@ const SORT_COMPARATORS: Record<SortOrder, (a: Bill, b: Bill) => number> = {
 
 interface BillHistoryProps {
   bills: Bill[];
-  onRefresh?: () => void;
 }
 
-export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
+export function BillHistory({ bills }: BillHistoryProps) {
   const [monthFilter, setMonthFilter] = useState<string>(ALL);
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [searchTerm, setSearchTerm] = useState("");
@@ -133,18 +135,48 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
     );
   };
 
+  // Undo re-creates the deleted bills from their client-side snapshots.
+  const restoreBills = async (removed: Bill[]) => {
+    try {
+      for (const bill of removed) {
+        await createBill({
+          amount: bill.amount,
+          date: bill.date,
+          providerName: bill.provider_name,
+          description: bill.description,
+          category: bill.category,
+        });
+      }
+      toast(removed.length === 1 ? "Bill restored" : "Bills restored");
+    } catch {
+      toast("Failed to restore bills", { variant: "error" });
+    } finally {
+      queryClient.invalidateQueries({ queryKey: ["bills"] });
+    }
+  };
+
   const handleConfirmDelete = () => {
     if (!deletingBill) return;
-    deleteMutation.mutate(deletingBill.id, {
-      onSuccess: () => setDeletingBill(null),
+    const removed = deletingBill;
+    deleteMutation.mutate(removed.id, {
+      onSuccess: () => {
+        setDeletingBill(null);
+        toast(`Deleted ${removed.provider_name} bill`, {
+          undo: () => restoreBills([removed]),
+        });
+      },
     });
   };
 
   const handleConfirmBulkDelete = () => {
+    const removed = bills.filter((bill) => selectedIds.has(bill.id));
     bulkDeleteMutation.mutate([...selectedIds], {
       onSuccess: () => {
         setSelectedIds(new Set());
         setIsBulkConfirmOpen(false);
+        toast(`Deleted ${removed.length} bills`, {
+          undo: () => restoreBills(removed),
+        });
       },
     });
   };
@@ -220,37 +252,7 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl font-semibold">Bill History</h2>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportBillsToCsv(bills)}
-          >
-            <Download className="size-3.5" />
-            CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportBillsToExcel(bills)}
-          >
-            <Download className="size-3.5" />
-            Excel
-          </Button>
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Refresh
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Filters */}
+      {/* Filters + exports */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -325,6 +327,30 @@ export function BillHistory({ bills, onRefresh }: BillHistoryProps) {
             Clear filters
           </Button>
         )}
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              exportBillsToCsv(bills);
+              toast("Exported bills as CSV");
+            }}
+          >
+            <Download className="size-3.5" />
+            CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              exportBillsToExcel(bills);
+              toast("Exported bills as Excel");
+            }}
+          >
+            <Download className="size-3.5" />
+            Excel
+          </Button>
+        </div>
       </div>
 
       {/* Selection toolbar */}

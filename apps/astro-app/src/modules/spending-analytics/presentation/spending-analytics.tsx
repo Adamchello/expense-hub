@@ -91,67 +91,72 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Headline stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="gap-0 py-5">
-          <CardContent className="px-5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        <Card className="gap-0 py-4">
+          <CardContent className="flex items-center gap-3 px-4">
+            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
               <Wallet className="size-4.5" />
             </div>
-            <p className="mt-4 text-sm font-medium text-muted-foreground">
-              Average monthly spending
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold tracking-tight">
-              {formatCurrency(average)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              across {months.length} {months.length === 1 ? "month" : "months"}{" "}
-              of history
-            </p>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
+                Average monthly spending
+              </p>
+              <p className="mt-0.5 truncate font-mono text-lg font-semibold tracking-tight sm:text-2xl">
+                {formatCurrency(average)}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                across {months.length}{" "}
+                {months.length === 1 ? "month" : "months"} of history
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="gap-0 py-5">
-          <CardContent className="px-5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+        <Card className="gap-0 py-4">
+          <CardContent className="flex items-center gap-3 px-4">
+            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
               <ListChecks className="size-4.5" />
             </div>
-            <p className="mt-4 text-sm font-medium text-muted-foreground">
-              This month
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold tracking-tight">
-              {formatCurrency(thisMonthTotal)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {average > 0 && thisMonthTotal > 0
-                ? `${Math.round((thisMonthTotal / average) * 100)}% of your monthly average`
-                : "recorded so far"}
-            </p>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
+                This month
+              </p>
+              <p className="mt-0.5 truncate font-mono text-lg font-semibold tracking-tight sm:text-2xl">
+                {formatCurrency(thisMonthTotal)}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {average > 0 && thisMonthTotal > 0
+                  ? `${Math.round((thisMonthTotal / average) * 100)}% of your monthly average`
+                  : "recorded so far"}
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="gap-0 py-5">
-          <CardContent className="px-5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+        <Card className="col-span-2 gap-0 py-4 sm:col-span-1">
+          <CardContent className="flex items-center gap-3 px-4">
+            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
               <Crown className="size-4.5" />
             </div>
-            <p className="mt-4 text-sm font-medium text-muted-foreground">
-              Biggest category this month
-            </p>
-            {biggest ? (
-              <>
-                <p className="mt-1 text-2xl font-semibold tracking-tight">
-                  {biggest.category}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {biggest.category} accounted for {biggest.share}% of your
-                  spending this month.
-                </p>
-              </>
-            ) : (
-              <p className="mt-1 text-sm text-muted-foreground">
-                No bills recorded this month yet.
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
+                Biggest category this month
               </p>
-            )}
+              {biggest ? (
+                <>
+                  <p className="mt-0.5 truncate text-lg font-semibold tracking-tight sm:text-2xl">
+                    {biggest.category}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {biggest.share}% of this month's spending
+                  </p>
+                </>
+              ) : (
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  No bills recorded this month yet.
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
