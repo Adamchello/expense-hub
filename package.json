@@ -1,5 +1,5 @@
 {
-  "name": "smart-bill-assistant",
+  "name": "smart-expense-assistant",
   "private": true,
   "scripts": {
     "build": "turbo run build",

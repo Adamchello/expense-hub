@@ -2,7 +2,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
 import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
-import { recurringBillSchema } from "@/lib/schemas/recurring-bill";
+import { recurringPaymentSchema } from "@/lib/schemas/recurring-payment";
 
 export const PUT: APIRoute = async (context) => {
   const supabase = createSupabaseServerClient(context);
@@ -18,13 +18,13 @@ export const PUT: APIRoute = async (context) => {
 
   const id = context.params.id;
   if (!id) {
-    return ApiError("Recurring bill id is required", 400);
+    return ApiError("Recurring payment id is required", 400);
   }
 
   try {
     const body = await context.request.json();
 
-    const validationResult = recurringBillSchema.safeParse(body);
+    const validationResult = recurringPaymentSchema.safeParse(body);
 
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
@@ -47,7 +47,7 @@ export const PUT: APIRoute = async (context) => {
     } = validationResult.data;
 
     const { data, error } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .update({
         amount: amount,
         provider_name: providerName,
@@ -62,15 +62,15 @@ export const PUT: APIRoute = async (context) => {
       .maybeSingle();
 
     if (error) {
-      console.error("Error updating recurring bill:", error);
-      return ApiError("Failed to update recurring bill", 500, error.message);
+      console.error("Error updating recurring payment:", error);
+      return ApiError("Failed to update recurring payment", 500, error.message);
     }
 
     if (!data) {
-      return ApiError("Recurring bill not found", 404);
+      return ApiError("Recurring payment not found", 404);
     }
 
-    return ApiResponse(data, 200, "Recurring bill updated successfully");
+    return ApiResponse(data, 200, "Recurring payment updated successfully");
   } catch (error) {
     console.error("Unexpected error:", error);
     return ApiError("Internal server error", 500);
@@ -91,12 +91,12 @@ export const DELETE: APIRoute = async (context) => {
 
   const id = context.params.id;
   if (!id) {
-    return ApiError("Recurring bill id is required", 400);
+    return ApiError("Recurring payment id is required", 400);
   }
 
   try {
     const { data, error } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id)
@@ -104,15 +104,15 @@ export const DELETE: APIRoute = async (context) => {
       .maybeSingle();
 
     if (error) {
-      console.error("Error deleting recurring bill:", error);
-      return ApiError("Failed to delete recurring bill", 500, error.message);
+      console.error("Error deleting recurring payment:", error);
+      return ApiError("Failed to delete recurring payment", 500, error.message);
     }
 
     if (!data) {
-      return ApiError("Recurring bill not found", 404);
+      return ApiError("Recurring payment not found", 404);
     }
 
-    return ApiResponse(data, 200, "Recurring bill deleted successfully");
+    return ApiResponse(data, 200, "Recurring payment deleted successfully");
   } catch (error) {
     console.error("Unexpected error:", error);
     return ApiError("Internal server error", 500);

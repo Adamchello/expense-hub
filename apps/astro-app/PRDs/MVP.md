@@ -1,7 +1,7 @@
 ```markdown
 # Product Requirements Document (PRD)
 
-## Smart Bill Assistant (MVP)
+## Smart Expense Assistant (MVP)
 
 **Version:** 1.0  
 **Status:** Draft for Validation
@@ -10,17 +10,17 @@
 
 # 1. Overview
 
-Smart Bill Assistant is a simple bill tracking application that helps people keep a complete record of every bill they pay.
+Smart Expense Assistant is a simple expense tracking application that helps people keep a complete record of every expense they pay.
 
-Rather than relying on spreadsheets, users can quickly record bills, organize them by category, review spending history, and see simple summaries of their expenses.
+Rather than relying on spreadsheets, users can quickly record expenses, organize them by category, review spending history, and see simple summaries of their expenses.
 
-The goal of the MVP is **not** to provide financial advice or AI-powered insights. Instead, it aims to become the easiest and most reliable way to manage personal bills.
+The goal of the MVP is **not** to provide financial advice or AI-powered insights. Instead, it aims to become the easiest and most reliable way to manage personal expenses.
 
 ---
 
 # 2. Problem Statement
 
-Many people track bills using spreadsheets, banking apps, or not at all.
+Many people track expenses using spreadsheets, banking apps, or not at all.
 
 Current solutions often have one or more of these problems:
 
@@ -34,17 +34,17 @@ People often ask themselves:
 - "Did I already pay this?"
 - "How much did I spend this month?"
 - "Where is my money going?"
-- "Can I quickly find that electricity bill from February?"
+- "Can I quickly find that electricity expense from February?"
 
-Smart Bill Assistant answers these questions with minimal effort.
+Smart Expense Assistant answers these questions with minimal effort.
 
 ---
 
 # 3. Product Vision
 
-> A faster, cleaner alternative to managing bills in spreadsheets.
+> A faster, cleaner alternative to managing expenses in spreadsheets.
 
-The app should feel like **Excel built specifically for bills**—simple enough for anyone to use while offering conveniences that spreadsheets don't.
+The app should feel like **Excel built specifically for expenses**—simple enough for anyone to use while offering conveniences that spreadsheets don't.
 
 ---
 
@@ -72,11 +72,11 @@ Small business owners who want to separate business expenses from personal expen
 
 Users should be able to:
 
-- Record bills in seconds.
-- Find previous bills easily.
+- Record expenses in seconds.
+- Find previous expenses easily.
 - Know how much they've spent.
 - Import existing records from Excel/CSV.
-- Organize bills into separate profiles.
+- Organize expenses into separate profiles.
 
 ---
 
@@ -110,7 +110,7 @@ Examples:
 
 Each profile contains:
 
-- Bills
+- Expenses
 - Dashboard
 - History
 
@@ -118,9 +118,9 @@ Users can switch between profiles instantly.
 
 ---
 
-## 7.2 Bill Management
+## 7.2 Expense Management
 
-A bill contains:
+An expense contains:
 
 ### Required
 
@@ -135,11 +135,11 @@ A bill contains:
 
 Users can:
 
-- Create bills
-- Edit bills
-- Delete bills
+- Create expenses
+- Edit expenses
+- Delete expenses
 
-**Success criterion:** Adding a bill should take less than 10 seconds.
+**Success criterion:** Adding an expense should take less than 10 seconds.
 
 ---
 
@@ -180,18 +180,18 @@ The dashboard provides a quick overview of the selected profile.
 
 Display:
 
-- Total number of bills
+- Total number of expenses
 - Total spent this month
 - Total spent this year
-- Five most recent bills
+- Five most recent expenses
 
 The dashboard is intended to provide a quick snapshot rather than detailed analytics.
 
 ---
 
-## 7.5 Bill History
+## 7.5 Expense History
 
-Display all bills in chronological order.
+Display all expenses in chronological order.
 
 Support:
 
@@ -209,7 +209,7 @@ Each row displays:
 
 ## 7.6 Import
 
-Users can import existing bills from CSV or Excel.
+Users can import existing expenses from CSV or Excel.
 
 ### Import Flow
 
@@ -234,28 +234,28 @@ The application should work comfortably on desktop and mobile.
 Mobile experience includes:
 
 - Responsive layout
-- Floating "Add Bill" button
+- Floating "Add Expense" button
 - Quick entry form
 
 ---
 
 # 8. User Stories
 
-### Quick Bill Entry
+### Quick Expense Entry
 
 **As a** user
 
-**I want** to record a bill in a few seconds
+**I want** to record an expense in a few seconds
 
 **So that** I actually keep my records up to date.
 
 ---
 
-### Bill History
+### Expense History
 
 **As a** user
 
-**I want** to browse previous bills
+**I want** to browse previous expenses
 
 **So that** I can verify what I paid.
 
@@ -295,9 +295,9 @@ Mobile experience includes:
 
 The MVP is successful if users can:
 
-- Add a bill in under 10 seconds.
+- Add an expense in under 10 seconds.
 - Successfully import existing data.
-- Return regularly to log new bills.
+- Return regularly to log new expenses.
 - Replace spreadsheets with the application.
 
 ---
@@ -306,11 +306,11 @@ The MVP is successful if users can:
 
 ## Version 1.1 — Workflow Improvements
 
-Focus on making bill tracking even more convenient.
+Focus on making expense tracking even more convenient.
 
-### Recurring Bills
+### Recurring Payments
 
-Allow users to create recurring bills.
+Allow users to create recurring payments.
 
 Supported frequencies:
 
@@ -319,13 +319,13 @@ Supported frequencies:
 - Quarterly
 - Yearly
 
-Recurring bills can automatically appear when due or remind users to add them.
+Recurring payments can automatically appear when due or remind users to add them.
 
 ---
 
 ### Reminders
 
-Notify users before bills are due.
+Notify users before payments are due.
 
 Examples:
 
@@ -348,7 +348,7 @@ Enhance the import experience with:
 
 ### Export
 
-Allow users to export all bills.
+Allow users to export all expenses.
 
 Supported formats:
 
@@ -359,7 +359,7 @@ Supported formats:
 
 ## Version 1.2 — Spending Analytics
 
-Introduce descriptive analytics based entirely on recorded bills.
+Introduce descriptive analytics based entirely on recorded expenses.
 
 ### Spending by Category
 
@@ -434,13 +434,13 @@ Potential features:
 
 # 11. Positioning
 
-## Smart Bill Assistant is **not**:
+## Smart Expense Assistant is **not**:
 
 - A budgeting app
 - An accounting system
 - A personal finance suite
 
-## Smart Bill Assistant **is**:
+## Smart Expense Assistant **is**:
 
-> A simple, modern bill tracker that replaces spreadsheets and helps people keep an organized history of what they pay, with useful summaries that become more valuable as more data is recorded.
+> A simple, modern expense tracker that replaces spreadsheets and helps people keep an organized history of what they pay, with useful summaries that become more valuable as more data is recorded.
 ```

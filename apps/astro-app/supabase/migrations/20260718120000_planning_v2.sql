@@ -2,27 +2,27 @@
 -- v2.x: recurring occurrence events + custom categories
 -- =========================
 
--- Per-occurrence outcomes for recurring bills. An occurrence with no event is
+-- Per-occurrence outcomes for recurring expenses. An occurrence with no event is
 -- Upcoming (due in the future) or Overdue (due in the past).
-create table public.recurring_bill_events (
+create table public.recurring_payment_events (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references auth.users(id) on delete cascade,
   profile_id    uuid not null references public.profiles(id) on delete cascade,
-  recurring_id  uuid not null references public.recurring_bills(id) on delete cascade,
+  recurring_id  uuid not null references public.recurring_payments(id) on delete cascade,
   due_date      date not null,
   status        text not null check (status in ('paid', 'skipped')),
-  bill_id       uuid references public.bills(id) on delete set null,
+  expense_id       uuid references public.expenses(id) on delete set null,
   created_at    timestamptz not null default now(),
-  constraint recurring_bill_events_unique_occurrence unique (recurring_id, due_date)
+  constraint recurring_payment_events_unique_occurrence unique (recurring_id, due_date)
 );
 
-create index recurring_bill_events_profile_due_idx
-  on public.recurring_bill_events (profile_id, due_date);
+create index recurring_payment_events_profile_due_idx
+  on public.recurring_payment_events (profile_id, due_date);
 
-alter table public.recurring_bill_events enable row level security;
+alter table public.recurring_payment_events enable row level security;
 
-create policy recurring_bill_events_select_active_profile
-on public.recurring_bill_events
+create policy recurring_payment_events_select_active_profile
+on public.recurring_payment_events
 for select
 using (
   profile_id in (
@@ -30,8 +30,8 @@ using (
   )
 );
 
-create policy recurring_bill_events_insert_active_profile
-on public.recurring_bill_events
+create policy recurring_payment_events_insert_active_profile
+on public.recurring_payment_events
 for insert
 with check (
   profile_id in (
@@ -39,8 +39,8 @@ with check (
   )
 );
 
-create policy recurring_bill_events_delete_own_profiles
-on public.recurring_bill_events
+create policy recurring_payment_events_delete_own_profiles
+on public.recurring_payment_events
 for delete
 using (
   profile_id in (

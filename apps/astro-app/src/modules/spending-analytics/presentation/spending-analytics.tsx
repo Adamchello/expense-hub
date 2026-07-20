@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/shared/format";
 import { cn } from "@/lib/utils";
-import type { Bill } from "@/modules/bill-management/domain/bill";
+import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { CategoryDonut } from "./category-donut";
 import {
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 interface SpendingAnalyticsProps {
-  bills: Bill[];
+  expenses: Expense[];
 }
 
 const previousMonthOf = (month: string): string => {
@@ -34,17 +34,18 @@ const previousMonthOf = (month: string): string => {
   return new Date(Date.UTC(year, m - 2, 1)).toISOString().slice(0, 7);
 };
 
-export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
+export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
   const [distributionScope, setDistributionScope] = useState<"month" | "all">(
     "month",
   );
   const { badgeClassFor, hexFor } = useCategoryOptions();
 
-  if (bills.length === 0) {
+  if (expenses.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
         <p className="text-muted-foreground">
-          No bills recorded yet. Analytics appear once you start tracking bills.
+          No expenses recorded yet. Analytics appear once you start tracking
+          expenses.
         </p>
       </div>
     );
@@ -53,18 +54,18 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
   const currentMonth = new Date().toISOString().slice(0, 7);
   const lastMonth = previousMonthOf(currentMonth);
 
-  const months = monthlyTotals(bills);
-  const average = averageMonthlySpending(bills);
+  const months = monthlyTotals(expenses);
+  const average = averageMonthlySpending(expenses);
   const thisMonthTotal =
     months.find((m) => m.month === currentMonth)?.total ?? 0;
 
   const distribution = totalsByCategory(
-    bills,
+    expenses,
     distributionScope === "month" ? currentMonth : undefined,
   );
-  const biggest = totalsByCategory(bills, currentMonth)[0];
-  const comparisons = categoryComparisons(bills, currentMonth, lastMonth);
-  const summaries = spendingSummaries(bills, currentMonth);
+  const biggest = totalsByCategory(expenses, currentMonth)[0];
+  const comparisons = categoryComparisons(expenses, currentMonth, lastMonth);
+  const summaries = spendingSummaries(expenses, currentMonth);
 
   // Donut: at most 8 slices, remainder folds into "Other".
   const distributionTotal = distribution.reduce((sum, e) => sum + e.total, 0);
@@ -153,7 +154,7 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
                 </>
               ) : (
                 <p className="mt-0.5 text-sm text-muted-foreground">
-                  No bills recorded this month yet.
+                  No expenses recorded this month yet.
                 </p>
               )}
             </div>
@@ -196,7 +197,7 @@ export function SpendingAnalytics({ bills }: SpendingAnalyticsProps) {
           <CardContent>
             {distribution.length === 0 ? (
               <p className="py-4 text-center text-sm text-muted-foreground">
-                No bills in this period.
+                No expenses in this period.
               </p>
             ) : (
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">

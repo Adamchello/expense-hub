@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Bill } from "@/modules/bill-management/domain/bill";
+import type { Expense } from "@/modules/expense-management/domain/expense";
 import {
   averageMonthlySpending,
   categoryComparisons,
@@ -8,31 +8,31 @@ import {
   totalsByCategory,
 } from "../core/analytics";
 
-let billId = 0;
-const bill = (date: string, amount: number, category: string): Bill => ({
-  id: String(++billId),
+let expenseId = 0;
+const expense = (date: string, amount: number, category: string): Expense => ({
+  id: String(++expenseId),
   amount,
   date,
   provider_name: "Provider",
   description: null,
-  category: category as Bill["category"],
+  category: category as Expense["category"],
   created_at: `${date}T00:00:00Z`,
 });
 
-const FIXTURE: Bill[] = [
+const FIXTURE: Expense[] = [
   // May
-  bill("2026-05-05", 100, "Rent"),
-  bill("2026-05-10", 40, "Groceries"),
-  bill("2026-05-15", 30, "Entertainment"),
+  expense("2026-05-05", 100, "Rent"),
+  expense("2026-05-10", 40, "Groceries"),
+  expense("2026-05-15", 30, "Entertainment"),
   // June
-  bill("2026-06-05", 100, "Rent"),
-  bill("2026-06-10", 50, "Groceries"),
-  bill("2026-06-15", 20, "Entertainment"),
+  expense("2026-06-05", 100, "Rent"),
+  expense("2026-06-10", 50, "Groceries"),
+  expense("2026-06-15", 20, "Entertainment"),
   // July (current)
-  bill("2026-07-05", 100, "Rent"),
-  bill("2026-07-10", 56, "Groceries"),
-  bill("2026-07-15", 10, "Entertainment"),
-  bill("2026-07-16", 60, "Fuel"),
+  expense("2026-07-05", 100, "Rent"),
+  expense("2026-07-10", 56, "Groceries"),
+  expense("2026-07-15", 10, "Entertainment"),
+  expense("2026-07-16", 60, "Fuel"),
 ];
 
 describe("totalsByCategory", () => {
@@ -70,7 +70,7 @@ describe("averageMonthlySpending", () => {
     expect(averageMonthlySpending(FIXTURE)).toBeCloseTo(188.67, 1);
   });
 
-  it("is zero without bills", () => {
+  it("is zero without expenses", () => {
     expect(averageMonthlySpending([])).toBe(0);
   });
 });
@@ -113,18 +113,18 @@ describe("spendingSummaries", () => {
   });
 
   it("reports rank climbs", () => {
-    const bills = [
+    const expenses = [
       ...FIXTURE,
       // June: Fuel was only $5 (5th place); in July it jumps to $60 (2nd place).
-      bill("2026-06-20", 5, "Fuel"),
+      expense("2026-06-20", 5, "Fuel"),
     ];
-    const summaries = spendingSummaries(bills, "2026-07");
+    const summaries = spendingSummaries(expenses, "2026-07");
     expect(summaries).toContain(
       "Fuel became your second-largest expense category.",
     );
   });
 
-  it("is empty without any bills", () => {
+  it("is empty without any expenses", () => {
     expect(spendingSummaries([], "2026-07")).toEqual([]);
   });
 });

@@ -10,7 +10,7 @@ const renameSchema = z.object({
 });
 
 /**
- * Renames a merchant everywhere: all bills and recurring bills of the user
+ * Renames a merchant everywhere: all expenses and recurring payments of the user
  * whose provider_name matches `from` are updated to `to`. Renaming onto an
  * existing merchant merges them.
  */
@@ -41,20 +41,20 @@ export const POST: APIRoute = async (context) => {
       return ApiError("New name must differ from the current name", 400);
     }
 
-    const { data: updatedBills, error: billsError } = await supabase
-      .from("bills")
+    const { data: updatedExpenses, error: expensesError } = await supabase
+      .from("expenses")
       .update({ provider_name: to })
       .eq("user_id", user.id)
       .eq("provider_name", from)
       .select("id");
 
-    if (billsError) {
-      console.error("Error renaming merchant on bills:", billsError);
-      return ApiError("Failed to rename merchant", 500, billsError.message);
+    if (expensesError) {
+      console.error("Error renaming merchant on expenses:", expensesError);
+      return ApiError("Failed to rename merchant", 500, expensesError.message);
     }
 
     const { data: updatedRecurring, error: recurringError } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .update({ provider_name: to })
       .eq("user_id", user.id)
       .eq("provider_name", from)
@@ -62,11 +62,11 @@ export const POST: APIRoute = async (context) => {
 
     if (recurringError) {
       console.error(
-        "Error renaming merchant on recurring bills:",
+        "Error renaming merchant on recurring payments:",
         recurringError,
       );
       return ApiError(
-        "Bills were renamed but recurring bills failed",
+        "Expenses were renamed but recurring payments failed",
         500,
         recurringError.message,
       );
@@ -74,7 +74,7 @@ export const POST: APIRoute = async (context) => {
 
     return ApiResponse(
       {
-        bills_updated: updatedBills?.length ?? 0,
+        expenses_updated: updatedExpenses?.length ?? 0,
         recurring_updated: updatedRecurring?.length ?? 0,
       },
       200,

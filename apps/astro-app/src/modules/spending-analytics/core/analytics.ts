@@ -1,4 +1,4 @@
-import type { Bill } from "@/modules/bill-management/domain/bill";
+import type { Expense } from "@/modules/expense-management/domain/expense";
 
 export interface CategoryTotal {
   category: string;
@@ -21,7 +21,7 @@ export interface CategoryComparison {
   changePct: number | null;
 }
 
-const monthOf = (bill: Bill) => bill.date.slice(0, 7);
+const monthOf = (expense: Expense) => expense.date.slice(0, 7);
 
 const sum = (values: number[]) => values.reduce((acc, value) => acc + value, 0);
 
@@ -29,15 +29,18 @@ const round1 = (value: number) => Math.round(value * 10) / 10;
 
 /** Spending distribution across categories, largest first. */
 export function totalsByCategory(
-  bills: Bill[],
+  expenses: Expense[],
   month?: string,
 ): CategoryTotal[] {
   const scoped = month
-    ? bills.filter((bill) => monthOf(bill) === month)
-    : bills;
+    ? expenses.filter((expense) => monthOf(expense) === month)
+    : expenses;
   const totals = new Map<string, number>();
-  for (const bill of scoped) {
-    totals.set(bill.category, (totals.get(bill.category) ?? 0) + bill.amount);
+  for (const expense of scoped) {
+    totals.set(
+      expense.category,
+      (totals.get(expense.category) ?? 0) + expense.amount,
+    );
   }
   const grandTotal = sum([...totals.values()]);
   return [...totals.entries()]
@@ -49,36 +52,36 @@ export function totalsByCategory(
     .sort((a, b) => b.total - a.total);
 }
 
-/** Chronological month totals, only months that have bills. */
-export function monthlyTotals(bills: Bill[]): MonthlyTotal[] {
+/** Chronological month totals, only months that have expenses. */
+export function monthlyTotals(expenses: Expense[]): MonthlyTotal[] {
   const totals = new Map<string, number>();
-  for (const bill of bills) {
-    const month = monthOf(bill);
-    totals.set(month, (totals.get(month) ?? 0) + bill.amount);
+  for (const expense of expenses) {
+    const month = monthOf(expense);
+    totals.set(month, (totals.get(month) ?? 0) + expense.amount);
   }
   return [...totals.entries()]
     .map(([month, total]) => ({ month, total }))
     .sort((a, b) => a.month.localeCompare(b.month));
 }
 
-/** Average spend across months that have at least one bill. */
-export function averageMonthlySpending(bills: Bill[]): number {
-  const months = monthlyTotals(bills);
+/** Average spend across months that have at least one expense. */
+export function averageMonthlySpending(expenses: Expense[]): number {
+  const months = monthlyTotals(expenses);
   if (months.length === 0) return 0;
   return sum(months.map((m) => m.total)) / months.length;
 }
 
 /** Per-category current vs previous month, sorted by biggest absolute swing. */
 export function categoryComparisons(
-  bills: Bill[],
+  expenses: Expense[],
   currentMonth: string,
   previousMonth: string,
 ): CategoryComparison[] {
   const current = new Map(
-    totalsByCategory(bills, currentMonth).map((c) => [c.category, c.total]),
+    totalsByCategory(expenses, currentMonth).map((c) => [c.category, c.total]),
   );
   const previous = new Map(
-    totalsByCategory(bills, previousMonth).map((c) => [c.category, c.total]),
+    totalsByCategory(expenses, previousMonth).map((c) => [c.category, c.total]),
   );
   const categories = new Set([...current.keys(), ...previous.keys()]);
 
@@ -109,18 +112,18 @@ const previousMonthOf = (month: string): string => {
 };
 
 /**
- * Descriptive, factual summaries derived from recorded bills — no predictions.
+ * Descriptive, factual summaries derived from recorded expenses — no predictions.
  * `currentMonth` is YYYY-MM.
  */
 export function spendingSummaries(
-  bills: Bill[],
+  expenses: Expense[],
   currentMonth: string,
 ): string[] {
   const summaries: string[] = [];
   const lastMonth = previousMonthOf(currentMonth);
 
   // 1. Biggest category share this month.
-  const thisMonth = totalsByCategory(bills, currentMonth);
+  const thisMonth = totalsByCategory(expenses, currentMonth);
   const biggest = thisMonth[0];
   if (biggest && biggest.share > 0) {
     summaries.push(
@@ -129,7 +132,9 @@ export function spendingSummaries(
   }
 
   // 2. Rank changes vs last month ("became your second-largest category").
-  const lastRanks = totalsByCategory(bills, lastMonth).map((c) => c.category);
+  const lastRanks = totalsByCategory(expenses, lastMonth).map(
+    (c) => c.category,
+  );
   thisMonth.slice(0, RANK_LABELS.length).forEach((entry, rank) => {
     const lastRank = lastRanks.indexOf(entry.category);
     if (lastRanks.length > 0 && lastRank !== -1 && lastRank > rank) {
@@ -140,7 +145,7 @@ export function spendingSummaries(
   });
 
   // 3. Biggest month-over-month movers.
-  const comparisons = categoryComparisons(bills, currentMonth, lastMonth)
+  const comparisons = categoryComparisons(expenses, currentMonth, lastMonth)
     .filter((c) => c.changePct !== null && c.changePct !== 0)
     .slice(0, 2);
   for (const comparison of comparisons) {
@@ -155,7 +160,9 @@ export function spendingSummaries(
   const months = [previousMonthOf(lastMonth), lastMonth, currentMonth];
   const byMonth = months.map(
     (month) =>
-      new Map(totalsByCategory(bills, month).map((c) => [c.category, c.total])),
+      new Map(
+        totalsByCategory(expenses, month).map((c) => [c.category, c.total]),
+      ),
   );
   const trendCategories = new Set(byMonth.flatMap((m) => [...m.keys()]));
   for (const category of trendCategories) {

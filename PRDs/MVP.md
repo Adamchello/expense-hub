@@ -1,17 +1,17 @@
-# MVP Definition: Smart Bill Assistant
+# MVP Definition: Smart Expense Assistant
 
 1. Problem Statement
 
-Many individuals struggle with managing recurring household bills and expenses. Existing budget trackers mostly focus on categorization and payment reminders, but they fail to provide proactive insights or help users understand their spending behavior. Users often:
+Many individuals struggle with managing recurring household expenses and expenses. Existing budget trackers mostly focus on categorization and payment reminders, but they fail to provide proactive insights or help users understand their spending behavior. Users often:
 
 - Lack visibility into future financial obligations, making it difficult to plan and budget effectively.
 - Struggle with motivation to save consistently because they don't understand their spending patterns.
-- Do not understand behavioral patterns that drive unnecessary spending or bill fluctuations.
-- Cannot anticipate bill increases due to seasonality, rate changes, or consumption patterns.
+- Do not understand behavioral patterns that drive unnecessary spending or expense fluctuations.
+- Cannot anticipate expense increases due to seasonality, rate changes, or consumption patterns.
 
 2. Target Audience & Early Adopters
 
-Primary users are tech-savvy adults who manage multiple recurring bills (utilities, rent, subscriptions, loans). Ideal early adopters include:
+Primary users are tech-savvy adults who manage multiple recurring payments (utilities, rent, subscriptions, loans). Ideal early adopters include:
 
 - Young professionals seeking financial control and optimization.
 - Families interested in better budgeting and understanding their household expense patterns.
@@ -19,42 +19,42 @@ Primary users are tech-savvy adults who manage multiple recurring bills (utiliti
 
 3. Value Proposition
 
-The Smart Bill Assistant goes beyond simple expense tracking by combining two powerful capabilities:
+The Smart Expense Assistant goes beyond simple expense tracking by combining two powerful capabilities:
 
-- **Intelligent Forecasting**: Predicts future bills based on historical data, seasonality, interest rate changes, and consumption patterns. Provides users with accurate projections of upcoming expenses, helping them plan budgets and avoid financial surprises.
+- **Intelligent Forecasting**: Predicts future expenses based on historical data, seasonality, interest rate changes, and consumption patterns. Provides users with accurate projections of upcoming expenses, helping them plan budgets and avoid financial surprises.
 
-- **Behavioral Insights**: Helps users understand _why_ they spend and identifies patterns in their bill management. Reveals spending triggers, impulse patterns, and consumption habits that drive bill fluctuations, empowering users to make informed decisions and build healthier financial behaviors.
+- **Behavioral Insights**: Helps users understand _why_ they spend and identifies patterns in their expense management. Reveals spending triggers, impulse patterns, and consumption habits that drive expense fluctuations, empowering users to make informed decisions and build healthier financial behaviors.
 
 This dual approach transforms financial management from reactive tracking into a proactive, educational experience that helps users anticipate expenses and understand their financial behavior.
 
 4. Core Features (The "Minimum" in MVP)
 
-- **Bill Forecasting Engine**:
-  - Analyzes historical bill data to identify patterns (seasonality, trends, anomalies)
-  - Predicts future bill amounts for each recurring expense category
+- **Expense Forecasting Engine**:
+  - Analyzes historical expense data to identify patterns (seasonality, trends, anomalies)
+  - Predicts future expense amounts for each recurring expense category
   - Factors in known rate changes, contract renewals, and seasonal variations
   - Provides confidence intervals and forecast accuracy metrics
   - Displays projected monthly/yearly expense totals
 
-- **Bill Categorization & History**:
-  - Manual or automated categorization of recurring bills (utilities, subscriptions, loans, rent)
+- **Expense Categorization & History**:
+  - Manual or automated categorization of recurring payments (utilities, subscriptions, loans, rent)
   - Historical data entry or import capability
-  - Visual timeline showing bill history and trends
+  - Visual timeline showing expense history and trends
 
 - **Behavioral Pattern Analysis**:
-  - Identifies spending patterns and anomalies (e.g., "Your utility bills spike in winter months")
+  - Identifies spending patterns and anomalies (e.g., "Your utility expenses spike in winter months")
   - Detects impulse spending patterns in recurring subscriptions
-  - Highlights unusual bill increases or decreases with context
+  - Highlights unusual expense increases or decreases with context
   - Tracks consumption trends over time
 
 - **Actionable Insights Dashboard**:
   - Presents personalized insights about spending behavior
-  - Explains why bills fluctuate (e.g., seasonal usage, rate changes, new subscriptions)
+  - Explains why expenses fluctuate (e.g., seasonal usage, rate changes, new subscriptions)
   - Suggests behavioral changes to optimize expenses (e.g., "You added 3 subscriptions this quarter")
   - Provides visual comparisons showing user patterns vs. historical averages
 
 - **Forecast vs. Reality Tracking**:
-  - Compares predicted bills to actual bills
+  - Compares predicted expenses to actual expenses
   - Helps users understand forecast accuracy and improve predictions
   - Identifies behavioral factors that cause deviations from forecasts
 
@@ -63,7 +63,7 @@ This dual approach transforms financial management from reactive tracking into a
 - Percentage of users who find forecasts accurate within ±10% tolerance
 - Number of times users reference forecasts when planning expenses
 - User-reported value: "Forecasting helps me plan my budget better" (5-point scale)
-- Forecast accuracy rate (actual vs. predicted bills)
+- Forecast accuracy rate (actual vs. predicted expenses)
 
 - Percentage of users who report understanding their spending patterns better
 - Number of insights viewed per user per week
@@ -73,7 +73,7 @@ This dual approach transforms financial management from reactive tracking into a
 **Overall MVP Metrics:**
 
 - Number of active users within first 3 months
-- Percentage of users connecting at least 3 recurring bills
+- Percentage of users connecting at least 3 recurring payments
 - User feedback scores (ease of use, usefulness, perceived value)
 - Retention rate after 1 and 3 months
 - Feature adoption rate (forecasting vs. insights usage)
@@ -81,7 +81,7 @@ This dual approach transforms financial management from reactive tracking into a
 6. "Learn" - Feedback and Iteration Plan
 
 - In-app surveys after 30 days of use, specifically asking:
-  - "How accurate were the bill forecasts?"
+  - "How accurate were the expense forecasts?"
   - "Did the behavioral insights help you understand your spending?"
   - "Which feature was more valuable: forecasting or behavioral insights?"
 - User interviews with early adopters (10-15 users) to capture:
@@ -109,10 +109,10 @@ This dual approach transforms financial management from reactive tracking into a
 
 **Assumptions:**
 
-- Users are willing to input historical bill data or connect accounts to enable forecasting.
-- Forecasting future bills provides measurable value that justifies using the product.
+- Users are willing to input historical expense data or connect accounts to enable forecasting.
+- Forecasting future expenses provides measurable value that justifies using the product.
 - Users are open to behavioral insights as part of financial management.
-- Users have enough historical bill data (at least 3-6 months) to generate meaningful forecasts.
+- Users have enough historical expense data (at least 3-6 months) to generate meaningful forecasts.
 - Behavioral insights will be actionable and lead to better financial decisions.
 
 **Risks:**
@@ -133,13 +133,13 @@ This dual approach transforms financial management from reactive tracking into a
 
 8. Future Vision (Post-MVP)
 
-Long term, Smart Bill Assistant aims to become an intelligent financial planning companion:
+Long term, Smart Expense Assistant aims to become an intelligent financial planning companion:
 
 - **Advanced Forecasting**: Machine learning models that improve accuracy over time, incorporate external factors (weather, economic indicators), and provide multi-scenario forecasting.
 
 - **Deep Behavioral Analytics**: Advanced AI-driven behavioral coaching that identifies specific spending triggers, suggests personalized habit changes, and tracks progress on financial goals.
 
-- **Proactive Recommendations**: System that automatically suggests bill optimizations, subscription reviews, and timing adjustments based on forecasted expenses and behavioral patterns.
+- **Proactive Recommendations**: System that automatically suggests expense optimizations, subscription reviews, and timing adjustments based on forecasted expenses and behavioral patterns.
 
 - **Integration Ecosystem**: Connect with bank accounts, utility providers, and subscription services for automated data collection and real-time forecasting updates.
 

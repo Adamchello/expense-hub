@@ -22,7 +22,7 @@ create table public.account_settings (
 
 create index account_settings_active_profile_idx on public.account_settings (active_profile_id);
 
-create table public.bills (
+create table public.expenses (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references auth.users(id) on delete cascade,
   profile_id    uuid not null references public.profiles(id) on delete cascade,
@@ -34,9 +34,9 @@ create table public.bills (
   created_at    timestamptz not null default now()
 );
 
-create index bills_user_id_idx on public.bills (user_id);
-create index bills_profile_id_idx on public.bills (profile_id);
-create index bills_profile_created_at_idx on public.bills (profile_id, created_at desc);
+create index expenses_user_id_idx on public.expenses (user_id);
+create index expenses_profile_id_idx on public.expenses (profile_id);
+create index expenses_profile_created_at_idx on public.expenses (profile_id, created_at desc);
 
 -- =========================
 -- Auto-create default profile + settings on signup
@@ -118,10 +118,10 @@ with check (
   )
 );
 
-alter table public.bills enable row level security;
+alter table public.expenses enable row level security;
 
-create policy bills_select_active_profile
-on public.bills
+create policy expenses_select_active_profile
+on public.expenses
 for select
 using (
   profile_id in (
@@ -129,8 +129,8 @@ using (
   )
 );
 
-create policy bills_insert_active_profile
-on public.bills
+create policy expenses_insert_active_profile
+on public.expenses
 for insert
 with check (
   profile_id in (
@@ -138,8 +138,8 @@ with check (
   )
 );
 
-create policy bills_update_active_profile
-on public.bills
+create policy expenses_update_active_profile
+on public.expenses
 for update
 using (
   profile_id in (
@@ -152,8 +152,8 @@ with check (
   )
 );
 
-create policy bills_delete_active_profile
-on public.bills
+create policy expenses_delete_active_profile
+on public.expenses
 for delete
 using (
   profile_id in (

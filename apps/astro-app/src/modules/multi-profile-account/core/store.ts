@@ -93,8 +93,8 @@ export function useRenameProfile() {
 }
 
 function invalidateProfileScopedQueries() {
-  queryClient.invalidateQueries({ queryKey: ["bills"] });
-  queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
+  queryClient.invalidateQueries({ queryKey: ["expenses"] });
+  queryClient.invalidateQueries({ queryKey: ["recurring-payments"] });
   queryClient.invalidateQueries({ queryKey: ["recurring-events"] });
   queryClient.invalidateQueries({ queryKey: ["custom-categories"] });
 }

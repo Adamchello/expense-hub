@@ -12,7 +12,7 @@ export const CATEGORIES: Category[] = CATEGORY_GROUPS.flatMap(
   (group) => group.categories,
 );
 
-// Fallback style for bills whose stored category predates the current taxonomy.
+// Fallback style for expenses whose stored category predates the current taxonomy.
 export const DEFAULT_CATEGORY_COLOR =
   "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20";
 

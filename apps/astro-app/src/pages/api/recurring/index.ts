@@ -2,21 +2,21 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
 import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
-import { recurringBillSchema } from "@/lib/schemas/recurring-bill";
+import { recurringPaymentSchema } from "@/lib/schemas/recurring-payment";
 import { advanceDueDate, type Frequency } from "@/shared/domain/recurrence";
 
-/** Safety cap: at most this many missed occurrences are back-filled per bill. */
+/** Safety cap: at most this many missed occurrences are back-filled per payment. */
 const MAX_CATCHUP = 24;
 
 /**
- * Subscription semantics: any occurrence whose billing date has arrived is
- * turned into a real bill automatically, and the schedule advances. Runs
+ * Subscription semantics: any occurrence whose due date has arrived is
+ * turned into a real expense automatically, and the schedule advances. Runs
  * lazily whenever the recurring list is fetched.
  */
-async function materializeDueBills(
+async function materializeDueExpenses(
   supabase: ReturnType<typeof createSupabaseServerClient>,
   userId: string,
-  bills: {
+  expenses: {
     id: string;
     profile_id: string;
     amount: number;
@@ -30,55 +30,55 @@ async function materializeDueBills(
   const today = new Date().toISOString().slice(0, 10);
   let created = 0;
 
-  for (const bill of bills) {
-    let dueDate = bill.next_due_date;
+  for (const expense of expenses) {
+    let dueDate = expense.next_due_date;
     let guard = 0;
 
     while (dueDate <= today && guard < MAX_CATCHUP) {
-      const { data: createdBill, error: billError } = await supabase
-        .from("bills")
+      const { data: createdExpense, error: expenseError } = await supabase
+        .from("expenses")
         .insert({
           user_id: userId,
-          profile_id: bill.profile_id,
-          amount: bill.amount,
+          profile_id: expense.profile_id,
+          amount: expense.amount,
           date: dueDate,
-          provider_name: bill.provider_name,
-          description: bill.description,
-          category: bill.category,
+          provider_name: expense.provider_name,
+          description: expense.description,
+          category: expense.category,
           created_at: new Date().toISOString(),
         })
         .select("id")
         .single();
 
-      if (billError) {
-        console.error("Error auto-logging recurring bill:", billError);
+      if (expenseError) {
+        console.error("Error auto-logging recurring payment:", expenseError);
         break;
       }
 
-      // Occurrence record; non-fatal, the bill itself is the source of truth.
+      // Occurrence record; non-fatal, the expense itself is the source of truth.
       const { error: eventError } = await supabase
-        .from("recurring_bill_events")
+        .from("recurring_payment_events")
         .insert({
           user_id: userId,
-          profile_id: bill.profile_id,
-          recurring_id: bill.id,
+          profile_id: expense.profile_id,
+          recurring_id: expense.id,
           due_date: dueDate,
           status: "paid",
-          bill_id: createdBill.id,
+          expense_id: createdExpense.id,
         });
       if (eventError) {
         console.error("Error recording occurrence event:", eventError);
       }
 
-      dueDate = advanceDueDate(dueDate, bill.frequency as Frequency);
+      dueDate = advanceDueDate(dueDate, expense.frequency as Frequency);
       const { error: updateError } = await supabase
-        .from("recurring_bills")
+        .from("recurring_payments")
         .update({ next_due_date: dueDate })
-        .eq("id", bill.id)
+        .eq("id", expense.id)
         .eq("user_id", userId);
 
       if (updateError) {
-        console.error("Error advancing recurring bill:", updateError);
+        console.error("Error advancing recurring payment:", updateError);
         break;
       }
 
@@ -114,39 +114,39 @@ export const GET: APIRoute = async (context) => {
     }
 
     const { data, error } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .select()
       .eq("profile_id", settings.active_profile_id)
       .order("next_due_date", { ascending: true });
 
     if (error) {
-      console.error("Error listing recurring bills:", error);
-      return ApiError("Failed to load recurring bills", 500, error.message);
+      console.error("Error listing recurring payments:", error);
+      return ApiError("Failed to load recurring payments", 500, error.message);
     }
 
-    const materialized = await materializeDueBills(
+    const materialized = await materializeDueExpenses(
       supabase,
       user.id,
       data ?? [],
     );
 
     if (materialized === 0) {
-      return ApiResponse({ bills: data, materialized: 0 }, 200);
+      return ApiResponse({ expenses: data, materialized: 0 }, 200);
     }
 
-    // Re-read so advanced billing dates are reflected in the response.
+    // Re-read so advanced due dates are reflected in the response.
     const { data: fresh, error: freshError } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .select()
       .eq("profile_id", settings.active_profile_id)
       .order("next_due_date", { ascending: true });
 
     if (freshError) {
-      console.error("Error re-reading recurring bills:", freshError);
-      return ApiResponse({ bills: data, materialized }, 200);
+      console.error("Error re-reading recurring payments:", freshError);
+      return ApiResponse({ expenses: data, materialized }, 200);
     }
 
-    return ApiResponse({ bills: fresh, materialized }, 200);
+    return ApiResponse({ expenses: fresh, materialized }, 200);
   } catch (error) {
     console.error("Unexpected error:", error);
     return ApiError("Internal server error", 500);
@@ -168,7 +168,7 @@ export const POST: APIRoute = async (context) => {
   try {
     const body = await context.request.json();
 
-    const validationResult = recurringBillSchema.safeParse(body);
+    const validationResult = recurringPaymentSchema.safeParse(body);
 
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
@@ -201,7 +201,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     const { data, error } = await supabase
-      .from("recurring_bills")
+      .from("recurring_payments")
       .insert({
         user_id: user.id,
         profile_id: settings.active_profile_id,
@@ -217,11 +217,11 @@ export const POST: APIRoute = async (context) => {
       .single();
 
     if (error) {
-      console.error("Error creating recurring bill:", error);
-      return ApiError("Failed to save recurring bill", 500, error.message);
+      console.error("Error creating recurring payment:", error);
+      return ApiError("Failed to save recurring payment", 500, error.message);
     }
 
-    return ApiResponse(data, 201, "Recurring bill saved successfully");
+    return ApiResponse(data, 201, "Recurring payment saved successfully");
   } catch (error) {
     console.error("Unexpected error:", error);
     return ApiError("Internal server error", 500);

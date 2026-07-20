@@ -31,7 +31,7 @@ export function ProfilesSection() {
       <header className="mb-6">
         <h2 className="text-xl font-semibold">Profiles</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Split bills across separate profiles (e.g. business, family,
+          Split expenses across separate profiles (e.g. business, family,
           personal).
         </p>
       </header>

@@ -42,8 +42,8 @@ export function DeleteProfileDialog({
         </DialogHeader>
         <div className="space-y-3 text-sm">
           <p>
-            Delete <strong>{profile?.name}</strong>? All bills in this profile
-            will be permanently deleted.
+            Delete <strong>{profile?.name}</strong>? All expenses in this
+            profile will be permanently deleted.
           </p>
           {error && <p className="text-sm text-destructive">{error.message}</p>}
         </div>

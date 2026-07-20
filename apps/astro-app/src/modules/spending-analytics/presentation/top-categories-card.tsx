@@ -3,20 +3,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/shared/format";
 import { cn } from "@/lib/utils";
-import type { Bill } from "@/modules/bill-management/domain/bill";
+import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { totalsByCategory } from "../core/analytics";
 import { Crown } from "lucide-react";
 
 interface TopCategoriesCardProps {
-  bills: Bill[];
+  expenses: Expense[];
 }
 
 /** The three categories eating most of this month's spending. */
-export function TopCategoriesCard({ bills }: TopCategoriesCardProps) {
+export function TopCategoriesCard({ expenses }: TopCategoriesCardProps) {
   const { textClassFor, hexFor } = useCategoryOptions();
   const currentMonth = new Date().toISOString().slice(0, 7);
-  const top = totalsByCategory(bills, currentMonth).slice(0, 3);
+  const top = totalsByCategory(expenses, currentMonth).slice(0, 3);
 
   return (
     <Card>

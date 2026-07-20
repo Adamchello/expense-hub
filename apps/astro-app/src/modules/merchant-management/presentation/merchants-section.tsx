@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/shared/format";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
-import { useBills } from "@/modules/bill-management/core/store";
+import { useExpenses } from "@/modules/expense-management/core/store";
 import { Check, Pencil, X } from "lucide-react";
 
 const renameMerchant = async (input: { from: string; to: string }) => {
@@ -24,11 +24,11 @@ const renameMerchant = async (input: { from: string; to: string }) => {
 
 /**
  * Keeps payee names consistent: lists every merchant with usage counts and
- * renames it across all bills and recurring bills (renaming onto an existing
+ * renames it across all expenses and recurring payments (renaming onto an existing
  * merchant merges them).
  */
 export function MerchantsSection() {
-  const { data: bills } = useBills();
+  const { data: expenses } = useExpenses();
   const [editing, setEditing] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
 
@@ -36,11 +36,11 @@ export function MerchantsSection() {
     {
       mutationFn: renameMerchant,
       onSuccess: (data, input) => {
-        queryClient.invalidateQueries({ queryKey: ["bills"] });
-        queryClient.invalidateQueries({ queryKey: ["recurring-bills"] });
+        queryClient.invalidateQueries({ queryKey: ["expenses"] });
+        queryClient.invalidateQueries({ queryKey: ["recurring-payments"] });
         setEditing(null);
         const updated =
-          (data?.data?.bills_updated ?? 0) +
+          (data?.data?.expenses_updated ?? 0) +
           (data?.data?.recurring_updated ?? 0);
         toast(`Renamed to "${input.to}" across ${updated} records`);
       },
@@ -50,16 +50,16 @@ export function MerchantsSection() {
 
   const merchants = useMemo(() => {
     const stats = new Map<string, { count: number; total: number }>();
-    for (const bill of bills ?? []) {
-      const entry = stats.get(bill.provider_name) ?? { count: 0, total: 0 };
+    for (const expense of expenses ?? []) {
+      const entry = stats.get(expense.provider_name) ?? { count: 0, total: 0 };
       entry.count++;
-      entry.total += bill.amount;
-      stats.set(bill.provider_name, entry);
+      entry.total += expense.amount;
+      stats.set(expense.provider_name, entry);
     }
     return [...stats.entries()]
       .map(([name, entry]) => ({ name, ...entry }))
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  }, [bills]);
+  }, [expenses]);
 
   const startEditing = (name: string) => {
     setEditing(name);
@@ -80,8 +80,8 @@ export function MerchantsSection() {
       <CardContent className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
           Rename a merchant to fix inconsistent payee names — the change applies
-          to every bill and recurring bill. Renaming onto an existing merchant
-          merges them.
+          to every expense and recurring payment. Renaming onto an existing
+          merchant merges them.
         </p>
 
         {mutation.error && (
@@ -94,7 +94,7 @@ export function MerchantsSection() {
 
         {merchants.length === 0 ? (
           <p className="py-2 text-sm text-muted-foreground">
-            No merchants yet — they appear as you record bills.
+            No merchants yet — they appear as you record expenses.
           </p>
         ) : (
           <ul className="flex flex-col divide-y divide-border">
@@ -152,7 +152,8 @@ export function MerchantsSection() {
                   </>
                 )}
                 <p className="ml-auto text-xs text-muted-foreground">
-                  {merchant.count} {merchant.count === 1 ? "bill" : "bills"} ·{" "}
+                  {merchant.count}{" "}
+                  {merchant.count === 1 ? "expense" : "expenses"} ·{" "}
                   <span className="font-mono">
                     {formatCurrency(merchant.total)}
                   </span>

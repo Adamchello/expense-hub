@@ -15,7 +15,7 @@ interface CategoryPickerPopoverProps {
   onSelect: (category: string) => void;
 }
 
-/** Grouped category picker (built-ins + customs) shared by bill forms. */
+/** Grouped category picker (built-ins + customs) shared by expense forms. */
 export function CategoryPickerPopover({
   value,
   onSelect,

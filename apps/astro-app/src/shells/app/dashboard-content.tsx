@@ -2,25 +2,23 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BillHistory } from "@/modules/bill-management/presentation/bill-history";
-import { DashboardOverview } from "@/modules/bill-management/presentation/dashboard-overview";
-import { RecurringBills } from "@/modules/recurring-bills/presentation/recurring-bills";
+import { ExpenseHistory } from "@/modules/expense-management/presentation/expense-history";
+import { DashboardOverview } from "@/modules/expense-management/presentation/dashboard-overview";
+import { RecurringPayments } from "@/modules/recurring-payments/presentation/recurring-payments";
 import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
-import { BillPlanning } from "@/modules/bill-planning/presentation/bill-planning";
 import { CategoriesSection } from "@/modules/category-management/presentation/categories-section";
 import { MerchantsSection } from "@/modules/merchant-management/presentation/merchants-section";
-import { IncomingPayments } from "@/modules/bill-planning/presentation/incoming-payments";
+import { IncomingPayments } from "@/modules/recurring-payments/presentation/incoming-payments";
 import { TopCategoriesCard } from "@/modules/spending-analytics/presentation/top-categories-card";
-import { useBills } from "@/modules/bill-management/core/store";
+import { useExpenses } from "@/modules/expense-management/core/store";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
 import { ProfilesSection } from "@/modules/multi-profile-account/presentation/profiles-section";
-import { AddBillDialog } from "./add-bill-dialog";
+import { AddExpenseDialog } from "./add-expense-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import { SkeletonList } from "@/components/ui/skeleton";
 import { useAuth } from "@/kernel/auth/use-auth";
 import {
-  CalendarDays,
   ChartColumn,
   LayoutDashboard,
   LogOut,
@@ -41,7 +39,6 @@ const NAV_GROUPS = [
       { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { value: "history", label: "History", icon: Receipt },
       { value: "recurring", label: "Recurring", icon: Repeat },
-      { value: "planning", label: "Planning", icon: CalendarDays },
       { value: "analytics", label: "Analytics", icon: ChartColumn },
     ],
   },
@@ -53,9 +50,8 @@ const NAV_GROUPS = [
 
 const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
-  history: "Bill History",
-  recurring: "Recurring Bills",
-  planning: "Planning",
+  history: "Expense History",
+  recurring: "Recurring Payments",
   analytics: "Spending Analytics",
   settings: "Settings",
 };
@@ -66,14 +62,14 @@ export function DashboardContent() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const openAddBill = (tab: "single" | "import" = "single") => {
+  const openAddExpense = (tab: "single" | "import" = "single") => {
     setAddTab(tab);
     setIsAddOpen(true);
   };
   const auth = useAuth();
   const email = auth.status === "authenticated" ? auth.user?.email : "";
 
-  const query = useBills();
+  const query = useExpenses();
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -88,7 +84,7 @@ export function DashboardContent() {
           <Wallet2 className="size-4.5" />
         </div>
         <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
-          Smart Bill Assistant
+          Smart Expense Assistant
         </span>
       </div>
 
@@ -199,10 +195,10 @@ export function DashboardContent() {
             <ThemeToggle />
             <Button
               className="hidden sm:inline-flex"
-              onClick={() => openAddBill()}
+              onClick={() => openAddExpense()}
             >
               <Plus className="size-4" />
-              Add Bill
+              Add Expense
             </Button>
           </div>
         </header>
@@ -214,7 +210,7 @@ export function DashboardContent() {
                 <p className="text-sm text-destructive">
                   {query.error instanceof Error
                     ? query.error.message
-                    : "Failed to load bills"}
+                    : "Failed to load expenses"}
                 </p>
               </div>
             )}
@@ -225,14 +221,14 @@ export function DashboardContent() {
               ) : (
                 <div className="flex flex-col gap-6">
                   <DashboardOverview
-                    bills={query.data || []}
-                    onAddBill={openAddBill}
+                    expenses={query.data || []}
+                    onAddExpense={openAddExpense}
                     onViewHistory={() => handleTabChange("history")}
                   />
                   {(query.data?.length ?? 0) > 0 && (
                     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                       <IncomingPayments />
-                      <TopCategoriesCard bills={query.data || []} />
+                      <TopCategoriesCard expenses={query.data || []} />
                     </div>
                   )}
                 </div>
@@ -242,20 +238,17 @@ export function DashboardContent() {
               {query.isLoading ? (
                 <SkeletonList rows={5} />
               ) : (
-                <BillHistory bills={query.data || []} />
+                <ExpenseHistory expenses={query.data || []} />
               )}
             </TabsContent>
             <TabsContent value="recurring" className="mt-0">
-              <RecurringBills />
-            </TabsContent>
-            <TabsContent value="planning" className="mt-0">
-              <BillPlanning />
+              <RecurringPayments />
             </TabsContent>
             <TabsContent value="analytics" className="mt-0">
               {query.isLoading ? (
                 <SkeletonList rows={4} />
               ) : (
-                <SpendingAnalytics bills={query.data || []} />
+                <SpendingAnalytics expenses={query.data || []} />
               )}
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
@@ -271,14 +264,14 @@ export function DashboardContent() {
 
       {/* Mobile floating add button */}
       <Button
-        aria-label="Add bill"
-        onClick={() => openAddBill()}
+        aria-label="Add expense"
+        onClick={() => openAddExpense()}
         className="fixed bottom-5 right-5 z-40 size-14 rounded-full shadow-lg sm:hidden"
       >
         <Plus className="size-6" />
       </Button>
 
-      <AddBillDialog
+      <AddExpenseDialog
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         initialTab={addTab}

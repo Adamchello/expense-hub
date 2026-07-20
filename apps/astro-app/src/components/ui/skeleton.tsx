@@ -4,7 +4,7 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-lg bg-muted", className)} />;
 }
 
-/** Placeholder list shown while bill-like data loads. */
+/** Placeholder list shown while expense-like data loads. */
 export function SkeletonList({ rows = 3 }: { rows?: number }) {
   return (
     <div className="flex flex-col gap-2" aria-hidden="true">
