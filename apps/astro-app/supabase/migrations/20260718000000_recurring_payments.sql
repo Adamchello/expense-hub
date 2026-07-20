@@ -61,3 +61,5 @@ using (
     select id from public.profiles where account_id = auth.uid()
   )
 );
+
+grant select, insert, update, delete on public.recurring_payments to authenticated, service_role;

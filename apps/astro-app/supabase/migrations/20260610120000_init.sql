@@ -160,3 +160,11 @@ using (
     select id from public.profiles where account_id = auth.uid()
   )
 );
+
+-- Table privileges. Supabase's default privileges are not a contract we can
+-- rely on across CLI versions — without these, a fresh `db reset` produces
+-- tables PostgREST cannot read ("permission denied"). RLS above still decides
+-- which rows each user sees; these grants only open the door.
+grant select, insert, update, delete on public.profiles to authenticated, service_role;
+grant select, insert, update, delete on public.account_settings to authenticated, service_role;
+grant select, insert, update, delete on public.expenses to authenticated, service_role;

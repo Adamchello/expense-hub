@@ -90,3 +90,6 @@ using (
     select id from public.profiles where account_id = auth.uid()
   )
 );
+
+grant select, insert, update, delete on public.recurring_payment_events to authenticated, service_role;
+grant select, insert, update, delete on public.custom_categories to authenticated, service_role;
