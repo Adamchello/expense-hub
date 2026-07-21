@@ -34,7 +34,7 @@ export function IncomingPayments() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CalendarClock className="size-4.5 text-primary" />
-          Incoming Payments
+          Upcoming Payments
         </CardTitle>
       </CardHeader>
       <CardContent>

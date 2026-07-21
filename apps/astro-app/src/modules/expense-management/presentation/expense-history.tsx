@@ -206,7 +206,7 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
           }
         }}
         className={cn(
-          "group relative cursor-pointer rounded-lg border p-3 transition-all hover:opacity-90",
+          "group relative cursor-pointer rounded-lg border p-3 transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           washClassFor(expense.category),
           isSelected && "ring-2 ring-primary",
         )}
@@ -257,8 +257,9 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters + exports */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Filters + exports. Search leads full-width; the three selects flex
+          so they never tower or clip on a phone. */}
+      <div className="flex flex-col gap-2">
         <div className="relative">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -267,104 +268,115 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
             aria-label="Search expenses"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64 pl-8"
+            className="w-full pl-8"
           />
         </div>
-        <Select value={monthFilter} onValueChange={setMonthFilter}>
-          <SelectTrigger className="w-40" aria-label="Filter by month">
-            <SelectValue placeholder="All months" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All months</SelectItem>
-            {monthOptions.map((month) => (
-              <SelectItem key={month} value={month}>
-                {formatMonth(month)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={monthFilter} onValueChange={setMonthFilter}>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-40 sm:flex-none"
+              aria-label="Filter by month"
+            >
+              <SelectValue placeholder="All months" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All months</SelectItem>
+              {monthOptions.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {formatMonth(month)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-40" aria-label="Filter by category">
-            <SelectValue placeholder="All categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All categories</SelectItem>
-            {categoryOptions.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-40 sm:flex-none"
+              aria-label="Filter by category"
+            >
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All categories</SelectItem>
+              {categoryOptions.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select
-          value={sortOrder}
-          onValueChange={(value) => setSortOrder(value as SortOrder)}
-        >
-          <SelectTrigger className="w-48" aria-label="Sort expenses">
-            <ArrowUpDown className="size-3.5" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(SORT_LABELS) as SortOrder[]).map((order) => (
-              <SelectItem key={order} value={order}>
-                {SORT_LABELS[order]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {(monthFilter !== ALL ||
-          categoryFilter !== ALL ||
-          searchTerm !== "" ||
-          sortOrder !== "date-desc") && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setMonthFilter(ALL);
-              setCategoryFilter(ALL);
-              setSearchTerm("");
-              setSortOrder("date-desc");
-            }}
+          <Select
+            value={sortOrder}
+            onValueChange={(value) => setSortOrder(value as SortOrder)}
           >
-            Clear filters
-          </Button>
-        )}
-        <div className="ml-auto">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Download className="size-3.5" />
-                Export
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-40 p-1">
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => {
-                  exportExpensesToCsv(expenses);
-                  toast("Exported expenses as CSV");
-                }}
-              >
-                <Download className="size-3.5" />
-                CSV
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => {
-                  exportExpensesToExcel(expenses);
-                  toast("Exported expenses as Excel");
-                }}
-              >
-                <Download className="size-3.5" />
-                Excel
-              </button>
-            </PopoverContent>
-          </Popover>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-48 sm:flex-none"
+              aria-label="Sort expenses"
+            >
+              <ArrowUpDown className="size-3.5" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(SORT_LABELS) as SortOrder[]).map((order) => (
+                <SelectItem key={order} value={order}>
+                  {SORT_LABELS[order]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {(monthFilter !== ALL ||
+            categoryFilter !== ALL ||
+            searchTerm !== "" ||
+            sortOrder !== "date-desc") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setMonthFilter(ALL);
+                setCategoryFilter(ALL);
+                setSearchTerm("");
+                setSortOrder("date-desc");
+              }}
+            >
+              Clear filters
+            </Button>
+          )}
+          <div className="ml-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="size-3.5" />
+                  Export
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 p-1">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  onClick={() => {
+                    exportExpensesToCsv(expenses);
+                    toast("Exported expenses as CSV");
+                  }}
+                >
+                  <Download className="size-3.5" />
+                  CSV
+                </button>
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  onClick={() => {
+                    exportExpensesToExcel(expenses);
+                    toast("Exported expenses as Excel");
+                  }}
+                >
+                  <Download className="size-3.5" />
+                  Excel
+                </button>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 

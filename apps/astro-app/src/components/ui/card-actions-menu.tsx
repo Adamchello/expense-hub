@@ -34,7 +34,7 @@ export function CardActionsMenu({ label, actions }: CardActionsMenuProps) {
           type="button"
           aria-label={label}
           onClick={(e) => e.stopPropagation()}
-          className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground sm:hidden sm:group-hover:block sm:group-focus-within:block sm:data-[state=open]:block"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:size-8 sm:hidden sm:group-hover:inline-flex sm:group-focus-within:inline-flex sm:data-[state=open]:inline-flex"
         >
           <MoreHorizontal className="size-4" />
         </button>

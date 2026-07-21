@@ -6,12 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Expense } from "../domain/expense";
 import type { Category } from "../domain/category";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateExpense } from "../core/store";
@@ -86,6 +80,9 @@ export function ExpenseFormBody({
   const [showMore, setShowMore] = useState(isEdit);
   // Once the user picks a category themselves, payee typing stops overriding it.
   const [categoryTouched, setCategoryTouched] = useState(isEdit);
+  // Surfaces a reason when Save does nothing (e.g. a negative amount) instead
+  // of silently swallowing the click.
+  const [amountError, setAmountError] = useState<string | null>(null);
 
   useEffect(() => {
     if (active) {
@@ -116,8 +113,10 @@ export function ExpenseFormBody({
 
     const amountNum = parseFloat(formState.amount);
     if (isNaN(amountNum) || amountNum < 0) {
+      setAmountError("Enter an amount of 0 or more.");
       return;
     }
+    setAmountError(null);
 
     const category = (formState.category || "Uncategorized") as Category;
 
@@ -195,9 +194,17 @@ export function ExpenseFormBody({
             placeholder="0.00"
             autoFocus
             value={formState.amount}
-            onChange={(e) => updateField("amount", e.target.value)}
+            onChange={(e) => {
+              if (amountError) setAmountError(null);
+              updateField("amount", e.target.value);
+            }}
             required
-            aria-invalid={error != null && !formState.amount ? "true" : "false"}
+            aria-invalid={
+              amountError != null || (error != null && !formState.amount)
+                ? "true"
+                : "false"
+            }
+            aria-describedby={amountError ? "amount-error" : undefined}
             style={{ width: `${amountLength + 1}ch` }}
             className={cn(
               "max-w-full border-none bg-transparent text-center font-mono font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
@@ -205,6 +212,11 @@ export function ExpenseFormBody({
             )}
           />
         </div>
+        {amountError && (
+          <p id="amount-error" className="text-xs font-medium text-destructive">
+            {amountError}
+          </p>
+        )}
       </div>
 
       {/* Category — the primary choice */}
@@ -383,29 +395,5 @@ export function ExpenseEntryFormBody({
       pendingLabel="Saving..."
       errorFallback="Failed to save expense"
     />
-  );
-}
-
-interface ExpenseEntryFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function ExpenseEntryForm({
-  open,
-  onOpenChange,
-}: ExpenseEntryFormProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add New Expense</DialogTitle>
-        </DialogHeader>
-        <ExpenseEntryFormBody
-          active={open}
-          onCancel={() => onOpenChange(false)}
-        />
-      </DialogContent>
-    </Dialog>
   );
 }

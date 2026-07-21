@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -40,6 +41,10 @@ export function AddExpenseDialog({
       >
         <DialogHeader>
           <DialogTitle>Add Expenses</DialogTitle>
+          <DialogDescription>
+            Record a single expense, or import many at once from a CSV or Excel
+            file.
+          </DialogDescription>
         </DialogHeader>
         <Tabs
           value={tab}

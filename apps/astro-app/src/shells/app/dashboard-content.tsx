@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ExpenseHistory } from "@/modules/expense-management/presentation/expense-history";
 import { DashboardOverview } from "@/modules/expense-management/presentation/dashboard-overview";
@@ -16,7 +17,7 @@ import { ProfilesSection } from "@/modules/multi-profile-account/presentation/pr
 import { AddExpenseDialog } from "./add-expense-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/toaster";
-import { SkeletonList } from "@/components/ui/skeleton";
+import { SkeletonList, SkeletonAnalytics } from "@/components/ui/skeleton";
 import { useAuth } from "@/kernel/auth/use-auth";
 import {
   ChartColumn,
@@ -60,7 +61,10 @@ export function DashboardContent() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addTab, setAddTab] = useState<"single" | "import">("single");
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Active tab lives in the URL (?tab=) so views deep-link and survive reload.
+  const navigate = useNavigate();
+  const { tab: activeTab } = useSearch({ from: "/app" });
 
   const openAddExpense = (tab: "single" | "import" = "single") => {
     setAddTab(tab);
@@ -72,7 +76,7 @@ export function DashboardContent() {
   const query = useExpenses();
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    navigate({ to: "/app", search: { tab: value as typeof activeTab } });
     setIsNavOpen(false);
   };
 
@@ -246,7 +250,7 @@ export function DashboardContent() {
             </TabsContent>
             <TabsContent value="analytics" className="mt-0">
               {query.isLoading ? (
-                <SkeletonList rows={4} />
+                <SkeletonAnalytics />
               ) : (
                 <SpendingAnalytics expenses={query.data || []} />
               )}

@@ -120,7 +120,7 @@ export function PaymentCalendar({
                   }
                 }}
                 className={cn(
-                  "group/day min-h-14 cursor-pointer rounded-lg border p-1 transition-colors sm:min-h-24 sm:p-1.5",
+                  "group/day min-h-14 cursor-pointer rounded-lg border p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-24 sm:p-1.5",
                   hasPayments
                     ? "border-border bg-accent/40 hover:border-primary/50 hover:bg-accent"
                     : "border-transparent hover:border-dashed hover:border-border hover:bg-accent/20",

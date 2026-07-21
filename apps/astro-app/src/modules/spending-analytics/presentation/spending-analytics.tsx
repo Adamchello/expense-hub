@@ -281,32 +281,29 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
                           {formatCurrency(comparison.previous)} →{" "}
                           {formatCurrency(comparison.current)}
                         </span>
-                        <span className="flex w-20 items-center justify-end gap-1 text-xs font-medium">
+                        {/* A record, not a verdict: the arrow states the fact
+                            (up/down); the color stays neutral so spending more
+                            never reads as an error. */}
+                        <span className="flex w-20 items-center justify-end gap-1 text-xs font-medium text-muted-foreground">
                           {direction === "up" && (
                             <>
-                              <ArrowUpRight className="size-3.5 text-destructive" />
-                              <span className="text-destructive">
-                                +{comparison.changePct}%
-                              </span>
+                              <ArrowUpRight className="size-3.5" />
+                              <span>+{comparison.changePct}%</span>
                             </>
                           )}
                           {direction === "down" && (
                             <>
-                              <ArrowDownRight className="size-3.5 text-green-600 dark:text-green-400" />
-                              <span className="text-green-600 dark:text-green-400">
-                                {comparison.changePct}%
-                              </span>
+                              <ArrowDownRight className="size-3.5" />
+                              <span>{comparison.changePct}%</span>
                             </>
                           )}
                           {direction === "flat" && (
                             <>
-                              <Minus className="size-3.5 text-muted-foreground" />
-                              <span className="text-muted-foreground">0%</span>
+                              <Minus className="size-3.5" />
+                              <span>0%</span>
                             </>
                           )}
-                          {direction === "new" && (
-                            <span className="text-muted-foreground">new</span>
-                          )}
+                          {direction === "new" && <span>new</span>}
                         </span>
                       </li>
                     );
