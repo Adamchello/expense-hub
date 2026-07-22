@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Upload, Download, AlertCircle } from "lucide-react";
+import { Upload, Download } from "lucide-react";
+import { Callout } from "@/components/shared";
 
 interface FileDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -56,7 +57,7 @@ export function FileDropZone({
           download
           className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
         >
-          <Download className="h-4 w-4" />
+          <Download className="size-4" />
           Download template file
         </a>
       </div>
@@ -84,9 +85,9 @@ export function FileDropZone({
         <div className="space-y-4">
           <div className="flex justify-center">
             {isProcessing ? (
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+              <div className="animate-spin rounded-full size-12 border-b-2 border-primary" />
             ) : (
-              <Upload className="h-12 w-12 text-muted-foreground" />
+              <Upload className="size-12 text-muted-foreground" />
             )}
           </div>
 
@@ -113,29 +114,21 @@ export function FileDropZone({
       </div>
 
       {errors.length > 0 && (
-        <div
-          data-e2e="expense-import.dropzone.errors"
-          className="rounded-md bg-destructive/10 border border-destructive/20 p-4"
-        >
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              {errors.map((error, idx) => (
-                <p key={idx} className="text-sm text-destructive">
-                  {error}
-                </p>
-              ))}
-              <a
-                href="/templates/expenses-import-template.csv"
-                download
-                className="inline-flex items-center gap-1 text-sm text-destructive hover:underline mt-2"
-              >
-                <Download className="h-3 w-3" />
-                Download template
-              </a>
-            </div>
+        <Callout variant="error" data-e2e="expense-import.dropzone.errors">
+          <div className="space-y-1">
+            {errors.map((error, idx) => (
+              <p key={idx}>{error}</p>
+            ))}
+            <a
+              href="/templates/expenses-import-template.csv"
+              download
+              className="inline-flex items-center gap-1 hover:underline mt-2"
+            >
+              <Download className="size-3" />
+              Download template
+            </a>
           </div>
-        </div>
+        </Callout>
       )}
 
       <div className="space-y-3 text-sm text-muted-foreground">

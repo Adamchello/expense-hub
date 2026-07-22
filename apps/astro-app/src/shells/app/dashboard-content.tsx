@@ -17,7 +17,12 @@ import { ProfilesSection } from "@/modules/multi-profile-account/presentation/pr
 import { AddExpenseDialog } from "./add-expense-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Toaster } from "@/components/ui/toaster";
-import { SkeletonList, SkeletonAnalytics } from "@/components/ui/skeleton";
+import {
+  SkeletonList,
+  SkeletonAnalytics,
+  SkeletonDashboard,
+} from "@/components/ui/skeleton";
+import { Callout, SectionLabel, errorMessage } from "@/components/shared";
 import { useAuth } from "@/kernel/auth/use-auth";
 import {
   ChartColumn,
@@ -102,9 +107,7 @@ export function DashboardContent() {
         <TabsList className="flex h-auto w-full flex-col items-stretch justify-start gap-1 rounded-none bg-transparent p-0">
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="flex flex-col gap-1 pb-4">
-              <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
-              </p>
+              <SectionLabel className="px-3 pb-1">{group.label}</SectionLabel>
               {group.tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
@@ -210,18 +213,14 @@ export function DashboardContent() {
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
             {query.error && (
-              <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-3">
-                <p className="text-sm text-destructive">
-                  {query.error instanceof Error
-                    ? query.error.message
-                    : "Failed to load expenses"}
-                </p>
-              </div>
+              <Callout variant="error">
+                {errorMessage(query.error, "Failed to load expenses")}
+              </Callout>
             )}
 
             <TabsContent value="dashboard" className="mt-0">
               {query.isLoading ? (
-                <SkeletonList rows={4} />
+                <SkeletonDashboard />
               ) : (
                 <div className="flex flex-col gap-6">
                   <DashboardOverview

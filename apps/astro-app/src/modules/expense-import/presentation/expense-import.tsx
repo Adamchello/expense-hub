@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Callout, errorMessage } from "@/components/shared";
 import { FileDropZone } from "./import/file-drop-zone";
 import { ImportStats } from "./import/import-stats";
 import { ImportTable } from "./import/import-table";
@@ -84,26 +85,22 @@ export function ExpenseImportBody({ active, onDone }: ExpenseImportBodyProps) {
             </div>
             <ImportErrors rows={store.rows} />
             {store.importError && (
-              <div
+              <Callout
+                variant="error"
                 data-e2e="expense-import.state.error"
-                className="rounded-md bg-destructive/10 border border-destructive/20 p-3 shrink-0"
+                className="shrink-0"
               >
-                <p className="text-sm text-destructive">
-                  {store.importError instanceof Error
-                    ? store.importError.message
-                    : "Failed to import expenses"}
-                </p>
-              </div>
+                {errorMessage(store.importError, "Failed to import expenses")}
+              </Callout>
             )}
             {store.importStatus.successMessage && (
-              <div
+              <Callout
+                variant="success"
                 data-e2e="expense-import.state.success"
-                className="rounded-md bg-green-500/10 border border-green-500/20 p-3 shrink-0"
+                className="shrink-0"
               >
-                <p className="text-sm text-green-600">
-                  {store.importStatus.successMessage}
-                </p>
-              </div>
+                {store.importStatus.successMessage}
+              </Callout>
             )}
           </div>
         )}

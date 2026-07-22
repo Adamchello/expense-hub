@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/shared/format";
+import { Amount, Callout, EmptyState, errorMessage } from "@/components/shared";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
 import { useExpenses } from "@/modules/expense-management/core/store";
@@ -85,17 +85,16 @@ export function MerchantsSection() {
         </p>
 
         {mutation.error && (
-          <p className="text-sm text-destructive">
-            {mutation.error instanceof Error
-              ? mutation.error.message
-              : "Failed to rename merchant"}
-          </p>
+          <Callout variant="error">
+            {errorMessage(mutation.error, "Failed to rename merchant")}
+          </Callout>
         )}
 
         {merchants.length === 0 ? (
-          <p className="py-2 text-sm text-muted-foreground">
-            No merchants yet — they appear as you record expenses.
-          </p>
+          <EmptyState
+            variant="inline"
+            description="No merchants yet — they appear as you record expenses."
+          />
         ) : (
           <ul className="flex flex-col divide-y divide-border">
             {merchants.map((merchant) => (
@@ -119,8 +118,7 @@ export function MerchantsSection() {
                       className="h-8 w-52"
                     />
                     <Button
-                      size="icon"
-                      className="size-8"
+                      size="icon-sm"
                       aria-label="Confirm rename"
                       disabled={mutation.isPending || !newName.trim()}
                       onClick={submitRename}
@@ -129,8 +127,7 @@ export function MerchantsSection() {
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="size-8"
+                      size="icon-sm"
                       aria-label="Cancel rename"
                       onClick={() => setEditing(null)}
                     >
@@ -142,8 +139,7 @@ export function MerchantsSection() {
                     <p className="text-sm font-medium">{merchant.name}</p>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="size-7"
+                      size="icon-sm"
                       aria-label={`Rename merchant ${merchant.name}`}
                       onClick={() => startEditing(merchant.name)}
                     >
@@ -154,9 +150,12 @@ export function MerchantsSection() {
                 <p className="ml-auto text-xs text-muted-foreground">
                   {merchant.count}{" "}
                   {merchant.count === 1 ? "expense" : "expenses"} ·{" "}
-                  <span className="font-mono">
-                    {formatCurrency(merchant.total)}
-                  </span>
+                  <Amount
+                    value={merchant.total}
+                    size="sm"
+                    weight="normal"
+                    muted
+                  />
                 </p>
               </li>
             ))}

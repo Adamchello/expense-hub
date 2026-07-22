@@ -8,6 +8,12 @@ import type { Expense } from "../domain/expense";
 import type { Category } from "../domain/category";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Callout,
+  errorMessage,
+  HeroAmountField,
+  SectionLabel,
+} from "@/components/shared";
 import { useCreateExpense } from "../core/store";
 import { suggestCategory } from "../core/category-suggestion";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
@@ -140,90 +146,37 @@ export function ExpenseFormBody({
 
   const isFormValid = formState.amount && formState.date;
 
-  // Scale the hero amount down as the number grows, and let the input
-  // width track its content so digits never get clipped.
-  const amountLength = Math.max(formState.amount.length, 4);
-  const amountSizeClass =
-    amountLength <= 7
-      ? "text-5xl"
-      : amountLength <= 10
-        ? "text-4xl"
-        : "text-3xl";
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
+    // `noValidate` hands validation to handleSubmit — the native `min`/`required`
+    // constraints blocked submit before our own amount message could ever render.
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="flex flex-col gap-5 py-2"
+    >
       {error != null && (
-        <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
-          <p className="text-sm text-destructive">
-            {error instanceof Error ? error.message : errorFallback}
-          </p>
-        </div>
+        <Callout variant="error">{errorMessage(error, errorFallback)}</Callout>
       )}
 
-      {successMessage && (
-        <div className="rounded-md bg-green-500/10 border border-green-500/20 p-3">
-          <p className="text-sm text-green-600 dark:text-green-400">
-            {successMessage}
-          </p>
-        </div>
-      )}
+      {successMessage && <Callout variant="success">{successMessage}</Callout>}
 
       {/* Hero amount */}
-      <div className="flex flex-col items-center gap-1 pt-2">
-        <label
-          htmlFor="amount"
-          className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
-        >
-          How much?
-        </label>
-        <div className="flex w-full min-w-0 items-baseline justify-center">
-          <span
-            className={cn(
-              "shrink-0 font-mono font-semibold text-muted-foreground",
-              amountLength <= 7 ? "text-3xl" : "text-2xl",
-            )}
-          >
-            $
-          </span>
-          <input
-            id="amount"
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            autoFocus
-            value={formState.amount}
-            onChange={(e) => {
-              if (amountError) setAmountError(null);
-              updateField("amount", e.target.value);
-            }}
-            required
-            aria-invalid={
-              amountError != null || (error != null && !formState.amount)
-                ? "true"
-                : "false"
-            }
-            aria-describedby={amountError ? "amount-error" : undefined}
-            style={{ width: `${amountLength + 1}ch` }}
-            className={cn(
-              "max-w-full border-none bg-transparent text-center font-mono font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-              amountSizeClass,
-            )}
-          />
-        </div>
-        {amountError && (
-          <p id="amount-error" className="text-xs font-medium text-destructive">
-            {amountError}
-          </p>
-        )}
-      </div>
+      <HeroAmountField
+        id="amount"
+        label="How much?"
+        value={formState.amount}
+        onChange={(value) => {
+          if (amountError) setAmountError(null);
+          updateField("amount", value);
+        }}
+        error={amountError}
+        autoFocus
+        invalid={error != null && !formState.amount}
+      />
 
       {/* Category — the primary choice */}
       <div className="flex flex-col gap-1.5">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          What was it for?
-        </p>
+        <SectionLabel className="text-center">What was it for?</SectionLabel>
         <CategoryPickerPopover
           value={formState.category}
           onSelect={(category) => {

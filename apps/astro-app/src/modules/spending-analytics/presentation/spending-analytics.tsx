@@ -1,10 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/shared/format";
-import { cn } from "@/lib/utils";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Amount,
+  CategoryBadge,
+  CategoryShareRow,
+  EmptyState,
+  SegmentedControl,
+  StatCard,
+} from "@/components/shared";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { CategoryDonut } from "./category-donut";
@@ -16,18 +27,16 @@ import {
   totalsByCategory,
 } from "../core/analytics";
 import { MonthlyTrendChart } from "./monthly-trend-chart";
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Crown,
-  ListChecks,
-  Minus,
-  Wallet,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
 interface SpendingAnalyticsProps {
   expenses: Expense[];
 }
+
+const DISTRIBUTION_SCOPES = [
+  { value: "month", label: "This month" },
+  { value: "all", label: "All time" },
+] as const;
 
 const previousMonthOf = (month: string): string => {
   const [year, m] = month.split("-").map(Number);
@@ -38,16 +47,11 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
   const [distributionScope, setDistributionScope] = useState<"month" | "all">(
     "month",
   );
-  const { badgeClassFor, hexFor } = useCategoryOptions();
+  const { hexFor } = useCategoryOptions();
 
   if (expenses.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">
-          No expenses recorded yet. Analytics appear once you start tracking
-          expenses.
-        </p>
-      </div>
+      <EmptyState description="No expenses recorded yet. Analytics appear once you start tracking expenses." />
     );
   }
 
@@ -84,6 +88,8 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
             name: "Other",
             value: restTotal,
             share: Math.round((restTotal / distributionTotal) * 1000) / 10,
+            // Deliberate neutral grey: "Other" is an aggregated remainder, not
+            // a category, so it must never borrow a category's colour.
             hex: "#9ca3af",
           },
         ]
@@ -93,73 +99,32 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
     <div className="flex flex-col gap-6">
       {/* Headline stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-        <Card className="gap-0 py-4">
-          <CardContent className="flex items-center gap-3 px-4">
-            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
-              <Wallet className="size-4.5" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
-                Average monthly spending
-              </p>
-              <p className="mt-0.5 truncate font-mono text-lg font-semibold tracking-tight sm:text-2xl">
-                {formatCurrency(average)}
-              </p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                across {months.length}{" "}
-                {months.length === 1 ? "month" : "months"} of history
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Average monthly spending"
+          value={<Amount value={average} size="inherit" />}
+          hint={`across ${months.length} ${months.length === 1 ? "month" : "months"} of history`}
+        />
 
-        <Card className="gap-0 py-4">
-          <CardContent className="flex items-center gap-3 px-4">
-            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
-              <ListChecks className="size-4.5" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
-                This month
-              </p>
-              <p className="mt-0.5 truncate font-mono text-lg font-semibold tracking-tight sm:text-2xl">
-                {formatCurrency(thisMonthTotal)}
-              </p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                {average > 0 && thisMonthTotal > 0
-                  ? `${Math.round((thisMonthTotal / average) * 100)}% of your monthly average`
-                  : "recorded so far"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          tone="lead"
+          label="This month"
+          value={<Amount value={thisMonthTotal} size="inherit" />}
+          hint={
+            average > 0 && thisMonthTotal > 0
+              ? `${Math.round((thisMonthTotal / average) * 100)}% of your monthly average`
+              : "recorded so far"
+          }
+        />
 
-        <Card className="col-span-2 gap-0 py-4 sm:col-span-1">
-          <CardContent className="flex items-center gap-3 px-4">
-            <div className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground sm:flex">
-              <Crown className="size-4.5" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">
-                Biggest category this month
-              </p>
-              {biggest ? (
-                <>
-                  <p className="mt-0.5 truncate text-lg font-semibold tracking-tight sm:text-2xl">
-                    {biggest.category}
-                  </p>
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {biggest.share}% of this month's spending
-                  </p>
-                </>
-              ) : (
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  No expenses recorded this month yet.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Biggest category this month"
+          value={biggest ? biggest.category : "—"}
+          hint={
+            biggest
+              ? `${biggest.share}% of this month's spending`
+              : "No expenses recorded this month yet."
+          }
+        />
       </div>
 
       {/* Monthly trend */}
@@ -175,66 +140,34 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Spending by category */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle>Spending by Category</CardTitle>
-            <div className="flex gap-1">
-              <Button
-                variant={distributionScope === "month" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => setDistributionScope("month")}
-              >
-                This month
-              </Button>
-              <Button
-                variant={distributionScope === "all" ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => setDistributionScope("all")}
-              >
-                All time
-              </Button>
-            </div>
+            <CardAction>
+              <SegmentedControl
+                value={distributionScope}
+                onChange={setDistributionScope}
+                options={DISTRIBUTION_SCOPES}
+                label="Spending distribution period"
+              />
+            </CardAction>
           </CardHeader>
           <CardContent>
             {distribution.length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">
-                No expenses in this period.
-              </p>
+              <EmptyState
+                variant="inline"
+                description="No expenses in this period."
+              />
             ) : (
               <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                 <CategoryDonut slices={donutSlices} total={distributionTotal} />
                 <ul className="flex w-full flex-col gap-3">
                   {distribution.map((entry) => (
-                    <li key={entry.category}>
-                      <div className="flex items-center justify-between gap-2 text-sm">
-                        <span className="flex items-center gap-1.5">
-                          <span
-                            className="size-2.5 rounded-full"
-                            style={{ backgroundColor: hexFor(entry.category) }}
-                            aria-hidden="true"
-                          />
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                              badgeClassFor(entry.category),
-                            )}
-                          >
-                            {entry.category}
-                          </span>
-                        </span>
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {formatCurrency(entry.total)} · {entry.share}%
-                        </span>
-                      </div>
-                      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${entry.share}%`,
-                            backgroundColor: hexFor(entry.category),
-                          }}
-                        />
-                      </div>
-                    </li>
+                    <CategoryShareRow
+                      key={entry.category}
+                      category={entry.category}
+                      total={entry.total}
+                      share={entry.share}
+                    />
                   ))}
                 </ul>
               </div>
@@ -250,9 +183,10 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
             </CardHeader>
             <CardContent>
               {comparisons.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  Not enough data to compare months yet.
-                </p>
+                <EmptyState
+                  variant="inline"
+                  description="Not enough data to compare months yet."
+                />
               ) : (
                 <ul className="flex flex-col divide-y divide-border">
                   {comparisons.map((comparison) => {
@@ -269,17 +203,21 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
                         key={comparison.category}
                         className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
                       >
-                        <span
-                          className={cn(
-                            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-                            badgeClassFor(comparison.category),
-                          )}
-                        >
-                          {comparison.category}
-                        </span>
-                        <span className="ml-auto font-mono text-xs text-muted-foreground">
-                          {formatCurrency(comparison.previous)} →{" "}
-                          {formatCurrency(comparison.current)}
+                        <CategoryBadge category={comparison.category} />
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          <Amount
+                            value={comparison.previous}
+                            size="sm"
+                            weight="normal"
+                            muted
+                          />{" "}
+                          →{" "}
+                          <Amount
+                            value={comparison.current}
+                            size="sm"
+                            weight="normal"
+                            muted
+                          />
                         </span>
                         {/* A record, not a verdict: the arrow states the fact
                             (up/down); the color stays neutral so spending more
@@ -320,9 +258,10 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
             </CardHeader>
             <CardContent>
               {summaries.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  Summaries appear as more history accumulates.
-                </p>
+                <EmptyState
+                  variant="inline"
+                  description="Summaries appear as more history accumulates."
+                />
               ) : (
                 <ul className="flex flex-col gap-2">
                   {summaries.map((summary) => (

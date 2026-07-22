@@ -6,34 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CardActionsMenu } from "@/components/ui/card-actions-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
+import {
+  Amount,
+  ConfirmDialog,
+  EmptyState,
+  RecordCard,
+} from "@/components/shared";
+import { formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
 import { queryClient } from "@/lib/query-client";
-import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { useDeleteExpense, useBulkDeleteExpenses } from "../core/store";
 import { createExpense } from "../integration/repository";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";
 import { EditExpenseDialog } from "./edit-expense-dialog";
-import { ArrowUpDown, Download, Pencil, Search, Trash2 } from "lucide-react";
+import {
+  ArrowUpDown,
+  Download,
+  Pencil,
+  Receipt,
+  Search,
+  Trash2,
+} from "lucide-react";
 
 const ALL = "all";
 
@@ -75,7 +79,6 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
   const [isBulkConfirmOpen, setIsBulkConfirmOpen] = useState(false);
 
-  const { washClassFor, textClassFor } = useCategoryOptions();
   const deleteMutation = useDeleteExpense();
   const bulkDeleteMutation = useBulkDeleteExpenses();
 
@@ -180,80 +183,43 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
 
   if (expenses.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">
-          No expenses yet. Add your first expense to get started!
-        </p>
-      </div>
+      <EmptyState
+        variant="block"
+        icon={Receipt}
+        title="No expenses yet"
+        description="Add your first expense and this becomes a searchable history — filter by month or category, group by month, and export the whole lot whenever you need it."
+      />
     );
   }
 
   // Clicking a card toggles selection; row actions live in the ⋯ menu.
-  const renderExpenseCard = (expense: Expense) => {
-    const isSelected = selectedIds.has(expense.id);
-    return (
-      <div
-        key={expense.id}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isSelected}
-        aria-label={`Select expense from ${expense.provider_name}`}
-        onClick={() => toggleSelected(expense.id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggleSelected(expense.id);
-          }
-        }}
-        className={cn(
-          "group relative cursor-pointer rounded-lg border p-3 transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          washClassFor(expense.category),
-          isSelected && "ring-2 ring-primary",
-        )}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="min-w-0 flex-1 truncate text-sm font-semibold">
-            {expense.provider_name}
-          </h4>
-          <p className="shrink-0 font-mono text-sm font-semibold tracking-tight">
-            {formatCurrency(expense.amount)}
-          </p>
-          <CardActionsMenu
-            label={`Actions for expense from ${expense.provider_name}`}
-            actions={[
-              {
-                label: "Edit",
-                icon: Pencil,
-                onClick: () => setEditingExpense(expense),
-              },
-              {
-                label: "Delete",
-                icon: Trash2,
-                destructive: true,
-                onClick: () => setDeletingExpense(expense),
-              },
-            ]}
-          />
-        </div>
-        <p
-          className={cn(
-            "mt-1 text-[11px] font-semibold",
-            textClassFor(expense.category),
-          )}
-        >
-          {expense.category}
-        </p>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">
-          {formatDate(expense.date)}
-        </p>
-        {expense.description && (
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-            {expense.description}
-          </p>
-        )}
-      </div>
-    );
-  };
+  const renderExpenseCard = (expense: Expense) => (
+    <RecordCard
+      key={expense.id}
+      name={expense.provider_name}
+      amount={expense.amount}
+      category={expense.category}
+      meta={formatDate(expense.date)}
+      note={expense.description}
+      onToggle={() => toggleSelected(expense.id)}
+      selected={selectedIds.has(expense.id)}
+      selectLabel={`Select expense from ${expense.provider_name}`}
+      actionsLabel={`Actions for expense from ${expense.provider_name}`}
+      actions={[
+        {
+          label: "Edit",
+          icon: Pencil,
+          onClick: () => setEditingExpense(expense),
+        },
+        {
+          label: "Delete",
+          icon: Trash2,
+          destructive: true,
+          onClick: () => setDeletingExpense(expense),
+        },
+      ]}
+    />
+  );
 
   return (
     <div className="space-y-6">
@@ -403,11 +369,10 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
       )}
 
       {filteredExpenses.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">
-            No expenses match the selected filters.
-          </p>
-        </div>
+        <EmptyState
+          variant="block"
+          description="No expenses match the selected filters."
+        />
       ) : isGroupedByMonth ? (
         <div className="space-y-6">
           {sortedMonths.map((month) => (
@@ -442,94 +407,55 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
       />
 
       {/* Single delete confirmation */}
-      <Dialog
+      <ConfirmDialog
         open={!!deletingExpense}
         onOpenChange={(open) => {
           if (!open) setDeletingExpense(null);
         }}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete expense?</DialogTitle>
-          </DialogHeader>
-          {deletingExpense && (
-            <p className="text-sm text-muted-foreground">
+        title="Delete expense?"
+        description={
+          deletingExpense && (
+            <>
               This will permanently remove the{" "}
-              <span className="font-medium text-foreground">
-                {formatCurrency(deletingExpense.amount)}
-              </span>{" "}
-              expense from{" "}
+              <Amount value={deletingExpense.amount} size="inherit" /> expense
+              from{" "}
               <span className="font-medium text-foreground">
                 {deletingExpense.provider_name}
               </span>
               .
-            </p>
-          )}
-          {deleteMutation.error && (
-            <p className="text-sm text-destructive">
-              {deleteMutation.error instanceof Error
-                ? deleteMutation.error.message
-                : "Failed to delete expense"}
-            </p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => setDeletingExpense(null)}
-              disabled={deleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </>
+          )
+        }
+        confirmLabel="Delete"
+        pendingLabel="Deleting..."
+        onConfirm={handleConfirmDelete}
+        isPending={deleteMutation.isPending}
+        error={deleteMutation.error}
+        errorFallback="Failed to delete expense"
+      />
 
       {/* Bulk delete confirmation */}
-      <Dialog open={isBulkConfirmOpen} onOpenChange={setIsBulkConfirmOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete {selectedIds.size} expenses?</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+      <ConfirmDialog
+        open={isBulkConfirmOpen}
+        onOpenChange={setIsBulkConfirmOpen}
+        title={`Delete ${selectedIds.size} expenses?`}
+        description={
+          <>
             This will permanently remove the{" "}
             <span className="font-medium text-foreground">
               {selectedIds.size}
             </span>{" "}
             selected {selectedIds.size === 1 ? "expense" : "expenses"}. This
             cannot be undone.
-          </p>
-          {bulkDeleteMutation.error && (
-            <p className="text-sm text-destructive">
-              {bulkDeleteMutation.error instanceof Error
-                ? bulkDeleteMutation.error.message
-                : "Failed to delete expenses"}
-            </p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => setIsBulkConfirmOpen(false)}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmBulkDelete}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              {bulkDeleteMutation.isPending ? "Deleting..." : "Delete selected"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </>
+        }
+        confirmLabel="Delete selected"
+        pendingLabel="Deleting..."
+        onConfirm={handleConfirmBulkDelete}
+        isPending={bulkDeleteMutation.isPending}
+        error={bulkDeleteMutation.error}
+        errorFallback="Failed to delete expenses"
+      />
     </div>
   );
 }

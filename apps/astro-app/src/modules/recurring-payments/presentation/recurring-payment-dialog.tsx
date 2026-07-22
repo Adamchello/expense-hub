@@ -17,6 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Callout,
+  HeroAmountField,
+  SectionLabel,
+  errorMessage,
+} from "@/components/shared";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
 import type { Category } from "@/shared/domain/category";
 import {
@@ -24,7 +30,6 @@ import {
   FREQUENCY_LABELS,
   type Frequency,
 } from "@/shared/domain/recurrence";
-import { cn } from "@/lib/utils";
 import type { RecurringPayment } from "../domain/recurring-payment";
 import {
   useCreateRecurringPayment,
@@ -100,15 +105,6 @@ export function RecurringPaymentDialog({
 
   const isFormValid = amount && providerName.trim() && nextDueDate;
 
-  // Mirror the add-expense hero: scale the amount down as it grows.
-  const amountLength = Math.max(amount.length, 4);
-  const amountSizeClass =
-    amountLength <= 7
-      ? "text-5xl"
-      : amountLength <= 10
-        ? "text-4xl"
-        : "text-3xl";
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -117,59 +113,29 @@ export function RecurringPaymentDialog({
             {editing ? "Edit Recurring Payment" : "New Recurring Payment"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-2">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-5 py-2"
+        >
           {mutation.error != null && (
-            <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
-              <p className="text-sm text-destructive">
-                {mutation.error instanceof Error
-                  ? mutation.error.message
-                  : "Failed to save recurring payment"}
-              </p>
-            </div>
+            <Callout variant="error">
+              {errorMessage(mutation.error, "Failed to save recurring payment")}
+            </Callout>
           )}
 
           {/* Hero amount */}
-          <div className="flex flex-col items-center gap-1 pt-2">
-            <label
-              htmlFor="recurring-amount"
-              className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
-            >
-              How much each time?
-            </label>
-            <div className="flex w-full min-w-0 items-baseline justify-center">
-              <span
-                className={cn(
-                  "shrink-0 font-mono font-semibold text-muted-foreground",
-                  amountLength <= 7 ? "text-3xl" : "text-2xl",
-                )}
-              >
-                $
-              </span>
-              <input
-                id="recurring-amount"
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                autoFocus
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-                style={{ width: `${amountLength + 1}ch` }}
-                className={cn(
-                  "max-w-full border-none bg-transparent text-center font-mono font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-                  amountSizeClass,
-                )}
-              />
-            </div>
-          </div>
+          <HeroAmountField
+            id="recurring-amount"
+            label="How much each time?"
+            value={amount}
+            onChange={setAmount}
+            autoFocus
+          />
 
           {/* Category — same picker as the add-expense form */}
           <div className="flex flex-col gap-1.5">
-            <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              What is it for?
-            </p>
+            <SectionLabel className="text-center">What is it for?</SectionLabel>
             <CategoryPickerPopover value={category} onSelect={setCategory} />
           </div>
 

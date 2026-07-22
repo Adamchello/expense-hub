@@ -1,5 +1,6 @@
 "use client";
 
+import { Callout } from "@/components/shared";
 import type { ParsedExpenseRow } from "../../domain/expense-import";
 
 interface ImportErrorsProps {
@@ -16,19 +17,15 @@ export function ImportErrors({ rows }: ImportErrorsProps) {
   return (
     <div className="space-y-2">
       {problemRows.slice(0, 5).map((row) => (
-        <div
+        <Callout
           key={row.id}
-          className={`text-xs p-2 rounded ${
-            row.errors.length > 0
-              ? "bg-destructive/10 text-destructive"
-              : "bg-yellow-50 text-yellow-700"
-          }`}
+          variant={row.errors.length > 0 ? "error" : "warning"}
         >
           <span className="font-medium">{row.providerName || "Unknown"}:</span>{" "}
           {row.errors.length > 0
             ? row.errors.join(", ")
             : `Potential duplicate of: ${row.duplicateOf}`}
-        </div>
+        </Callout>
       ))}
     </div>
   );

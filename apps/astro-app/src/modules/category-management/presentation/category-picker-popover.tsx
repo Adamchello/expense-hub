@@ -7,6 +7,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
+import { SectionLabel } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { useCategoryOptions } from "../core/use-category-options";
 
@@ -45,9 +46,7 @@ export function CategoryPickerPopover({
         <div className="flex flex-col gap-3">
           {groups.map((group) => (
             <div key={group.label} className="flex flex-col gap-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
-              </p>
+              <SectionLabel>{group.label}</SectionLabel>
               <div className="flex flex-wrap gap-1.5">
                 {group.categories.map((category) => (
                   <button

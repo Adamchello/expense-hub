@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionLabel } from "@/components/shared";
 import { formatCurrency, formatMonth } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { RecurringPayment } from "../domain/recurring-payment";
@@ -85,12 +86,9 @@ export function PaymentCalendar({
       <CardContent>
         <div className="grid grid-cols-7 gap-1">
           {WEEKDAYS.map((weekday) => (
-            <p
-              key={weekday}
-              className="pb-1 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
-            >
+            <SectionLabel key={weekday} as="span" className="pb-1 text-center">
               {weekday}
-            </p>
+            </SectionLabel>
           ))}
           {cells.map((day, index) => {
             if (day === null) {
@@ -153,7 +151,7 @@ export function PaymentCalendar({
                     />
                   ))}
                   {occurrences.length > MAX_CHIPS && (
-                    <span className="text-[9px] leading-none text-muted-foreground">
+                    <span className="text-[10px] leading-none text-muted-foreground">
                       +{occurrences.length - MAX_CHIPS}
                     </span>
                   )}
