@@ -16,7 +16,7 @@ The secondary audience is small business owners who want business expenses kept 
 
 ## Product Purpose
 
-Smart Expense Assistant is the fastest, cleanest way to record every expense and find it again later. It answers the everyday questions a spreadsheet answers slowly: did I already pay this, how much did I spend this month, where is my money going, where is that February electricity bill. Success is a person who logs an expense in under ten seconds, comes back regularly to do it again, and stops keeping the spreadsheet.
+ExpenseHub is the fastest, cleanest way to record every expense and find it again later. It answers the everyday questions a spreadsheet answers slowly: did I already pay this, how much did I spend this month, where is my money going, where is that February electricity bill. Success is a person who logs an expense in under ten seconds, comes back regularly to do it again, and stops keeping the spreadsheet.
 
 It is deliberately not a budgeting tool, an accounting system, or a finance suite. Any summaries it shows are descriptive facts drawn from what the user recorded, never advice or prediction.
 

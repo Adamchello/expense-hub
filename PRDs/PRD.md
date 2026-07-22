@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD) - Smart Expense Assistant
+# Product Requirements Document (PRD) - ExpenseHub
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@
 
 Many individuals struggle with managing recurring household expenses and expenses. Existing budget trackers mostly focus on categorization and payment reminders, but they fail to provide proactive insights or help users understand their spending behavior.
 
-The Smart Expense Assistant goes beyond simple expense tracking by combining two powerful capabilities:
+The ExpenseHub goes beyond simple expense tracking by combining two powerful capabilities:
 
 - **Intelligent Forecasting:** Predicts future expenses based on historical data, seasonality, interest rate changes, and consumption patterns. Provides users with accurate projections of upcoming expenses, helping them plan budgets and avoid financial surprises.
 

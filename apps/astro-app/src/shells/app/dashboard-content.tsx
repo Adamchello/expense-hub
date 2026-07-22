@@ -81,7 +81,13 @@ export function DashboardContent() {
   const query = useExpenses();
 
   const handleTabChange = (value: string) => {
-    navigate({ to: "/app", search: { tab: value as typeof activeTab } });
+    // `replace` so Back leaves the app instead of walking every tab the user
+    // has visited this session — tab switching is not navigation history.
+    navigate({
+      to: "/app",
+      search: { tab: value as typeof activeTab },
+      replace: true,
+    });
     setIsNavOpen(false);
   };
 
@@ -93,7 +99,7 @@ export function DashboardContent() {
           <Wallet2 className="size-4.5" />
         </div>
         <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
-          Smart Expense Assistant
+          ExpenseHub
         </span>
       </div>
 

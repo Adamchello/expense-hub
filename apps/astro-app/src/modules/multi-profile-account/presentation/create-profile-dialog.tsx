@@ -79,7 +79,7 @@ export function CreateProfileDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !name.trim()}>
+            <Button type="submit" loading={isPending} disabled={!name.trim()}>
               {isPending ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>

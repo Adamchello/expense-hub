@@ -55,58 +55,52 @@ export function DashboardOverview({
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const currentYear = new Date().toISOString().slice(0, 4);
-  const thisMonthTotal = expenses
-    .filter((expense) => expense.date.startsWith(currentMonth))
-    .reduce((sum, expense) => sum + expense.amount, 0);
-  const thisYearTotal = expenses
-    .filter((expense) => expense.date.startsWith(currentYear))
-    .reduce((sum, expense) => sum + expense.amount, 0);
-  const categoriesUsed = new Set(expenses.map((expense) => expense.category))
-    .size;
 
-  // Money renders as <Amount>; counts stay in the sans face — monospacing a
-  // quantity buys nothing.
-  const stats: {
-    label: string;
-    value: ReactNode;
-    hint: string;
-    tone?: "default" | "lead";
-  }[] = [
-    {
-      label: "Expenses tracked",
-      value: expenses.length,
-      hint: expenses.length === 0 ? "Add your first expense" : "all time",
-    },
+  // Each period answers the same two things: how much, and over how many
+  // expenses. A bare count ("5 tracked all time") and a category tally drove
+  // no decision, so they're folded in here or dropped.
+  const summarize = (prefix: string) => {
+    const inPeriod = expenses.filter((expense) =>
+      expense.date.startsWith(prefix),
+    );
+    return {
+      total: inPeriod.reduce((sum, expense) => sum + expense.amount, 0),
+      count: inPeriod.length,
+    };
+  };
+
+  const countHint = (count: number) =>
+    count === 0
+      ? "nothing recorded yet"
+      : `across ${count} ${count === 1 ? "expense" : "expenses"}`;
+
+  const month = summarize(currentMonth);
+  const year = summarize(currentYear);
+
+  const stats: { label: string; value: ReactNode; hint: string }[] = [
     {
       label: "This month",
-      value: <Amount value={thisMonthTotal} size="inherit" />,
-      hint: "recorded so far",
-      // The question this dashboard exists to answer.
-      tone: "lead",
+      value: <Amount value={month.total} size="inherit" />,
+      hint: countHint(month.count),
     },
     {
       label: "This year",
-      value: <Amount value={thisYearTotal} size="inherit" />,
-      hint: `in ${currentYear}`,
-    },
-    {
-      label: "Categories",
-      value: categoriesUsed,
-      hint: "in use",
+      value: <Amount value={year.total} size="inherit" />,
+      hint: countHint(year.count),
     },
   ];
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+      {/* Two periods side by side, weighted equally — one is not more important
+          than the other, they're the same question at two scales. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         {stats.map((stat) => (
           <StatCard
             key={stat.label}
             label={stat.label}
             value={stat.value}
             hint={stat.hint}
-            tone={stat.tone}
           />
         ))}
       </div>

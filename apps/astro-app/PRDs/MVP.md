@@ -1,7 +1,7 @@
 ```markdown
 # Product Requirements Document (PRD)
 
-## Smart Expense Assistant (MVP)
+## ExpenseHub (MVP)
 
 **Version:** 1.0  
 **Status:** Draft for Validation
@@ -10,7 +10,7 @@
 
 # 1. Overview
 
-Smart Expense Assistant is a simple expense tracking application that helps people keep a complete record of every expense they pay.
+ExpenseHub is a simple expense tracking application that helps people keep a complete record of every expense they pay.
 
 Rather than relying on spreadsheets, users can quickly record expenses, organize them by category, review spending history, and see simple summaries of their expenses.
 
@@ -36,7 +36,7 @@ People often ask themselves:
 - "Where is my money going?"
 - "Can I quickly find that electricity expense from February?"
 
-Smart Expense Assistant answers these questions with minimal effort.
+ExpenseHub answers these questions with minimal effort.
 
 ---
 
@@ -434,13 +434,13 @@ Potential features:
 
 # 11. Positioning
 
-## Smart Expense Assistant is **not**:
+## ExpenseHub is **not**:
 
 - A budgeting app
 - An accounting system
 - A personal finance suite
 
-## Smart Expense Assistant **is**:
+## ExpenseHub **is**:
 
 > A simple, modern expense tracker that replaces spreadsheets and helps people keep an organized history of what they pay, with useful summaries that become more valuable as more data is recorded.
 ```

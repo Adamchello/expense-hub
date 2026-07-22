@@ -76,7 +76,7 @@ export function RenameProfileDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !name.trim()}>
+            <Button type="submit" loading={isPending} disabled={!name.trim()}>
               {isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>

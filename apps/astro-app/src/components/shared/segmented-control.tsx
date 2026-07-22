@@ -52,7 +52,11 @@ export function SegmentedControl<T extends string>({
             aria-pressed={isActive}
             onClick={() => onChange(option.value)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              "inline-flex items-center justify-center gap-2 rounded-md px-3 text-sm font-medium",
+              // 44px on touch, tightened on pointer devices where the control
+              // sits beside other compact chrome.
+              "min-h-11 sm:min-h-8",
+              "transition-colors duration-150 ease-out-quart",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
               isActive
                 ? "bg-accent text-accent-foreground"

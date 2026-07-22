@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +44,8 @@ interface RecurringPaymentDialogProps {
   /** Seeds the due date when creating — the calendar day that was clicked. */
   initialDueDate?: string | null;
   onOpenChange: (open: boolean) => void;
+  /** Hands the template back for deletion; the caller owns confirm. */
+  onRequestDelete?: (payment: RecurringPayment) => void;
 }
 
 const todayIso = () => new Date().toISOString().split("T")[0];
@@ -52,6 +55,7 @@ export function RecurringPaymentDialog({
   editing,
   initialDueDate = null,
   onOpenChange,
+  onRequestDelete,
 }: RecurringPaymentDialogProps) {
   const [amount, setAmount] = useState("");
   const [providerName, setProviderName] = useState("");
@@ -213,6 +217,20 @@ export function RecurringPaymentDialog({
           </div>
 
           <div className="flex gap-2">
+            {/* Delete sits with the record you're looking at, not on the card. */}
+            {editing && onRequestDelete && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={`Delete recurring payment ${editing.provider_name}`}
+                disabled={mutation.isPending}
+                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => onRequestDelete(editing)}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
@@ -225,7 +243,8 @@ export function RecurringPaymentDialog({
               type="submit"
               size="lg"
               className="flex-1"
-              disabled={!isFormValid || mutation.isPending}
+              loading={mutation.isPending}
+              disabled={!isFormValid}
             >
               {mutation.isPending
                 ? "Saving..."

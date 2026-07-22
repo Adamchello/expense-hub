@@ -106,7 +106,8 @@ export function CategoriesSection() {
           </div>
           <Button
             type="submit"
-            disabled={!name.trim() || createMutation.isPending}
+            loading={createMutation.isPending}
+            disabled={!name.trim()}
           >
             {createMutation.isPending ? "Adding..." : "Add Category"}
           </Button>

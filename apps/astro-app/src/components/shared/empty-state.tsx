@@ -54,13 +54,15 @@ export function EmptyState({
         </div>
       )}
       {title && (
-        <h3 className={cn("text-base font-semibold", Icon && "mt-4")}>
+        <h3
+          className={cn("text-balance text-base font-semibold", Icon && "mt-4")}
+        >
           {title}
         </h3>
       )}
       <p
         className={cn(
-          "mx-auto max-w-prose text-sm text-muted-foreground",
+          "mx-auto max-w-prose text-pretty text-sm text-muted-foreground",
           title ? "mt-1.5" : Icon && "mt-4",
         )}
       >

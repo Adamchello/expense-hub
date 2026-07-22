@@ -65,6 +65,11 @@ interface ExpenseFormBodyProps {
   submitLabel: string;
   pendingLabel: string;
   errorFallback: string;
+  /**
+   * Leading action in the footer — used by edit mode for Delete, which lives
+   * here rather than on the card so you can see what you're removing.
+   */
+  footerAction?: React.ReactNode;
 }
 
 export function ExpenseFormBody({
@@ -78,6 +83,7 @@ export function ExpenseFormBody({
   submitLabel,
   pendingLabel,
   errorFallback,
+  footerAction,
 }: ExpenseFormBodyProps) {
   const isEdit = !!initialExpense;
   const [formState, setFormState] = useState<FormState>(() =>
@@ -270,6 +276,7 @@ export function ExpenseFormBody({
       </div>
 
       <div className="flex gap-2">
+        {footerAction}
         <Button
           type="button"
           variant="ghost"
@@ -282,7 +289,8 @@ export function ExpenseFormBody({
           type="submit"
           size="lg"
           className="flex-1"
-          disabled={!isFormValid || isPending}
+          loading={isPending}
+          disabled={!isFormValid}
         >
           {isPending ? pendingLabel : submitLabel}
         </Button>

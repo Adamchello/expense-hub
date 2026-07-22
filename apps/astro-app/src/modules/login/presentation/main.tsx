@@ -21,8 +21,8 @@ export function LoginForm() {
           <form action="/api/auth/signin" method="post">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-xl font-bold">
-                  Welcome to Smart Expense Assistant
+                <h1 className="text-balance text-xl font-bold">
+                  Welcome to ExpenseHub
                 </h1>
                 <FieldDescription>
                   Don&apos;t have an account? <a href="/register">Sign up</a>

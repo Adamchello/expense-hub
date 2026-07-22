@@ -9,8 +9,9 @@ import type { ReactNode } from "react";
  * decoration, and the accent colour is reserved for actions and state. The
  * number is the point, so the number is the only thing that gets to be big.
  *
- * `tone="lead"` promotes the one metric that matters most on a screen, so a
- * row of stats reads as a hierarchy instead of four interchangeable boxes.
+ * Every card carries the same weight. A "lead" variant that enlarged one metric
+ * existed briefly and read as noise — sibling figures you're meant to compare
+ * should be the same size.
  */
 interface StatCardProps {
   label: string;
@@ -18,31 +19,19 @@ interface StatCardProps {
   value: ReactNode;
   /** One quiet line of context. Omit it rather than padding with filler. */
   hint?: ReactNode;
-  tone?: "default" | "lead";
   className?: string;
 }
 
-export function StatCard({
-  label,
-  value,
-  hint,
-  tone = "default",
-  className,
-}: StatCardProps) {
-  const isLead = tone === "lead";
-
+export function StatCard({ label, value, hint, className }: StatCardProps) {
   return (
     <Card className={cn("gap-0 py-5", className)}>
       <CardContent className="flex flex-col gap-1.5 px-5">
         <p className="truncate text-sm font-medium text-muted-foreground">
           {label}
         </p>
-        <p
-          className={cn(
-            "truncate font-semibold tracking-tight text-foreground",
-            isLead ? "text-3xl sm:text-4xl" : "text-2xl",
-          )}
-        >
+        {/* tabular-nums so counts and currency both hold their columns as
+            values change — figures shouldn't shuffle while you read them. */}
+        <p className="truncate text-2xl font-semibold tabular-nums tracking-tight text-foreground">
           {value}
         </p>
         {hint && (

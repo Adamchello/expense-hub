@@ -80,7 +80,7 @@ export function ConfirmDialog({
           <Button
             variant={destructive ? "destructive" : "default"}
             onClick={onConfirm}
-            disabled={isPending}
+            loading={isPending}
           >
             {isPending ? pendingLabel : confirmLabel}
           </Button>

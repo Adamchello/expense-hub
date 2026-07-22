@@ -69,7 +69,10 @@ export function HeroAmountField({
           aria-describedby={error ? errorId : undefined}
           style={{ width: `${length + 1}ch` }}
           className={cn(
-            "max-w-full border-none bg-transparent text-center font-mono font-semibold tabular-nums tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            // Placeholder at /70 rather than the usual faint grey: at this size
+            // it is large text, so it clears 3:1 comfortably and still reads as
+            // a prompt instead of a value.
+            "max-w-full border-none bg-transparent text-center font-mono font-semibold tabular-nums tracking-tight text-foreground outline-none placeholder:text-muted-foreground/70 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
             valueSize,
           )}
         />

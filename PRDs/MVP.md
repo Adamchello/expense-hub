@@ -1,4 +1,4 @@
-# MVP Definition: Smart Expense Assistant
+# MVP Definition: ExpenseHub
 
 1. Problem Statement
 
@@ -19,7 +19,7 @@ Primary users are tech-savvy adults who manage multiple recurring payments (util
 
 3. Value Proposition
 
-The Smart Expense Assistant goes beyond simple expense tracking by combining two powerful capabilities:
+The ExpenseHub goes beyond simple expense tracking by combining two powerful capabilities:
 
 - **Intelligent Forecasting**: Predicts future expenses based on historical data, seasonality, interest rate changes, and consumption patterns. Provides users with accurate projections of upcoming expenses, helping them plan budgets and avoid financial surprises.
 
@@ -133,7 +133,7 @@ This dual approach transforms financial management from reactive tracking into a
 
 8. Future Vision (Post-MVP)
 
-Long term, Smart Expense Assistant aims to become an intelligent financial planning companion:
+Long term, ExpenseHub aims to become an intelligent financial planning companion:
 
 - **Advanced Forecasting**: Machine learning models that improve accuracy over time, incorporate external factors (weather, economic indicators), and provide multi-scenario forecasting.
 

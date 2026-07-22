@@ -120,10 +120,14 @@ export function MerchantsSection() {
                     <Button
                       size="icon-sm"
                       aria-label="Confirm rename"
-                      disabled={mutation.isPending || !newName.trim()}
+                      loading={mutation.isPending}
+                      disabled={!newName.trim()}
                       onClick={submitRename}
                     >
-                      <Check className="size-4" />
+                      {/* Icon-only button: the spinner stands in for the icon
+                          rather than sitting beside it — both at once overflow
+                          a 32px target. */}
+                      {!mutation.isPending && <Check className="size-4" />}
                     </Button>
                     <Button
                       variant="ghost"

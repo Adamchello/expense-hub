@@ -106,7 +106,6 @@ export function SpendingAnalytics({ expenses }: SpendingAnalyticsProps) {
         />
 
         <StatCard
-          tone="lead"
           label="This month"
           value={<Amount value={thisMonthTotal} size="inherit" />}
           hint={

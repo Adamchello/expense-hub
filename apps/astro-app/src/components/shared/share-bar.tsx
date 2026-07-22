@@ -30,8 +30,10 @@ export function ShareBar({ share, color, label, className }: ShareBarProps) {
         className,
       )}
     >
+      {/* Width eases when the period or filter changes, so a bar re-reads as
+          the same bar moving rather than a new one appearing. */}
       <div
-        className="h-full rounded-full"
+        className="h-full rounded-full transition-[width] duration-500 ease-out-quart"
         style={{ width: `${share}%`, backgroundColor: color }}
       />
     </div>

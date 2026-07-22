@@ -2,10 +2,6 @@
 
 import { Amount } from "./amount";
 import { CategoryBadge } from "./category-badge";
-import {
-  CardActionsMenu,
-  type CardAction,
-} from "@/components/ui/card-actions-menu";
 import { cn } from "@/lib/utils";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { DataE2E } from "@/__e2e__/data-e2e";
@@ -26,12 +22,15 @@ interface RecordCardProps {
   /** The when: a formatted date or a phrase like "Next payment Jul 21". */
   meta: string;
   note?: string | null;
-  actions?: CardAction[];
-  actionsLabel?: string;
-  /** Turns the card into a selectable control. */
-  onToggle?: () => void;
-  selected?: boolean;
-  selectLabel?: string;
+  /**
+   * Makes the whole card the affordance — clicking it opens the record, and
+   * destructive actions live inside that dialog. This replaced a
+   * hidden-until-hover ⋯ menu, which stole the amount's right edge and shifted
+   * it on mouseover to reach two menu items.
+   */
+  onOpen?: () => void;
+  /** Accessible name for the card-as-button, e.g. "Edit Netflix expense". */
+  openLabel?: string;
   metaTestId?: DataE2E;
 }
 
@@ -42,15 +41,12 @@ export function RecordCard({
   categorySuffix,
   meta,
   note,
-  actions,
-  actionsLabel,
-  onToggle,
-  selected = false,
-  selectLabel,
+  onOpen,
+  openLabel,
   metaTestId,
 }: RecordCardProps) {
   const { washClassFor } = useCategoryOptions();
-  const isInteractive = !!onToggle;
+  const isInteractive = !!onOpen;
 
   return (
     <div
@@ -58,23 +54,24 @@ export function RecordCard({
         ? {
             role: "button",
             tabIndex: 0,
-            "aria-pressed": selected,
-            "aria-label": selectLabel,
-            onClick: onToggle,
+            "aria-label": openLabel,
+            onClick: onOpen,
             onKeyDown: (event: React.KeyboardEvent) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                onToggle();
+                onOpen();
               }
             },
           }
         : {})}
       className={cn(
-        "group relative rounded-xl border p-3.5 transition-colors",
+        "group relative rounded-xl border p-3.5",
         washClassFor(category),
-        isInteractive &&
-          "cursor-pointer hover:brightness-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        selected && "ring-2 ring-primary",
+        isInteractive && [
+          "cursor-pointer transition-[box-shadow,transform] duration-150 ease-out-quart",
+          "hover:shadow-sm active:scale-[0.995]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        ],
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -82,23 +79,17 @@ export function RecordCard({
           {name}
         </h4>
         <Amount value={amount} size="md" />
-        {actions && actions.length > 0 && (
-          <CardActionsMenu
-            label={actionsLabel ?? `Actions for ${name}`}
-            actions={actions}
-          />
-        )}
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
         <CategoryBadge category={category} suffix={categorySuffix} />
-        <span className="text-xs text-foreground/65" data-e2e={metaTestId}>
+        <span className="text-xs text-foreground/70" data-e2e={metaTestId}>
           {meta}
         </span>
       </div>
 
       {note && (
-        <p className="mt-1.5 truncate text-xs text-foreground/65">{note}</p>
+        <p className="mt-1.5 truncate text-xs text-foreground/70">{note}</p>
       )}
     </div>
   );

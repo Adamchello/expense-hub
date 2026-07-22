@@ -7,7 +7,6 @@ import {
   createExpense,
   updateExpense,
   deleteExpense,
-  bulkDeleteExpenses,
   suggestCategoryApi,
 } from "../integration/repository";
 
@@ -52,18 +51,6 @@ export function useDeleteExpense() {
   return useMutation(
     {
       mutationFn: (id: string) => deleteExpense(id),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      },
-    },
-    queryClient,
-  );
-}
-
-export function useBulkDeleteExpenses() {
-  return useMutation(
-    {
-      mutationFn: (ids: string[]) => bulkDeleteExpenses(ids),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
       },

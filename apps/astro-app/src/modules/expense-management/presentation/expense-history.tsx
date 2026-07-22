@@ -26,18 +26,11 @@ import {
 import { formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
 import { queryClient } from "@/lib/query-client";
-import { useDeleteExpense, useBulkDeleteExpenses } from "../core/store";
+import { useDeleteExpense } from "../core/store";
 import { createExpense } from "../integration/repository";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";
 import { EditExpenseDialog } from "./edit-expense-dialog";
-import {
-  ArrowUpDown,
-  Download,
-  Pencil,
-  Receipt,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { ArrowUpDown, Download, Receipt, Search } from "lucide-react";
 
 const ALL = "all";
 
@@ -74,13 +67,10 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("date-desc");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
-  const [isBulkConfirmOpen, setIsBulkConfirmOpen] = useState(false);
 
   const deleteMutation = useDeleteExpense();
-  const bulkDeleteMutation = useBulkDeleteExpenses();
 
   const monthOptions = useMemo(() => {
     const months = new Set(expenses.map((expense) => expense.date.slice(0, 7)));
@@ -123,33 +113,19 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
     return sortOrder === "date-asc" ? months.sort() : months.sort().reverse();
   }, [groupedExpenses, sortOrder]);
 
-  const toggleSelected = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  // Undo re-creates the deleted expenses from their client-side snapshots.
-  const restoreExpenses = async (removed: Expense[]) => {
+  // Undo re-creates the deleted expense from its client-side snapshot.
+  const restoreExpense = async (removed: Expense) => {
     try {
-      for (const expense of removed) {
-        await createExpense({
-          amount: expense.amount,
-          date: expense.date,
-          providerName: expense.provider_name,
-          description: expense.description,
-          category: expense.category,
-        });
-      }
-      toast(removed.length === 1 ? "Expense restored" : "Expenses restored");
+      await createExpense({
+        amount: removed.amount,
+        date: removed.date,
+        providerName: removed.provider_name,
+        description: removed.description,
+        category: removed.category,
+      });
+      toast("Expense restored");
     } catch {
-      toast("Failed to restore expenses", { variant: "error" });
+      toast("Failed to restore expense", { variant: "error" });
     } finally {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
     }
@@ -162,20 +138,7 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
       onSuccess: () => {
         setDeletingExpense(null);
         toast(`Deleted ${removed.provider_name} expense`, {
-          undo: () => restoreExpenses([removed]),
-        });
-      },
-    });
-  };
-
-  const handleConfirmBulkDelete = () => {
-    const removed = expenses.filter((expense) => selectedIds.has(expense.id));
-    bulkDeleteMutation.mutate([...selectedIds], {
-      onSuccess: () => {
-        setSelectedIds(new Set());
-        setIsBulkConfirmOpen(false);
-        toast(`Deleted ${removed.length} expenses`, {
-          undo: () => restoreExpenses(removed),
+          undo: () => restoreExpense(removed),
         });
       },
     });
@@ -192,7 +155,9 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
     );
   }
 
-  // Clicking a card toggles selection; row actions live in the ⋯ menu.
+  // The card is the affordance: clicking it opens the record for editing, and
+  // Delete lives inside that dialog. No hover-revealed menu stealing the
+  // amount's right edge or shifting it on mouseover.
   const renderExpenseCard = (expense: Expense) => (
     <RecordCard
       key={expense.id}
@@ -201,23 +166,8 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
       category={expense.category}
       meta={formatDate(expense.date)}
       note={expense.description}
-      onToggle={() => toggleSelected(expense.id)}
-      selected={selectedIds.has(expense.id)}
-      selectLabel={`Select expense from ${expense.provider_name}`}
-      actionsLabel={`Actions for expense from ${expense.provider_name}`}
-      actions={[
-        {
-          label: "Edit",
-          icon: Pencil,
-          onClick: () => setEditingExpense(expense),
-        },
-        {
-          label: "Delete",
-          icon: Trash2,
-          destructive: true,
-          onClick: () => setDeletingExpense(expense),
-        },
-      ]}
+      onOpen={() => setEditingExpense(expense)}
+      openLabel={`Edit expense from ${expense.provider_name}`}
     />
   );
 
@@ -346,28 +296,6 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
         </div>
       </div>
 
-      {/* Selection toolbar — appears once cards are selected by clicking them */}
-      {selectedIds.size > 0 && (
-        <div className="sticky top-16 z-20 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card/95 px-3 py-2 text-sm shadow-sm backdrop-blur">
-          <span className="font-medium">{selectedIds.size} selected</span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setIsBulkConfirmOpen(true)}
-          >
-            <Trash2 className="size-3.5" />
-            Delete selected
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSelectedIds(new Set())}
-          >
-            Clear selection
-          </Button>
-        </div>
-      )}
-
       {filteredExpenses.length === 0 ? (
         <EmptyState
           variant="block"
@@ -404,6 +332,11 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
         onOpenChange={(open) => {
           if (!open) setEditingExpense(null);
         }}
+        onRequestDelete={(expense) => {
+          // Hand off from edit to the confirm step so only one dialog is open.
+          setEditingExpense(null);
+          setDeletingExpense(expense);
+        }}
       />
 
       {/* Single delete confirmation */}
@@ -432,29 +365,6 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
         isPending={deleteMutation.isPending}
         error={deleteMutation.error}
         errorFallback="Failed to delete expense"
-      />
-
-      {/* Bulk delete confirmation */}
-      <ConfirmDialog
-        open={isBulkConfirmOpen}
-        onOpenChange={setIsBulkConfirmOpen}
-        title={`Delete ${selectedIds.size} expenses?`}
-        description={
-          <>
-            This will permanently remove the{" "}
-            <span className="font-medium text-foreground">
-              {selectedIds.size}
-            </span>{" "}
-            selected {selectedIds.size === 1 ? "expense" : "expenses"}. This
-            cannot be undone.
-          </>
-        }
-        confirmLabel="Delete selected"
-        pendingLabel="Deleting..."
-        onConfirm={handleConfirmBulkDelete}
-        isPending={bulkDeleteMutation.isPending}
-        error={bulkDeleteMutation.error}
-        errorFallback="Failed to delete expenses"
       />
     </div>
   );

@@ -119,7 +119,8 @@ export function ExpenseImportBody({ active, onDone }: ExpenseImportBodyProps) {
           <Button
             data-e2e="expense-import.button.finalize"
             onClick={handleFinalize}
-            disabled={store.validRows === 0 || store.isImporting}
+            loading={store.isImporting}
+            disabled={store.validRows === 0}
           >
             {store.isImporting
               ? "Importing..."

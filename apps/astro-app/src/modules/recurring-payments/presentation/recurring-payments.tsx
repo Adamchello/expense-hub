@@ -67,8 +67,12 @@ export function RecurringPayments() {
     setIsDialogOpen(true);
   };
 
+  // Delete always arrives from another dialog (day detail, or the edit form),
+  // so close whatever is open first — one dialog at a time.
   const openDelete = (expense: RecurringPayment) => {
     setDayDetail(null);
+    setIsDialogOpen(false);
+    setEditing(null);
     setDeleting(expense);
   };
 
@@ -111,7 +115,6 @@ export function RecurringPayments() {
             <RecurringPaymentsList
               recurringPayments={recurringPayments}
               onEdit={openEdit}
-              onDelete={openDelete}
             />
           ) : (
             <PaymentCalendar
@@ -139,6 +142,7 @@ export function RecurringPayments() {
         editing={editing}
         initialDueDate={createOnDate}
         onOpenChange={setIsDialogOpen}
+        onRequestDelete={openDelete}
       />
 
       {/* Delete confirmation */}

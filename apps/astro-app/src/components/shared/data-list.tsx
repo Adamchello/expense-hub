@@ -49,7 +49,7 @@ export function ListRow({
         <span className="shrink-0 text-xs text-muted-foreground">{meta}</span>
       )}
       {amount !== undefined && (
-        <span className="w-24 shrink-0 text-right">
+        <span className="min-w-24 shrink-0 text-right">
           <Amount value={amount} size="md" />
         </span>
       )}
