@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Callout, errorMessage } from "@/components/shared";
 import {
   useActiveProfile,
   useCanCreateProfile,
@@ -45,7 +47,7 @@ export function ProfilesSection() {
           disabled={!canCreate}
           aria-label="Create profile"
         >
-          <Plus className="h-4 w-4 mr-1" />
+          <Plus className="size-4 mr-1" />
           New profile
         </Button>
       </div>
@@ -57,17 +59,13 @@ export function ProfilesSection() {
       )}
 
       {profilesQuery.isLoading && (
-        <p className="text-sm text-muted-foreground">Loading profiles...</p>
+        <Skeleton className="h-[68px] w-full rounded-xl" />
       )}
 
       {profilesQuery.error && (
-        <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 mb-4">
-          <p className="text-sm text-destructive">
-            {profilesQuery.error instanceof Error
-              ? profilesQuery.error.message
-              : "Failed to load profiles"}
-          </p>
-        </div>
+        <Callout variant="error" className="mb-4">
+          {errorMessage(profilesQuery.error, "Failed to load profiles")}
+        </Callout>
       )}
 
       <ul className="space-y-2">
@@ -92,7 +90,7 @@ export function ProfilesSection() {
                   onClick={() => setRenameTarget(profile)}
                   aria-label={`Rename ${profile.name}`}
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="size-4" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -101,7 +99,7 @@ export function ProfilesSection() {
                   disabled={!canDelete}
                   aria-label={`Delete ${profile.name}`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-4" />
                 </Button>
               </div>
             </li>

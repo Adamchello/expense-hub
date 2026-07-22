@@ -59,21 +59,6 @@ export const updateExpense = async (
   return data;
 };
 
-export const bulkDeleteExpenses = async (
-  ids: string[],
-  signal?: AbortSignal,
-) => {
-  const response = await fetch("/api/expenses/bulk-delete", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-    signal,
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to delete expenses");
-  return data;
-};
-
 export const deleteExpense = async (id: string, signal?: AbortSignal) => {
   const response = await fetch(`/api/expenses/${id}`, {
     method: "DELETE",

@@ -6,34 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CardActionsMenu } from "@/components/ui/card-actions-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
+import {
+  Amount,
+  ConfirmDialog,
+  EmptyState,
+  RecordCard,
+} from "@/components/shared";
+import { formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
 import { queryClient } from "@/lib/query-client";
-import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
-import { useDeleteExpense, useBulkDeleteExpenses } from "../core/store";
+import { useDeleteExpense } from "../core/store";
 import { createExpense } from "../integration/repository";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";
 import { EditExpenseDialog } from "./edit-expense-dialog";
-import { ArrowUpDown, Download, Pencil, Search, Trash2 } from "lucide-react";
+import { ArrowUpDown, Download, Receipt, Search } from "lucide-react";
 
 const ALL = "all";
 
@@ -70,14 +67,10 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("date-desc");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
-  const [isBulkConfirmOpen, setIsBulkConfirmOpen] = useState(false);
 
-  const { washClassFor, textClassFor } = useCategoryOptions();
   const deleteMutation = useDeleteExpense();
-  const bulkDeleteMutation = useBulkDeleteExpenses();
 
   const monthOptions = useMemo(() => {
     const months = new Set(expenses.map((expense) => expense.date.slice(0, 7)));
@@ -120,33 +113,19 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
     return sortOrder === "date-asc" ? months.sort() : months.sort().reverse();
   }, [groupedExpenses, sortOrder]);
 
-  const toggleSelected = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  // Undo re-creates the deleted expenses from their client-side snapshots.
-  const restoreExpenses = async (removed: Expense[]) => {
+  // Undo re-creates the deleted expense from its client-side snapshot.
+  const restoreExpense = async (removed: Expense) => {
     try {
-      for (const expense of removed) {
-        await createExpense({
-          amount: expense.amount,
-          date: expense.date,
-          providerName: expense.provider_name,
-          description: expense.description,
-          category: expense.category,
-        });
-      }
-      toast(removed.length === 1 ? "Expense restored" : "Expenses restored");
+      await createExpense({
+        amount: removed.amount,
+        date: removed.date,
+        providerName: removed.provider_name,
+        description: removed.description,
+        category: removed.category,
+      });
+      toast("Expense restored");
     } catch {
-      toast("Failed to restore expenses", { variant: "error" });
+      toast("Failed to restore expense", { variant: "error" });
     } finally {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
     }
@@ -159,20 +138,7 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
       onSuccess: () => {
         setDeletingExpense(null);
         toast(`Deleted ${removed.provider_name} expense`, {
-          undo: () => restoreExpenses([removed]),
-        });
-      },
-    });
-  };
-
-  const handleConfirmBulkDelete = () => {
-    const removed = expenses.filter((expense) => selectedIds.has(expense.id));
-    bulkDeleteMutation.mutate([...selectedIds], {
-      onSuccess: () => {
-        setSelectedIds(new Set());
-        setIsBulkConfirmOpen(false);
-        toast(`Deleted ${removed.length} expenses`, {
-          undo: () => restoreExpenses(removed),
+          undo: () => restoreExpense(removed),
         });
       },
     });
@@ -180,85 +146,36 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
 
   if (expenses.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">
-          No expenses yet. Add your first expense to get started!
-        </p>
-      </div>
+      <EmptyState
+        variant="block"
+        icon={Receipt}
+        title="No expenses yet"
+        description="Add your first expense and this becomes a searchable history — filter by month or category, group by month, and export the whole lot whenever you need it."
+      />
     );
   }
 
-  // Clicking a card toggles selection; row actions live in the ⋯ menu.
-  const renderExpenseCard = (expense: Expense) => {
-    const isSelected = selectedIds.has(expense.id);
-    return (
-      <div
-        key={expense.id}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isSelected}
-        aria-label={`Select expense from ${expense.provider_name}`}
-        onClick={() => toggleSelected(expense.id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggleSelected(expense.id);
-          }
-        }}
-        className={cn(
-          "group relative cursor-pointer rounded-lg border p-3 transition-all hover:opacity-90",
-          washClassFor(expense.category),
-          isSelected && "ring-2 ring-primary",
-        )}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="min-w-0 flex-1 truncate text-sm font-semibold">
-            {expense.provider_name}
-          </h4>
-          <p className="shrink-0 font-mono text-sm font-semibold tracking-tight">
-            {formatCurrency(expense.amount)}
-          </p>
-          <CardActionsMenu
-            label={`Actions for expense from ${expense.provider_name}`}
-            actions={[
-              {
-                label: "Edit",
-                icon: Pencil,
-                onClick: () => setEditingExpense(expense),
-              },
-              {
-                label: "Delete",
-                icon: Trash2,
-                destructive: true,
-                onClick: () => setDeletingExpense(expense),
-              },
-            ]}
-          />
-        </div>
-        <p
-          className={cn(
-            "mt-1 text-[11px] font-semibold",
-            textClassFor(expense.category),
-          )}
-        >
-          {expense.category}
-        </p>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">
-          {formatDate(expense.date)}
-        </p>
-        {expense.description && (
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-            {expense.description}
-          </p>
-        )}
-      </div>
-    );
-  };
+  // The card is the affordance: clicking it opens the record for editing, and
+  // Delete lives inside that dialog. No hover-revealed menu stealing the
+  // amount's right edge or shifting it on mouseover.
+  const renderExpenseCard = (expense: Expense) => (
+    <RecordCard
+      key={expense.id}
+      name={expense.provider_name}
+      amount={expense.amount}
+      category={expense.category}
+      meta={formatDate(expense.date)}
+      note={expense.description}
+      onOpen={() => setEditingExpense(expense)}
+      openLabel={`Edit expense from ${expense.provider_name}`}
+    />
+  );
 
   return (
     <div className="space-y-6">
-      {/* Filters + exports */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Filters + exports. Search leads full-width; the three selects flex
+          so they never tower or clip on a phone. */}
+      <div className="flex flex-col gap-2">
         <div className="relative">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -267,135 +184,123 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
             aria-label="Search expenses"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64 pl-8"
+            className="w-full pl-8"
           />
         </div>
-        <Select value={monthFilter} onValueChange={setMonthFilter}>
-          <SelectTrigger className="w-40" aria-label="Filter by month">
-            <SelectValue placeholder="All months" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All months</SelectItem>
-            {monthOptions.map((month) => (
-              <SelectItem key={month} value={month}>
-                {formatMonth(month)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={monthFilter} onValueChange={setMonthFilter}>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-40 sm:flex-none"
+              aria-label="Filter by month"
+            >
+              <SelectValue placeholder="All months" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All months</SelectItem>
+              {monthOptions.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {formatMonth(month)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-40" aria-label="Filter by category">
-            <SelectValue placeholder="All categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All categories</SelectItem>
-            {categoryOptions.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-40 sm:flex-none"
+              aria-label="Filter by category"
+            >
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>All categories</SelectItem>
+              {categoryOptions.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select
-          value={sortOrder}
-          onValueChange={(value) => setSortOrder(value as SortOrder)}
-        >
-          <SelectTrigger className="w-48" aria-label="Sort expenses">
-            <ArrowUpDown className="size-3.5" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(SORT_LABELS) as SortOrder[]).map((order) => (
-              <SelectItem key={order} value={order}>
-                {SORT_LABELS[order]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {(monthFilter !== ALL ||
-          categoryFilter !== ALL ||
-          searchTerm !== "" ||
-          sortOrder !== "date-desc") && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setMonthFilter(ALL);
-              setCategoryFilter(ALL);
-              setSearchTerm("");
-              setSortOrder("date-desc");
-            }}
+          <Select
+            value={sortOrder}
+            onValueChange={(value) => setSortOrder(value as SortOrder)}
           >
-            Clear filters
-          </Button>
-        )}
-        <div className="ml-auto">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Download className="size-3.5" />
-                Export
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-40 p-1">
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => {
-                  exportExpensesToCsv(expenses);
-                  toast("Exported expenses as CSV");
-                }}
-              >
-                <Download className="size-3.5" />
-                CSV
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => {
-                  exportExpensesToExcel(expenses);
-                  toast("Exported expenses as Excel");
-                }}
-              >
-                <Download className="size-3.5" />
-                Excel
-              </button>
-            </PopoverContent>
-          </Popover>
+            <SelectTrigger
+              className="w-full flex-1 sm:w-48 sm:flex-none"
+              aria-label="Sort expenses"
+            >
+              <ArrowUpDown className="size-3.5" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(SORT_LABELS) as SortOrder[]).map((order) => (
+                <SelectItem key={order} value={order}>
+                  {SORT_LABELS[order]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {(monthFilter !== ALL ||
+            categoryFilter !== ALL ||
+            searchTerm !== "" ||
+            sortOrder !== "date-desc") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setMonthFilter(ALL);
+                setCategoryFilter(ALL);
+                setSearchTerm("");
+                setSortOrder("date-desc");
+              }}
+            >
+              Clear filters
+            </Button>
+          )}
+          <div className="ml-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="size-3.5" />
+                  Export
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 p-1">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  onClick={() => {
+                    exportExpensesToCsv(expenses);
+                    toast("Exported expenses as CSV");
+                  }}
+                >
+                  <Download className="size-3.5" />
+                  CSV
+                </button>
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  onClick={() => {
+                    exportExpensesToExcel(expenses);
+                    toast("Exported expenses as Excel");
+                  }}
+                >
+                  <Download className="size-3.5" />
+                  Excel
+                </button>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 
-      {/* Selection toolbar — appears once cards are selected by clicking them */}
-      {selectedIds.size > 0 && (
-        <div className="sticky top-16 z-20 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card/95 px-3 py-2 text-sm shadow-sm backdrop-blur">
-          <span className="font-medium">{selectedIds.size} selected</span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setIsBulkConfirmOpen(true)}
-          >
-            <Trash2 className="size-3.5" />
-            Delete selected
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSelectedIds(new Set())}
-          >
-            Clear selection
-          </Button>
-        </div>
-      )}
-
       {filteredExpenses.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">
-            No expenses match the selected filters.
-          </p>
-        </div>
+        <EmptyState
+          variant="block"
+          description="No expenses match the selected filters."
+        />
       ) : isGroupedByMonth ? (
         <div className="space-y-6">
           {sortedMonths.map((month) => (
@@ -427,97 +332,40 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
         onOpenChange={(open) => {
           if (!open) setEditingExpense(null);
         }}
+        onRequestDelete={(expense) => {
+          // Hand off from edit to the confirm step so only one dialog is open.
+          setEditingExpense(null);
+          setDeletingExpense(expense);
+        }}
       />
 
       {/* Single delete confirmation */}
-      <Dialog
+      <ConfirmDialog
         open={!!deletingExpense}
         onOpenChange={(open) => {
           if (!open) setDeletingExpense(null);
         }}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete expense?</DialogTitle>
-          </DialogHeader>
-          {deletingExpense && (
-            <p className="text-sm text-muted-foreground">
+        title="Delete expense?"
+        description={
+          deletingExpense && (
+            <>
               This will permanently remove the{" "}
-              <span className="font-medium text-foreground">
-                {formatCurrency(deletingExpense.amount)}
-              </span>{" "}
-              expense from{" "}
+              <Amount value={deletingExpense.amount} size="inherit" /> expense
+              from{" "}
               <span className="font-medium text-foreground">
                 {deletingExpense.provider_name}
               </span>
               .
-            </p>
-          )}
-          {deleteMutation.error && (
-            <p className="text-sm text-destructive">
-              {deleteMutation.error instanceof Error
-                ? deleteMutation.error.message
-                : "Failed to delete expense"}
-            </p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => setDeletingExpense(null)}
-              disabled={deleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Bulk delete confirmation */}
-      <Dialog open={isBulkConfirmOpen} onOpenChange={setIsBulkConfirmOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete {selectedIds.size} expenses?</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            This will permanently remove the{" "}
-            <span className="font-medium text-foreground">
-              {selectedIds.size}
-            </span>{" "}
-            selected {selectedIds.size === 1 ? "expense" : "expenses"}. This
-            cannot be undone.
-          </p>
-          {bulkDeleteMutation.error && (
-            <p className="text-sm text-destructive">
-              {bulkDeleteMutation.error instanceof Error
-                ? bulkDeleteMutation.error.message
-                : "Failed to delete expenses"}
-            </p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => setIsBulkConfirmOpen(false)}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmBulkDelete}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              {bulkDeleteMutation.isPending ? "Deleting..." : "Delete selected"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </>
+          )
+        }
+        confirmLabel="Delete"
+        pendingLabel="Deleting..."
+        onConfirm={handleConfirmDelete}
+        isPending={deleteMutation.isPending}
+        error={deleteMutation.error}
+        errorFallback="Failed to delete expense"
+      />
     </div>
   );
 }

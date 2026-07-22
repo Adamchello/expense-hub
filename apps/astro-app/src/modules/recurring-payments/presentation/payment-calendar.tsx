@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionLabel } from "@/components/shared";
 import { formatCurrency, formatMonth } from "@/shared/format";
 import { cn } from "@/lib/utils";
 import type { RecurringPayment } from "../domain/recurring-payment";
@@ -85,12 +86,9 @@ export function PaymentCalendar({
       <CardContent>
         <div className="grid grid-cols-7 gap-1">
           {WEEKDAYS.map((weekday) => (
-            <p
-              key={weekday}
-              className="pb-1 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
-            >
+            <SectionLabel key={weekday} as="span" className="pb-1 text-center">
               {weekday}
-            </p>
+            </SectionLabel>
           ))}
           {cells.map((day, index) => {
             if (day === null) {
@@ -120,7 +118,7 @@ export function PaymentCalendar({
                   }
                 }}
                 className={cn(
-                  "group/day min-h-14 cursor-pointer rounded-lg border p-1 transition-colors sm:min-h-24 sm:p-1.5",
+                  "group/day min-h-14 cursor-pointer rounded-lg border p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-24 sm:p-1.5",
                   hasPayments
                     ? "border-border bg-accent/40 hover:border-primary/50 hover:bg-accent"
                     : "border-transparent hover:border-dashed hover:border-border hover:bg-accent/20",
@@ -153,7 +151,7 @@ export function PaymentCalendar({
                     />
                   ))}
                   {occurrences.length > MAX_CHIPS && (
-                    <span className="text-[9px] leading-none text-muted-foreground">
+                    <span className="text-[10px] leading-none text-muted-foreground">
                       +{occurrences.length - MAX_CHIPS}
                     </span>
                   )}

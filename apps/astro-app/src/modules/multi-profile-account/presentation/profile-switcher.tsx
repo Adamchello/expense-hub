@@ -1,26 +1,17 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useActiveProfile,
   useProfiles,
   useSwitchActiveProfile,
 } from "../core/store";
-
-const initialsOf = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() || "?";
 
 export function ProfileSwitcher() {
   const profilesQuery = useProfiles();
@@ -33,12 +24,8 @@ export function ProfileSwitcher() {
   );
 
   if (isLoading) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading profile...
-      </div>
-    );
+    // Match the trigger's shape so the panel doesn't jump when it resolves.
+    return <Skeleton className="h-[52px] w-full rounded-xl" />;
   }
 
   const handleChange = (value: string) => {

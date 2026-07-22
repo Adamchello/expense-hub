@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -41,19 +42,47 @@ function Button({
   variant,
   size,
   asChild = false,
+  loading = false,
+  disabled,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    /**
+     * Async in flight. Adds a spinner and `aria-busy`, and blocks re-submits.
+     *
+     * Swapping the label to "Saving…" is not enough on its own: a label change
+     * is easy to miss and says nothing to a screen reader. Ignored with
+     * `asChild`, where Slot requires exactly one child.
+     */
+    loading?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button";
+  // `children` rides along in the spread rather than being destructured at the
+  // signature: the repo resolves two copies of @types/react, and re-typing
+  // children across the Slot boundary doesn't compile.
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    );
+  }
+
+  const { children, ...rest } = props;
 
   return (
-    <Comp
+    <button
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
+      aria-busy={loading || undefined}
+      disabled={loading || disabled}
+      {...rest}
+    >
+      {loading && <Loader2 className="size-4 animate-spin" aria-hidden />}
+      {children}
+    </button>
   );
 }
 

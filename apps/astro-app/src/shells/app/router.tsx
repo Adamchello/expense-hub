@@ -1,5 +1,4 @@
 import { DashboardContent } from "./dashboard-content";
-import { SettingsPage } from "./settings-page";
 import {
   createRouter,
   createRoute,
@@ -7,6 +6,21 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
+
+/** Tabs are driven by ?tab= so views deep-link, survive reload, and honor
+ * browser Back. Unknown values fall back to the dashboard. */
+const TAB_VALUES = [
+  "dashboard",
+  "history",
+  "recurring",
+  "analytics",
+  "settings",
+] as const;
+type TabValue = (typeof TAB_VALUES)[number];
+
+interface AppSearch {
+  tab: TabValue;
+}
 
 const rootRoute = createRootRoute({
   component: () => {
@@ -21,20 +35,17 @@ const rootRoute = createRootRoute({
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/app",
+  validateSearch: (search: Record<string, unknown>): AppSearch => ({
+    tab: TAB_VALUES.includes(search.tab as TabValue)
+      ? (search.tab as TabValue)
+      : "dashboard",
+  }),
   component: () => {
     return <DashboardContent />;
   },
 });
 
-const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/settings",
-  component: () => {
-    return <SettingsPage />;
-  },
-});
-
-const routeTree = rootRoute.addChildren([dashboardRoute, settingsRoute]);
+const routeTree = rootRoute.addChildren([dashboardRoute]);
 
 const router = createRouter({
   routeTree,

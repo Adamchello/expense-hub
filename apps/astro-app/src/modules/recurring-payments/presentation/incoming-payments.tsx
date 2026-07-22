@@ -1,7 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency, formatDate } from "@/shared/format";
+import { DataList, EmptyState, ListRow, ListTotal } from "@/components/shared";
+import { formatDate } from "@/shared/format";
 import { daysUntil } from "@/shared/domain/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { addDays, expectedTotal, projectOccurrences } from "../core/projection";
@@ -34,45 +35,39 @@ export function IncomingPayments() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CalendarClock className="size-4.5 text-primary" />
-          Incoming Payments
+          Upcoming Payments
         </CardTitle>
       </CardHeader>
       <CardContent>
         {occurrences.length === 0 ? (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            No recurring payments in the next {WINDOW_DAYS} days.
-          </p>
+          <EmptyState
+            variant="inline"
+            description={`No recurring payments in the next ${WINDOW_DAYS} days.`}
+          />
         ) : (
           <>
-            <ul className="flex flex-col divide-y divide-border">
+            <DataList>
               {shown.map((occurrence) => (
-                <li
+                <ListRow
                   key={`${occurrence.recurring.id}-${occurrence.date}`}
-                  className="flex items-baseline gap-2 py-2 first:pt-0"
-                >
-                  <p className="min-w-0 flex-1 truncate text-sm font-medium">
-                    {occurrence.recurring.provider_name}
-                  </p>
-                  <p className="shrink-0 text-[11px] text-muted-foreground">
-                    {formatDate(occurrence.date)} ·{" "}
-                    {whenLabel(daysUntil(today, occurrence.date))}
-                  </p>
-                  <p className="w-20 shrink-0 text-right font-mono text-sm font-semibold tracking-tight">
-                    {formatCurrency(occurrence.recurring.amount)}
-                  </p>
-                </li>
+                  name={occurrence.recurring.provider_name}
+                  meta={`${formatDate(occurrence.date)} · ${whenLabel(
+                    daysUntil(today, occurrence.date),
+                  )}`}
+                  amount={occurrence.recurring.amount}
+                />
               ))}
-            </ul>
-            <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
-              <p className="text-xs text-muted-foreground">
-                Next {WINDOW_DAYS} days
-                {occurrences.length > shown.length &&
-                  ` · ${occurrences.length - shown.length} more`}
-              </p>
-              <p className="font-mono text-sm font-semibold tracking-tight">
-                {formatCurrency(total)}
-              </p>
-            </div>
+            </DataList>
+            <ListTotal
+              label={
+                <>
+                  Next {WINDOW_DAYS} days
+                  {occurrences.length > shown.length &&
+                    ` · ${occurrences.length - shown.length} more`}
+                </>
+              }
+              value={total}
+            />
           </>
         )}
       </CardContent>

@@ -21,6 +21,9 @@ export function RegisterForm() {
           <form action="/api/auth/register" method="post">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-balance text-xl font-bold">
+                  Start tracking your expenses
+                </h1>
                 <FieldDescription>
                   Already have an account? <a href="/">Sign in</a>
                 </FieldDescription>

@@ -42,6 +42,9 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* One deceleration curve for the whole app. Exponential ease-out settles
+     naturally; no bounce, no elastic. */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,18 +57,22 @@
 :root {
   color-scheme: light;
   --radius: 0.75rem;
-  --background: oklch(0.968 0.004 150);
+  /* Surfaces are tinted toward the brand's own hue (152) rather than left
+     neutral: the page, the cards and the panels read as one green family.
+     The card used to be pure white (chroma 0) on a tinted page, so every
+     card sat on the background like a foreign object. */
+  --background: oklch(0.962 0.01 152);
   --foreground: oklch(0.22 0.02 155);
-  --card: oklch(1 0 0);
+  --card: oklch(0.995 0.005 152);
   --card-foreground: oklch(0.22 0.02 155);
-  --popover: oklch(1 0 0);
+  --popover: oklch(0.995 0.005 152);
   --popover-foreground: oklch(0.22 0.02 155);
   --primary: oklch(0.54 0.12 154);
   --primary-foreground: oklch(0.99 0.01 150);
-  --secondary: oklch(0.955 0.006 150);
+  --secondary: oklch(0.945 0.011 152);
   --secondary-foreground: oklch(0.3 0.02 155);
-  --muted: oklch(0.955 0.006 150);
-  --muted-foreground: oklch(0.53 0.018 150);
+  --muted: oklch(0.945 0.011 152);
+  --muted-foreground: oklch(0.5 0.02 150);
   --accent: oklch(0.95 0.03 154);
   --accent-foreground: oklch(0.38 0.07 154);
   --destructive: oklch(0.58 0.2 25);
@@ -74,21 +81,21 @@
   --success-foreground: oklch(0.99 0.01 150);
   --warning: oklch(0.72 0.13 70);
   --warning-foreground: oklch(0.28 0.05 70);
-  --border: oklch(0.916 0.005 150);
-  --input: oklch(0.916 0.005 150);
+  --border: oklch(0.905 0.01 152);
+  --input: oklch(0.905 0.01 152);
   --ring: oklch(0.54 0.12 154);
   --chart-1: oklch(0.54 0.12 154);
   --chart-2: oklch(0.72 0.11 150);
   --chart-3: oklch(0.72 0.13 70);
   --chart-4: oklch(0.44 0.06 156);
   --chart-5: oklch(0.68 0.02 150);
-  --sidebar: oklch(0.99 0.002 150);
+  --sidebar: oklch(0.978 0.008 152);
   --sidebar-foreground: oklch(0.22 0.02 155);
   --sidebar-primary: oklch(0.54 0.12 154);
   --sidebar-primary-foreground: oklch(0.99 0.01 150);
   --sidebar-accent: oklch(0.95 0.025 154);
   --sidebar-accent-foreground: oklch(0.36 0.07 154);
-  --sidebar-border: oklch(0.92 0.005 150);
+  --sidebar-border: oklch(0.912 0.009 152);
   --sidebar-ring: oklch(0.54 0.12 154);
 }
 
@@ -139,5 +146,18 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Users who ask for less motion get near-instant transitions everywhere:
+   dialog/popover/select zooms, skeleton pulses, and any future animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

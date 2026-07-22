@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/shared";
 import type { Profile } from "../domain/profile";
 import { useDeleteProfile } from "../core/store";
 
@@ -35,31 +28,22 @@ export function DeleteProfileDialog({
   };
 
   return (
-    <Dialog open={!!profile} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete profile</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-3 text-sm">
-          <p>
-            Delete <strong>{profile?.name}</strong>? All expenses in this
-            profile will be permanently deleted.
-          </p>
-          {error && <p className="text-sm text-destructive">{error.message}</p>}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isPending}
-          >
-            {isPending ? "Deleting..." : "Delete"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <ConfirmDialog
+      open={!!profile}
+      onOpenChange={(o) => !o && onClose()}
+      title="Delete profile?"
+      description={
+        <>
+          Delete <strong>{profile?.name}</strong>? All expenses in this profile
+          will be permanently deleted.
+        </>
+      }
+      confirmLabel="Delete"
+      pendingLabel="Deleting..."
+      onConfirm={handleConfirm}
+      isPending={isPending}
+      error={error}
+      errorFallback="Failed to delete profile"
+    />
   );
 }

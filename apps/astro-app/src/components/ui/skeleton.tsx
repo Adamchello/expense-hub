@@ -4,6 +4,54 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-lg bg-muted", className)} />;
 }
 
+/** One StatCard's silhouette: no icon tile, just label / value / hint stacked
+ * on the same `rounded-xl` + ring surface the real `Card` uses. */
+function SkeletonStatCard() {
+  return (
+    <div className="flex flex-col gap-1.5 rounded-xl bg-card px-5 py-5 ring-1 ring-foreground/10">
+      <Skeleton className="h-3 w-24" />
+      <Skeleton className="h-7 w-20" />
+      <Skeleton className="h-2.5 w-28" />
+    </div>
+  );
+}
+
+/** Placeholder for the analytics tab: stat row + chart block, so the
+ * skeleton previews the real layout instead of expense rows. */
+export function SkeletonAnalytics() {
+  return (
+    <div className="flex flex-col gap-6" aria-hidden="true">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        {Array.from({ length: 3 }, (_, index) => (
+          <SkeletonStatCard key={index} />
+        ))}
+      </div>
+      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="mt-4 h-48 w-full" />
+      </div>
+    </div>
+  );
+}
+
+/** Placeholder for the dashboard tab: a stat row over a card block, matching
+ * the overview's layout rather than a list of rows. */
+export function SkeletonDashboard() {
+  return (
+    <div className="flex flex-col gap-6" aria-hidden="true">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+        {Array.from({ length: 2 }, (_, index) => (
+          <SkeletonStatCard key={index} />
+        ))}
+      </div>
+      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="mt-4 h-32 w-full" />
+      </div>
+    </div>
+  );
+}
+
 /** Placeholder list shown while expense-like data loads. */
 export function SkeletonList({ rows = 3 }: { rows?: number }) {
   return (

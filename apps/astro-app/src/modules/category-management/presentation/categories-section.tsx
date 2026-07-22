@@ -12,11 +12,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Callout,
+  CategoryBadge,
+  DataList,
+  errorMessage,
+} from "@/components/shared";
+import {
   COLOR_PRESETS,
   PRESET_COLOR_CLASSES,
   PRESET_COLOR_HEX,
 } from "@/shared/configuration/category";
-import { cn } from "@/lib/utils";
 import {
   useCustomCategories,
   useCreateCustomCategory,
@@ -101,36 +106,33 @@ export function CategoriesSection() {
           </div>
           <Button
             type="submit"
-            disabled={!name.trim() || createMutation.isPending}
+            loading={createMutation.isPending}
+            disabled={!name.trim()}
           >
             {createMutation.isPending ? "Adding..." : "Add Category"}
           </Button>
         </form>
 
         {createMutation.error && (
-          <p className="text-sm text-destructive">
-            {createMutation.error instanceof Error
-              ? createMutation.error.message
-              : "Failed to create category"}
-          </p>
+          <Callout variant="error">
+            {errorMessage(createMutation.error, "Failed to create category")}
+          </Callout>
         )}
 
         {customs.length > 0 && (
-          <ul className="flex flex-col divide-y divide-border">
+          <DataList>
             {customs.map((custom) => (
               <li
                 key={custom.id}
                 className="flex items-center gap-3 py-2 first:pt-0 last:pb-0"
               >
-                <span
-                  className={cn(
-                    "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                <CategoryBadge
+                  category={custom.name}
+                  colorClassName={
                     PRESET_COLOR_CLASSES[custom.color] ??
-                      PRESET_COLOR_CLASSES.gray,
-                  )}
-                >
-                  {custom.name}
-                </span>
+                    PRESET_COLOR_CLASSES.gray
+                  }
+                />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -143,7 +145,7 @@ export function CategoriesSection() {
                 </Button>
               </li>
             ))}
-          </ul>
+          </DataList>
         )}
       </CardContent>
     </Card>

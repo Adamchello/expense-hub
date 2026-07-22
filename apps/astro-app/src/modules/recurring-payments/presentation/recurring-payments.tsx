@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SkeletonList } from "@/components/ui/skeleton";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Callout,
+  ConfirmDialog,
+  EmptyState,
+  SegmentedControl,
+  errorMessage,
+} from "@/components/shared";
 import { formatCurrency } from "@/shared/format";
 import { FREQUENCY_LABELS } from "@/shared/domain/recurrence";
-import { cn } from "@/lib/utils";
 import type { RecurringPayment } from "../domain/recurring-payment";
 import { useRecurringPayments, useDeleteRecurringPayment } from "../core/store";
 import { PaymentCalendar } from "./payment-calendar";
@@ -67,8 +67,12 @@ export function RecurringPayments() {
     setIsDialogOpen(true);
   };
 
+  // Delete always arrives from another dialog (day detail, or the edit form),
+  // so close whatever is open first — one dialog at a time.
   const openDelete = (expense: RecurringPayment) => {
     setDayDetail(null);
+    setIsDialogOpen(false);
+    setEditing(null);
     setDeleting(expense);
   };
 
@@ -82,30 +86,12 @@ export function RecurringPayments() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div
-          role="tablist"
-          aria-label="Recurring payments view"
-          className="inline-flex rounded-lg border border-border bg-card p-0.5"
-        >
-          {VIEWS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              role="tab"
-              aria-selected={view === option.value}
-              onClick={() => setView(option.value)}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                view === option.value
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <option.icon className="size-4" />
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          options={VIEWS}
+          label="Recurring payments view"
+        />
         <Button onClick={openCreate}>
           <Plus className="size-4" />
           New Recurring Payment
@@ -113,25 +99,15 @@ export function RecurringPayments() {
       </div>
 
       {query.error && (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-3">
-          <p className="text-sm text-destructive">
-            {query.error instanceof Error
-              ? query.error.message
-              : "Failed to load recurring payments"}
-          </p>
-        </div>
+        <Callout variant="error">
+          {errorMessage(query.error, "Failed to load recurring payments")}
+        </Callout>
       )}
 
       {query.isLoading ? (
         <SkeletonList rows={3} />
       ) : recurringPayments.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
-          <p className="text-muted-foreground">
-            No recurring payments yet. Create one for rent, subscriptions, or
-            any payment that repeats — the calendar and expected totals build
-            themselves from here.
-          </p>
-        </div>
+        <EmptyState description="No recurring payments yet. Create one for rent, subscriptions, or any payment that repeats — the calendar and expected totals build themselves from here." />
       ) : (
         <>
           <NextMonthSummary recurringPayments={recurringPayments} />
@@ -139,7 +115,6 @@ export function RecurringPayments() {
             <RecurringPaymentsList
               recurringPayments={recurringPayments}
               onEdit={openEdit}
-              onDelete={openDelete}
             />
           ) : (
             <PaymentCalendar
@@ -167,21 +142,19 @@ export function RecurringPayments() {
         editing={editing}
         initialDueDate={createOnDate}
         onOpenChange={setIsDialogOpen}
+        onRequestDelete={openDelete}
       />
 
       {/* Delete confirmation */}
-      <Dialog
+      <ConfirmDialog
         open={!!deleting}
         onOpenChange={(open) => {
           if (!open) setDeleting(null);
         }}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete recurring payment?</DialogTitle>
-          </DialogHeader>
-          {deleting && (
-            <p className="text-sm text-muted-foreground">
+        title="Delete recurring payment?"
+        description={
+          deleting && (
+            <>
               This will stop tracking{" "}
               <span className="font-medium text-foreground">
                 {deleting.provider_name}
@@ -189,33 +162,16 @@ export function RecurringPayments() {
               ({FREQUENCY_LABELS[deleting.frequency].toLowerCase()},{" "}
               {formatCurrency(deleting.amount)}). Already-logged expenses stay
               in your history.
-            </p>
-          )}
-          {deleteMutation.error && (
-            <p className="text-sm text-destructive">
-              {deleteMutation.error instanceof Error
-                ? deleteMutation.error.message
-                : "Failed to delete recurring payment"}
-            </p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => setDeleting(null)}
-              disabled={deleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </>
+          )
+        }
+        confirmLabel="Delete"
+        pendingLabel="Deleting..."
+        onConfirm={handleConfirmDelete}
+        isPending={deleteMutation.isPending}
+        error={deleteMutation.error}
+        errorFallback="Failed to delete recurring payment"
+      />
     </div>
   );
 }
