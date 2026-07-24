@@ -15,10 +15,10 @@ beforeEach(() => {
 });
 
 describe("CSV Import Flow", () => {
-  // REQ1: Upload step shows "Import Expenses" heading and file drop zone
-  it("shows Import Expenses heading when dialog opens", () => {
+  // REQ1: Upload step shows "Import expenses" heading and file drop zone
+  it("shows Import expenses heading when dialog opens", () => {
     render(<ExpenseImport open={true} onOpenChange={() => {}} />);
-    expect(screen.getByText("Import Expenses")).toBeInTheDocument();
+    expect(screen.getByText("Import expenses")).toBeInTheDocument();
   });
 
   it("shows file drop zone with drag and drop prompt", () => {
@@ -67,7 +67,7 @@ describe("CSV Import Flow", () => {
 
     // If file parsing works in jsdom, we should see the review heading
     const reviewHeading = await screen.findByText(
-      "Review Import",
+      "Review import",
       {},
       { timeout: 3000 },
     );

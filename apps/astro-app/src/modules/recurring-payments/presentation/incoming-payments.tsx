@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import {
   Amount,
+  Callout,
   CardTable,
   CardTableCell,
   CardTableRow,
@@ -16,8 +17,10 @@ import {
   CategoryBadge,
   EmptyState,
   ListTotal,
+  errorMessage,
   type CardTableColumn,
 } from "@/components/shared";
+import { SkeletonPanel } from "@/components/ui/skeleton";
 import { formatDate } from "@/shared/format";
 import { daysUntil } from "@/shared/domain/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
@@ -73,7 +76,8 @@ export function IncomingPayments({ onViewAll }: IncomingPaymentsProps) {
             <button
               type="button"
               onClick={onViewAll}
-              className="flex items-center gap-1 rounded-md text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="View all upcoming payments on the calendar"
+              className="-my-3 flex items-center gap-1 rounded-md py-3 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               View all
               <ArrowRight className="size-3.5" aria-hidden />
@@ -82,7 +86,19 @@ export function IncomingPayments({ onViewAll }: IncomingPaymentsProps) {
         )}
       </CardHeader>
       <CardContent>
-        {occurrences.length === 0 ? (
+        {/* "Nothing due" and "I could not find out" are different sentences,
+            and this card used to say the first when it meant the second: it
+            read `query.data ?? []` and never checked the query's state, so a
+            failed request rendered as a confident all-clear. On the one card
+            that answers "what is about to leave my account", that is the worst
+            available failure — a missed rent charge presented as good news. */}
+        {query.isLoading ? (
+          <SkeletonPanel rows={MAX_ROWS} />
+        ) : query.error ? (
+          <Callout variant="error">
+            {errorMessage(query.error, "Couldn't load upcoming payments")}
+          </Callout>
+        ) : occurrences.length === 0 ? (
           <EmptyState
             variant="inline"
             description={`No recurring payments in the next ${WINDOW_DAYS} days.`}

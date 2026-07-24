@@ -2,6 +2,13 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Edge treatments are a rule, not a preference, so the page doesn't read as
+ * two systems: a top-level card lifts off the page with `ring-1`, anything
+ * subdividing the inside of one sits flat with `border`, and `EmptyState`'s
+ * dashed border is the third case on purpose — dashed says "a thing belongs
+ * here and doesn't exist yet", which neither of the others can say.
+ */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -28,9 +35,23 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * A card's title is a real heading by default.
+ *
+ * It used to render a `<div>`, which meant a page of five titled cards had a
+ * heading outline of one item — the greeting — and a screen-reader user could
+ * not jump to any card at all. The level is a prop rather than fixed so a card
+ * nested under an `h2` section can drop to `h3` without the visual changing.
+ */
+function CardTitle({
+  className,
+  as: Tag = "h2",
+  ...props
+}: React.ComponentProps<"div"> & {
+  as?: "h2" | "h3" | "h4" | "div";
+}) {
   return (
-    <div
+    <Tag
       data-slot="card-title"
       className={cn("text-base leading-snug font-medium", className)}
       {...props}

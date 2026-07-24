@@ -12,29 +12,44 @@ export const CATEGORIES: Category[] = CATEGORY_GROUPS.flatMap(
   (group) => group.categories,
 );
 
+/*
+ * Label text is the 700 step in light and 400 in dark — not 600/400.
+ *
+ * At 600 on the tinted card the four brightest hues failed WCAG AA as 12px
+ * text: Groceries 2.88:1, Internet 3.23:1, Entertainment 3.28:1, Streaming
+ * 3.89:1, all against a 4.5:1 requirement. The step is uniform rather than
+ * per-hue so the chips stay one family; only the label moved, the 500/10 fill
+ * and 500/20 border are unchanged, so the palette reads exactly as before.
+ *
+ * Green is the one exception, at 800. Every surface in this app is tinted
+ * toward the brand's own green, so green text starts with less separation from
+ * its background than any other hue — it still measured 4.43:1 at 700 while
+ * the rest cleared. The exception is the tint's fault, not the palette's.
+ */
+
 // Fallback style for expenses whose stored category predates the current taxonomy.
 export const DEFAULT_CATEGORY_COLOR =
-  "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20";
+  "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20";
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  Rent: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+  Rent: "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
   Electricity:
-    "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
-  Water: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
+  Water: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
   Internet:
-    "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+    "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20",
   Groceries:
-    "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20",
-  Fuel: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20",
+    "bg-green-500/10 text-green-800 dark:text-green-400 border-green-500/20",
+  Fuel: "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
   Insurance:
-    "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
-  Medical: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+    "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
+  Medical: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
   Streaming:
-    "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
+    "bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20",
   Dining:
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
   Entertainment:
-    "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
+    "bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
   Uncategorized: DEFAULT_CATEGORY_COLOR,
 };
 
@@ -76,59 +91,59 @@ export const PRESET_COLOR_WASH: Record<string, string> = {
   pink: "bg-pink-500/10 border-pink-500/25",
 };
 
-export const DEFAULT_CATEGORY_TEXT = "text-gray-600 dark:text-gray-400";
+export const DEFAULT_CATEGORY_TEXT = "text-gray-700 dark:text-gray-400";
 
 /** Colored label text per built-in category. */
 export const CATEGORY_TEXT: Record<Category, string> = {
-  Rent: "text-purple-600 dark:text-purple-400",
-  Electricity: "text-yellow-600 dark:text-yellow-400",
-  Water: "text-blue-600 dark:text-blue-400",
-  Internet: "text-cyan-600 dark:text-cyan-400",
-  Groceries: "text-green-600 dark:text-green-400",
-  Fuel: "text-orange-600 dark:text-orange-400",
-  Insurance: "text-indigo-600 dark:text-indigo-400",
-  Medical: "text-red-600 dark:text-red-400",
-  Streaming: "text-pink-600 dark:text-pink-400",
-  Dining: "text-amber-600 dark:text-amber-400",
-  Entertainment: "text-teal-600 dark:text-teal-400",
+  Rent: "text-purple-700 dark:text-purple-400",
+  Electricity: "text-yellow-700 dark:text-yellow-400",
+  Water: "text-blue-700 dark:text-blue-400",
+  Internet: "text-cyan-700 dark:text-cyan-400",
+  Groceries: "text-green-800 dark:text-green-400",
+  Fuel: "text-orange-700 dark:text-orange-400",
+  Insurance: "text-indigo-700 dark:text-indigo-400",
+  Medical: "text-red-700 dark:text-red-400",
+  Streaming: "text-pink-700 dark:text-pink-400",
+  Dining: "text-amber-700 dark:text-amber-400",
+  Entertainment: "text-teal-700 dark:text-teal-400",
   Uncategorized: DEFAULT_CATEGORY_TEXT,
 };
 
 export const PRESET_COLOR_TEXT: Record<string, string> = {
   gray: DEFAULT_CATEGORY_TEXT,
-  red: "text-red-600 dark:text-red-400",
-  orange: "text-orange-600 dark:text-orange-400",
-  amber: "text-amber-600 dark:text-amber-400",
-  yellow: "text-yellow-600 dark:text-yellow-400",
-  green: "text-green-600 dark:text-green-400",
-  teal: "text-teal-600 dark:text-teal-400",
-  cyan: "text-cyan-600 dark:text-cyan-400",
-  blue: "text-blue-600 dark:text-blue-400",
-  indigo: "text-indigo-600 dark:text-indigo-400",
-  purple: "text-purple-600 dark:text-purple-400",
-  pink: "text-pink-600 dark:text-pink-400",
+  red: "text-red-700 dark:text-red-400",
+  orange: "text-orange-700 dark:text-orange-400",
+  amber: "text-amber-700 dark:text-amber-400",
+  yellow: "text-yellow-700 dark:text-yellow-400",
+  green: "text-green-800 dark:text-green-400",
+  teal: "text-teal-700 dark:text-teal-400",
+  cyan: "text-cyan-700 dark:text-cyan-400",
+  blue: "text-blue-700 dark:text-blue-400",
+  indigo: "text-indigo-700 dark:text-indigo-400",
+  purple: "text-purple-700 dark:text-purple-400",
+  pink: "text-pink-700 dark:text-pink-400",
 };
 
 /** Badge classes for each custom-category color preset. */
 export const PRESET_COLOR_CLASSES: Record<string, string> = {
   gray: DEFAULT_CATEGORY_COLOR,
-  red: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+  red: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
   orange:
-    "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20",
+    "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
   amber:
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
   yellow:
-    "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
+    "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
   green:
-    "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20",
-  teal: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
-  cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
-  blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    "bg-green-500/10 text-green-800 dark:text-green-400 border-green-500/20",
+  teal: "bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
+  cyan: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20",
+  blue: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
   indigo:
-    "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+    "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
   purple:
-    "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-  pink: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
+    "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+  pink: "bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20",
 };
 
 export const COLOR_PRESETS = Object.keys(PRESET_COLOR_CLASSES);

@@ -65,13 +65,13 @@ export function TopCategoriesCard({
           this month" beside "View full report" wraps the title into two lines
           and butts it against the link at 360px. */}
       <CardHeader className="max-sm:grid-cols-1!">
-        <CardTitle>Top categories this month</CardTitle>
+        <CardTitle>Top categories · {formatMonth(month)}</CardTitle>
         {onViewReport && (
           <CardAction className="max-sm:col-start-1! max-sm:row-start-2! max-sm:justify-self-start">
             <button
               type="button"
               onClick={onViewReport}
-              className="flex items-center gap-1 rounded-md text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="-my-3 flex items-center gap-1 rounded-md py-3 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               View full report
               <ArrowRight className="size-3.5" aria-hidden />
@@ -124,6 +124,9 @@ export function TopCategoriesCard({
                   {/* The share is stated once, on the bar that draws it. It
                       used to be spelled out here as well — the same number
                       twice in one tile, four inches apart. */}
+                  {/* `emptyLabel` matters most on the biggest tile: a category
+                      with no prior month has no delta, so Rent — often the
+                      largest share on the card — was the emptiest box on it. */}
                   <TrendDelta
                     className="mt-2"
                     changePct={changePct(
@@ -131,6 +134,7 @@ export function TopCategoriesCard({
                       previousTotals.get(entry.category) ?? 0,
                     )}
                     comparisonLabel={formatMonth(previousMonth)}
+                    emptyLabel={`Nothing recorded in ${formatMonth(previousMonth)}`}
                   />
 
                   <div className="mt-auto flex items-center gap-3 pt-3">

@@ -13,7 +13,7 @@ const commands = {
     await page.getByRole("button", { name: /add expense/i }).click();
     await page.getByRole("tab", { name: /import file/i }).click();
     await expect(getById(page, "expense-import.title")).toHaveText(
-      "Import Expenses",
+      "Import expenses",
     );
   },
 
@@ -49,7 +49,7 @@ const commands = {
 
   "see review table with parsed rows": async (page: Page) => {
     await expect(getById(page, "expense-import.title")).toHaveText(
-      "Review Import",
+      "Review import",
     );
     await expect(getById(page, "expense-import.table")).toBeVisible();
   },

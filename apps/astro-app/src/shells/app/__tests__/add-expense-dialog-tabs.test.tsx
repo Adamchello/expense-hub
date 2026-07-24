@@ -69,12 +69,12 @@ describe("AddExpenseDialog tab state", () => {
       new File([csvContent], "expenses.csv", { type: "text/csv" }),
     );
 
-    await screen.findByText("Review Import", {}, { timeout: 3000 });
+    await screen.findByText("Review import", {}, { timeout: 3000 });
 
     await switchTo(user, SINGLE_TAB);
     await switchTo(user, IMPORT_TAB);
 
-    expect(screen.getByText("Review Import")).toBeInTheDocument();
+    expect(screen.getByText("Review import")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Netflix")).toBeInTheDocument();
   });
 });
