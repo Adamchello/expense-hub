@@ -34,19 +34,63 @@ export function SkeletonAnalytics() {
   );
 }
 
-/** Placeholder for the dashboard tab: a stat row over a card block, matching
- * the overview's layout rather than a list of rows. */
-export function SkeletonDashboard() {
+/** One headline card's silhouette: label, figure, comparison line. */
+function SkeletonHeroCard() {
   return (
-    <div className="flex flex-col gap-6" aria-hidden="true">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-        {Array.from({ length: 2 }, (_, index) => (
-          <SkeletonStatCard key={index} />
+    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+      <div className="flex min-h-36 flex-col justify-center gap-2 px-5 py-6 sm:min-h-40 sm:px-6">
+        <Skeleton className="h-3.5 w-32" />
+        <Skeleton className="h-9 w-44" />
+        <Skeleton className="h-3 w-36" />
+      </div>
+    </div>
+  );
+}
+
+function SkeletonPanel({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+      <Skeleton className="h-4 w-40" />
+      <div className="mt-4 flex flex-col gap-3">
+        {Array.from({ length: rows }, (_, index) => (
+          <Skeleton key={index} className="h-8 w-full" />
         ))}
       </div>
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <Skeleton className="h-4 w-40" />
-        <Skeleton className="mt-4 h-32 w-full" />
+    </div>
+  );
+}
+
+/**
+ * Placeholder for the dashboard tab. Mirrors the real composition — greeting,
+ * two headline cards, the paired panels, the category tiles — so the page
+ * fills in rather than being replaced when the data lands.
+ */
+export function SkeletonDashboard() {
+  return (
+    <div className="flex flex-col gap-4 sm:gap-6" aria-hidden="true">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-6 w-52" />
+        <Skeleton className="h-3.5 w-64" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {Array.from({ length: 2 }, (_, index) => (
+          <SkeletonHeroCard key={index} />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <SkeletonPanel rows={5} />
+        <SkeletonPanel rows={5} />
+      </div>
+
+      <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+        <Skeleton className="h-4 w-48" />
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton key={index} className="h-32 w-full" />
+          ))}
+        </div>
       </div>
     </div>
   );

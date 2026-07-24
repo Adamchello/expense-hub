@@ -18,12 +18,15 @@ interface AddExpenseDialogProps {
   onOpenChange: (open: boolean) => void;
   /** Tab the dialog opens on; resets when closed. */
   initialTab?: "single" | "import";
+  /** Seeds the expense date — set when entry started from a calendar day. */
+  initialDate?: string | null;
 }
 
 export function AddExpenseDialog({
   open,
   onOpenChange,
   initialTab = "single",
+  initialDate,
 }: AddExpenseDialogProps) {
   const [tab, setTab] = useState<string>(initialTab);
 
@@ -59,21 +62,29 @@ export function AddExpenseDialog({
               Import File
             </TabsTrigger>
           </TabsList>
+          {/*
+            Both panels stay mounted so a half-filled form or a reviewed import
+            survives a tab switch; `active` tracks the dialog itself, so the
+            reset still happens on close (and only on close).
+          */}
           <TabsContent
+            forceMount
             value="single"
             className="-mx-2 mt-0 min-h-0 flex-1 overflow-y-auto px-2"
           >
             <ExpenseEntryFormBody
-              active={open && tab === "single"}
+              active={open}
+              initialDate={initialDate}
               onCancel={() => onOpenChange(false)}
             />
           </TabsContent>
           <TabsContent
+            forceMount
             value="import"
             className="mt-0 flex min-h-0 flex-1 flex-col"
           >
             <ExpenseImportBody
-              active={open && tab === "import"}
+              active={open}
               onDone={() => onOpenChange(false)}
             />
           </TabsContent>

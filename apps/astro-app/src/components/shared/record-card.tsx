@@ -32,6 +32,8 @@ interface RecordCardProps {
   /** Accessible name for the card-as-button, e.g. "Edit Netflix expense". */
   openLabel?: string;
   metaTestId?: DataE2E;
+  /** Top-right marker, e.g. "Recurring". A dot renders with it. */
+  flag?: string;
 }
 
 export function RecordCard({
@@ -44,6 +46,7 @@ export function RecordCard({
   onOpen,
   openLabel,
   metaTestId,
+  flag,
 }: RecordCardProps) {
   const { washClassFor } = useCategoryOptions();
   const isInteractive = !!onOpen;
@@ -74,16 +77,34 @@ export function RecordCard({
         ],
       )}
     >
+      {/* Name, then the amount on its own line. Side by side they competed:
+          the payee is what you scan for, the amount is what you land on, and
+          giving each its own line lets the amount carry real weight. */}
       <div className="flex items-start justify-between gap-2">
         <h4 className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
           {name}
         </h4>
-        <Amount value={amount} size="md" />
+        {flag && (
+          <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-primary">
+            <span
+              className="size-1.5 rounded-full bg-primary"
+              aria-hidden="true"
+            />
+            {flag}
+          </span>
+        )}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <p className="mt-1 text-lg">
+        <Amount value={amount} size="inherit" />
+      </p>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1">
         <CategoryBadge category={category} suffix={categorySuffix} />
-        <span className="text-xs text-foreground/70" data-e2e={metaTestId}>
+        <span
+          className="ml-auto text-xs text-foreground/70"
+          data-e2e={metaTestId}
+        >
           {meta}
         </span>
       </div>

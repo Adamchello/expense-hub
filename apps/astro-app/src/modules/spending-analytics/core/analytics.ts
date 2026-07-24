@@ -105,11 +105,117 @@ export function categoryComparisons(
 
 const RANK_LABELS = ["largest", "second-largest", "third-largest"];
 
-const previousMonthOf = (month: string): string => {
+/** The YYYY-MM before the given one, rolling the year over correctly. */
+export const previousMonthOf = (month: string): string => {
   const [year, m] = month.split("-").map(Number);
   const date = new Date(Date.UTC(year, m - 2, 1));
   return date.toISOString().slice(0, 7);
 };
+
+/** The same YYYY-MM one year earlier. */
+export const sameMonthLastYear = (month: string): string => {
+  const [year, m] = month.split("-");
+  return `${Number(year) - 1}-${m}`;
+};
+
+export interface PeriodTotal {
+  total: number;
+  count: number;
+}
+
+/**
+ * How much, over how many expenses, inside an inclusive YYYY-MM range.
+ *
+ * A single range function serves both headline cards: "this month" is a range
+ * of one, "this year" is January through the selected month. The year card has
+ * to stop at the selected month rather than run to December, otherwise it is
+ * compared against a full previous year and always looks like a saving.
+ */
+export function rangeTotal(
+  expenses: Expense[],
+  startMonth: string,
+  endMonth: string,
+): PeriodTotal {
+  const inRange = expenses.filter((expense) => {
+    const month = monthOf(expense);
+    return month >= startMonth && month <= endMonth;
+  });
+  return {
+    total: sum(inRange.map((expense) => expense.amount)),
+    count: inRange.length,
+  };
+}
+
+/**
+ * Percent change against a baseline, or null when there is nothing to compare
+ * to — a first month has no trend, and inventing 0% would claim otherwise.
+ */
+export function changePct(current: number, previous: number): number | null {
+  if (previous <= 0) return null;
+  return round1(((current - previous) / previous) * 100);
+}
+
+/** Distinct spending days a category needs before its trend is worth drawing. */
+const MIN_TREND_DAYS = 4;
+
+const daysInMonth = (month: string): number => {
+  const [year, m] = month.split("-").map(Number);
+  return new Date(Date.UTC(year, m, 0)).getUTCDate();
+};
+
+/**
+ * The shape of spending across a month, as a trailing-window running total per
+ * day — the series behind the sparklines.
+ *
+ * A raw per-day series is mostly zeros with occasional spikes, which draws a
+ * comb rather than a trend. A trailing window smooths that into the pace of
+ * spending, which is what the line is actually claiming to show.
+ *
+ * The series stops at today for the current month: running it to month end
+ * would tail every line to zero and read as "spending collapsed".
+ */
+export function spendingPace(
+  expenses: Expense[],
+  month: string,
+  options: { category?: string; window?: number; today?: string } = {},
+): number[] {
+  const { category, window = 7 } = options;
+  const today = options.today ?? new Date().toISOString().slice(0, 10);
+
+  const scoped = expenses.filter(
+    (expense) =>
+      monthOf(expense) === month &&
+      (category === undefined || expense.category === category),
+  );
+
+  // Below a handful of active days there is no pace to draw — a single rent
+  // charge produces a flat line with one cliff in it, and a cliff shown as a
+  // trend line claims a movement that never happened. Returning nothing lets
+  // the caller omit the chart rather than illustrate noise.
+  const activeDays = new Set(scoped.map((expense) => expense.date));
+  if (activeDays.size < MIN_TREND_DAYS) return [];
+
+  const lastDay =
+    today.slice(0, 7) === month
+      ? Number(today.slice(8, 10))
+      : daysInMonth(month);
+
+  const perDay = new Array<number>(lastDay + 1).fill(0);
+  for (const expense of scoped) {
+    const day = Number(expense.date.slice(8, 10));
+    if (day >= 1 && day <= lastDay) perDay[day] += expense.amount;
+  }
+
+  const series: number[] = [];
+  for (let day = 1; day <= lastDay; day++) {
+    let windowTotal = 0;
+    for (let back = 0; back < window && day - back >= 1; back++) {
+      windowTotal += perDay[day - back];
+    }
+    series.push(windowTotal);
+  }
+  return series;
+}
 
 /**
  * Descriptive, factual summaries derived from recorded expenses — no predictions.

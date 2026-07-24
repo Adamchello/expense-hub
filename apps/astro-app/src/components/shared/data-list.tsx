@@ -44,9 +44,19 @@ export function ListRow({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">{name}</p>
         {secondary && <div className="mt-0.5">{secondary}</div>}
+        {/* Below sm the meta drops under the name instead of competing with
+            the amount for the same line — at 360px the two together truncate
+            the payee to nothing. */}
+        {meta && (
+          <div className="mt-0.5 text-xs text-muted-foreground sm:hidden">
+            {meta}
+          </div>
+        )}
       </div>
       {meta && (
-        <span className="shrink-0 text-xs text-muted-foreground">{meta}</span>
+        <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+          {meta}
+        </span>
       )}
       {amount !== undefined && (
         <span className="min-w-24 shrink-0 text-right">
@@ -62,10 +72,17 @@ export function ListRow({
 export function ListTotal({
   label,
   value,
+  emphasis = false,
   className,
 }: {
   label: ReactNode;
   value: number;
+  /**
+   * Promotes the strip from a footnote to a figure. Used where the total is
+   * the reason the card exists (what you owe in the next 30 days), not just
+   * the arithmetic of the rows above it.
+   */
+  emphasis?: boolean;
   className?: string;
 }) {
   return (
@@ -75,8 +92,20 @@ export function ListTotal({
         className,
       )}
     >
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <Amount value={value} size="md" />
+      <span
+        className={cn(
+          emphasis
+            ? "text-sm font-medium text-foreground"
+            : "text-xs text-muted-foreground",
+        )}
+      >
+        {label}
+      </span>
+      <Amount
+        value={value}
+        size={emphasis ? "lg" : "md"}
+        className={cn(emphasis && "text-lg text-primary sm:text-xl")}
+      />
     </div>
   );
 }

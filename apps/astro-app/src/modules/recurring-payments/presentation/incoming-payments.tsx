@@ -1,12 +1,28 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DataList, EmptyState, ListRow, ListTotal } from "@/components/shared";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Amount,
+  CardTable,
+  CardTableCell,
+  CardTableRow,
+  CARD_TABLE_GRID,
+  CategoryBadge,
+  EmptyState,
+  ListTotal,
+  type CardTableColumn,
+} from "@/components/shared";
 import { formatDate } from "@/shared/format";
 import { daysUntil } from "@/shared/domain/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { addDays, expectedTotal, projectOccurrences } from "../core/projection";
-import { CalendarClock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const WINDOW_DAYS = 30;
 const MAX_ROWS = 5;
@@ -17,8 +33,26 @@ const whenLabel = (days: number): string => {
   return `in ${days} days`;
 };
 
+// Shares `CARD_TABLE_GRID` with the recent-expenses register so the two cards
+// sitting side by side read as one system rather than two near-misses.
+//
+// "Due in" replaces the absolute date entirely. The two were competing for the
+// same column of attention, and the relative distance is the actionable half —
+// "in 3 days" is what changes a decision; "Jul 27, 2026" is bookkeeping.
+const COLUMNS: CardTableColumn[] = [
+  { label: "Payee" },
+  { label: "Category" },
+  { label: "Due in" },
+  { label: "Amount", className: "text-right" },
+];
+
 /** Next recurring charges — informational only, they post automatically. */
-export function IncomingPayments() {
+interface IncomingPaymentsProps {
+  /** Opens History, where these charges sit on the calendar. */
+  onViewAll?: () => void;
+}
+
+export function IncomingPayments({ onViewAll }: IncomingPaymentsProps) {
   const query = useRecurringPayments();
 
   const today = new Date().toISOString().slice(0, 10);
@@ -31,12 +65,21 @@ export function IncomingPayments() {
   const total = expectedTotal(occurrences);
 
   return (
-    <Card>
+    <Card className="gap-3">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarClock className="size-4.5 text-primary" />
-          Upcoming Payments
-        </CardTitle>
+        <CardTitle>Upcoming payments</CardTitle>
+        {onViewAll && (
+          <CardAction>
+            <button
+              type="button"
+              onClick={onViewAll}
+              className="flex items-center gap-1 rounded-md text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              View all
+              <ArrowRight className="size-3.5" aria-hidden />
+            </button>
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent>
         {occurrences.length === 0 ? (
@@ -46,27 +89,53 @@ export function IncomingPayments() {
           />
         ) : (
           <>
-            <DataList>
-              {shown.map((occurrence) => (
-                <ListRow
-                  key={`${occurrence.recurring.id}-${occurrence.date}`}
-                  name={occurrence.recurring.provider_name}
-                  meta={`${formatDate(occurrence.date)} · ${whenLabel(
-                    daysUntil(today, occurrence.date),
-                  )}`}
-                  amount={occurrence.recurring.amount}
-                />
-              ))}
-            </DataList>
+            <CardTable
+              label="Upcoming payments"
+              gridClassName={CARD_TABLE_GRID}
+              columns={COLUMNS}
+            >
+              {shown.map((occurrence) => {
+                const days = daysUntil(today, occurrence.date);
+                return (
+                  <CardTableRow
+                    key={`${occurrence.recurring.id}-${occurrence.date}`}
+                  >
+                    <CardTableCell className="truncate text-sm font-medium text-foreground">
+                      {occurrence.recurring.provider_name}
+                    </CardTableCell>
+
+                    {/* Below sm the chip and the countdown drop to a second
+                        line and the amount rides up beside the payee. */}
+                    <CardTableCell className="col-start-1 row-start-2 sm:col-start-2 sm:row-start-1">
+                      <CategoryBadge category={occurrence.recurring.category} />
+                    </CardTableCell>
+
+                    <CardTableCell
+                      className="col-start-2 row-start-2 justify-self-end text-xs font-medium text-primary sm:col-start-3 sm:row-start-1 sm:justify-self-start"
+                      // The countdown is relative, so the date it resolves to
+                      // stays reachable rather than being thrown away.
+                      title={formatDate(occurrence.date)}
+                    >
+                      {whenLabel(days)}
+                    </CardTableCell>
+
+                    <CardTableCell className="col-start-2 row-start-1 text-right sm:col-start-4">
+                      <Amount value={occurrence.recurring.amount} size="md" />
+                    </CardTableCell>
+                  </CardTableRow>
+                );
+              })}
+            </CardTable>
             <ListTotal
               label={
                 <>
-                  Next {WINDOW_DAYS} days
+                  Total upcoming
                   {occurrences.length > shown.length &&
                     ` · ${occurrences.length - shown.length} more`}
                 </>
               }
               value={total}
+              emphasis
             />
           </>
         )}

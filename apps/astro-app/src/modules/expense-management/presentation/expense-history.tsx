@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import type { Expense } from "../domain/expense";
+import type { Category } from "@/shared/domain/category";
+import type { DataE2E } from "@/__e2e__/data-e2e";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -21,16 +22,25 @@ import {
   Amount,
   ConfirmDialog,
   EmptyState,
+  ListGroupHeader,
   RecordCard,
+  SectionLabel,
 } from "@/components/shared";
-import { formatDate, formatMonth } from "@/shared/format";
+import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/lib/toast";
 import { queryClient } from "@/lib/query-client";
 import { useDeleteExpense } from "../core/store";
 import { createExpense } from "../integration/repository";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";
 import { EditExpenseDialog } from "./edit-expense-dialog";
-import { ArrowUpDown, Download, Receipt, Search } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Download,
+  Filter,
+  Receipt,
+  Search,
+} from "lucide-react";
 
 const ALL = "all";
 
@@ -49,20 +59,75 @@ const SORT_LABELS: Record<SortOrder, string> = {
   "name-asc": "Payee A–Z",
 };
 
-const SORT_COMPARATORS: Record<SortOrder, (a: Expense, b: Expense) => number> =
-  {
-    "date-desc": (a, b) => b.date.localeCompare(a.date),
-    "date-asc": (a, b) => a.date.localeCompare(b.date),
-    "amount-desc": (a, b) => b.amount - a.amount,
-    "amount-asc": (a, b) => a.amount - b.amount,
-    "name-asc": (a, b) => a.provider_name.localeCompare(b.provider_name),
-  };
+/**
+ * The shape the filters and the sorts read. Expenses and incoming records are
+ * different things with different actions, but they are searched, filtered and
+ * ordered identically — so that part of them is expressed once, here.
+ */
+interface SortableRecord {
+  date: string;
+  amount: number;
+  name: string;
+  category: string;
+  description: string | null;
+}
+
+const SORT_COMPARATORS: Record<
+  SortOrder,
+  (a: SortableRecord, b: SortableRecord) => number
+> = {
+  "date-desc": (a, b) => b.date.localeCompare(a.date),
+  "date-asc": (a, b) => a.date.localeCompare(b.date),
+  "amount-desc": (a, b) => b.amount - a.amount,
+  "amount-asc": (a, b) => a.amount - b.amount,
+  "name-asc": (a, b) => a.name.localeCompare(b.name),
+};
+
+const sortableExpense = (expense: Expense): SortableRecord => ({
+  date: expense.date,
+  amount: expense.amount,
+  name: expense.provider_name,
+  category: expense.category,
+  description: expense.description,
+});
+
+/**
+ * A record that has not happened yet — a recurring payment, projected.
+ *
+ * The register renders it as a plain view model rather than importing the
+ * recurring-payments module: this file owns "what a searchable list of records
+ * looks like", not what a recurring payment is. Whoever composes the page maps
+ * one into the other.
+ */
+export interface IncomingRecord {
+  id: string;
+  name: string;
+  amount: number;
+  category: Category;
+  description: string | null;
+  /** Due date (YYYY-MM-DD) — filtered and sorted with the expense dates. */
+  date: string;
+  /** Trails the category chip, e.g. "· Monthly". */
+  categorySuffix?: string;
+  meta: string;
+  metaTestId?: DataE2E;
+  openLabel: string;
+  onOpen: () => void;
+}
 
 interface ExpenseHistoryProps {
   expenses: Expense[];
+  /** Prepended as the "Incoming" group, under the same filters and sort. */
+  incoming?: IncomingRecord[];
+  /** Sits on the Incoming divider, e.g. "New recurring payment". */
+  incomingAction?: React.ReactNode;
 }
 
-export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
+export function ExpenseHistory({
+  expenses,
+  incoming = [],
+  incomingAction,
+}: ExpenseHistoryProps) {
   const [monthFilter, setMonthFilter] = useState<string>(ALL);
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,30 +137,57 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
 
   const deleteMutation = useDeleteExpense();
 
+  // Incoming months belong in the picker too, or filtering to next August
+  // silently drops the only records that exist there.
   const monthOptions = useMemo(() => {
-    const months = new Set(expenses.map((expense) => expense.date.slice(0, 7)));
+    const months = new Set([
+      ...expenses.map((expense) => expense.date.slice(0, 7)),
+      ...incoming.map((record) => record.date.slice(0, 7)),
+    ]);
     return [...months].sort((a, b) => b.localeCompare(a));
-  }, [expenses]);
+  }, [expenses, incoming]);
 
   const categoryOptions = useMemo(() => {
-    const categories = new Set(expenses.map((expense) => expense.category));
+    const categories = new Set([
+      ...expenses.map((expense) => expense.category as string),
+      ...incoming.map((record) => record.category),
+    ]);
     return [...categories].sort();
-  }, [expenses]);
+  }, [expenses, incoming]);
 
-  const filteredExpenses = useMemo(() => {
+  // One predicate for both lists — the filters read as filters only if a
+  // search for "netflix" hides the Netflix subscription too.
+  const matchesFilters = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    return expenses
-      .filter(
-        (expense) =>
-          (monthFilter === ALL || expense.date.startsWith(monthFilter)) &&
-          (categoryFilter === ALL || expense.category === categoryFilter) &&
-          (term === "" ||
-            expense.provider_name.toLowerCase().includes(term) ||
-            (expense.description ?? "").toLowerCase().includes(term) ||
-            expense.category.toLowerCase().includes(term)),
-      )
-      .sort(SORT_COMPARATORS[sortOrder]);
-  }, [expenses, monthFilter, categoryFilter, searchTerm, sortOrder]);
+    return (record: SortableRecord) =>
+      (monthFilter === ALL || record.date.startsWith(monthFilter)) &&
+      (categoryFilter === ALL || record.category === categoryFilter) &&
+      (term === "" ||
+        record.name.toLowerCase().includes(term) ||
+        (record.description ?? "").toLowerCase().includes(term) ||
+        record.category.toLowerCase().includes(term));
+  }, [monthFilter, categoryFilter, searchTerm]);
+
+  const filteredExpenses = useMemo(
+    () =>
+      expenses
+        .filter((expense) => matchesFilters(sortableExpense(expense)))
+        .sort((a, b) =>
+          SORT_COMPARATORS[sortOrder](sortableExpense(a), sortableExpense(b)),
+        ),
+    [expenses, matchesFilters, sortOrder],
+  );
+
+  const filteredIncoming = useMemo(
+    () =>
+      incoming
+        .filter(matchesFilters)
+        .sort((a, b) => SORT_COMPARATORS[sortOrder](a, b)),
+    [incoming, matchesFilters, sortOrder],
+  );
+
+  const activeFilterCount =
+    (monthFilter === ALL ? 0 : 1) + (categoryFilter === ALL ? 0 : 1);
 
   const isGroupedByMonth =
     sortOrder === "date-desc" || sortOrder === "date-asc";
@@ -144,7 +236,7 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
     });
   };
 
-  if (expenses.length === 0) {
+  if (expenses.length === 0 && incoming.length === 0) {
     return (
       <EmptyState
         variant="block"
@@ -173,64 +265,113 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters + exports. Search leads full-width; the three selects flex
-          so they never tower or clip on a phone. */}
-      <div className="flex flex-col gap-2">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      {/* One control row: search takes the space it deserves, the two
+          narrowing controls sit beside it. Month and category used to be two
+          more selects competing at the same size as search — they are behind
+          one "Filters" surface now, which carries a count so a filter left on
+          can never hide half the ledger silently. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search payee, note or category"
+            placeholder="Search expenses..."
             aria-label="Search expenses"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8"
+            className="h-11 w-full rounded-xl pl-9"
           />
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Select value={monthFilter} onValueChange={setMonthFilter}>
-            <SelectTrigger
-              className="w-full flex-1 sm:w-40 sm:flex-none"
-              aria-label="Filter by month"
-            >
-              <SelectValue placeholder="All months" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>All months</SelectItem>
-              {monthOptions.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {formatMonth(month)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger
-              className="w-full flex-1 sm:w-40 sm:flex-none"
-              aria-label="Filter by category"
-            >
-              <SelectValue placeholder="All categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>All categories</SelectItem>
-              {categoryOptions.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="h-11 flex-1 justify-between gap-2 rounded-xl sm:flex-none"
+              >
+                <span className="flex items-center gap-2">
+                  <Filter className="size-4" />
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span className="inline-flex size-5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </span>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-64 space-y-3">
+              <div className="space-y-1.5">
+                <SectionLabel as="span">Month</SectionLabel>
+                <Select value={monthFilter} onValueChange={setMonthFilter}>
+                  <SelectTrigger
+                    className="w-full"
+                    aria-label="Filter by month"
+                  >
+                    <SelectValue placeholder="All months" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL}>All months</SelectItem>
+                    {monthOptions.map((month) => (
+                      <SelectItem key={month} value={month}>
+                        {formatMonth(month)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel as="span">Category</SectionLabel>
+                <Select
+                  value={categoryFilter}
+                  onValueChange={setCategoryFilter}
+                >
+                  <SelectTrigger
+                    className="w-full"
+                    aria-label="Filter by category"
+                  >
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL}>All categories</SelectItem>
+                    {categoryOptions.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {activeFilterCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    setMonthFilter(ALL);
+                    setCategoryFilter(ALL);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
+            </PopoverContent>
+          </Popover>
 
           <Select
             value={sortOrder}
             onValueChange={(value) => setSortOrder(value as SortOrder)}
           >
             <SelectTrigger
-              className="w-full flex-1 sm:w-48 sm:flex-none"
+              className="h-11 flex-1 gap-2 rounded-xl sm:w-56 sm:flex-none"
               aria-label="Sort expenses"
             >
-              <ArrowUpDown className="size-3.5" />
+              <ArrowUpDown className="size-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Sorting:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -242,59 +383,91 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
             </SelectContent>
           </Select>
 
-          {(monthFilter !== ALL ||
-            categoryFilter !== ALL ||
-            searchTerm !== "" ||
-            sortOrder !== "date-desc") && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setMonthFilter(ALL);
-                setCategoryFilter(ALL);
-                setSearchTerm("");
-                setSortOrder("date-desc");
-              }}
-            >
-              Clear filters
-            </Button>
-          )}
-          <div className="ml-auto">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Download className="size-3.5" />
-                  Export
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-40 p-1">
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                  onClick={() => {
-                    exportExpensesToCsv(expenses);
-                    toast("Exported expenses as CSV");
-                  }}
-                >
-                  <Download className="size-3.5" />
-                  CSV
-                </button>
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                  onClick={() => {
-                    exportExpensesToExcel(expenses);
-                    toast("Exported expenses as Excel");
-                  }}
-                >
-                  <Download className="size-3.5" />
-                  Excel
-                </button>
-              </PopoverContent>
-            </Popover>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-11 shrink-0 rounded-xl"
+                aria-label="Export expenses"
+              >
+                <Download className="size-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-40 p-1">
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                onClick={() => {
+                  exportExpensesToCsv(expenses);
+                  toast("Exported expenses as CSV");
+                }}
+              >
+                <Download className="size-3.5" />
+                CSV
+              </button>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                onClick={() => {
+                  exportExpensesToExcel(expenses);
+                  toast("Exported expenses as Excel");
+                }}
+              >
+                <Download className="size-3.5" />
+                Excel
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
+
+      {/* Incoming heads the ledger and stays its own group under every sort —
+          money that has not left yet does not belong under a month heading
+          that claims it did. */}
+      {(filteredIncoming.length > 0 || incomingAction) && (
+        <div className="space-y-3">
+          <ListGroupHeader
+            title="Incoming"
+            meta={
+              filteredIncoming.length > 0 &&
+              `${filteredIncoming.length} recurring`
+            }
+            action={incomingAction}
+          />
+          {/* No "Total" here on purpose: a weekly and a monthly payment are
+              not addable numbers, and a sum that means nothing next to a
+              month total that means something is worse than no sum. */}
+          {filteredIncoming.length === 0 ? (
+            <EmptyState
+              variant="inline"
+              description={
+                incoming.length === 0
+                  ? "Nothing repeats yet. Add rent, a subscription, or any payment that comes back."
+                  : "No recurring payments match the selected filters."
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredIncoming.map((record) => (
+                <RecordCard
+                  key={record.id}
+                  name={record.name}
+                  amount={record.amount}
+                  category={record.category}
+                  categorySuffix={record.categorySuffix}
+                  meta={record.meta}
+                  metaTestId={record.metaTestId}
+                  note={record.description}
+                  onOpen={record.onOpen}
+                  openLabel={record.openLabel}
+                  flag="Recurring"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {filteredExpenses.length === 0 ? (
         <EmptyState
@@ -305,16 +478,18 @@ export function ExpenseHistory({ expenses }: ExpenseHistoryProps) {
         <div className="space-y-6">
           {sortedMonths.map((month) => (
             <div key={month} className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  {formatMonth(month)}
-                </h3>
-                <Separator className="flex-1" />
-                <span className="text-xs text-muted-foreground">
-                  {groupedExpenses[month].length}{" "}
-                  {groupedExpenses[month].length === 1 ? "expense" : "expenses"}
-                </span>
-              </div>
+              <ListGroupHeader
+                title={formatMonth(month)}
+                total={`Total: ${formatCurrency(
+                  groupedExpenses[month].reduce(
+                    (sum, expense) => sum + expense.amount,
+                    0,
+                  ),
+                )}`}
+                meta={`${groupedExpenses[month].length} ${
+                  groupedExpenses[month].length === 1 ? "expense" : "expenses"
+                }`}
+              />
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {groupedExpenses[month].map(renderExpenseCard)}
               </div>

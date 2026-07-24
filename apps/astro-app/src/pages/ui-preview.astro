@@ -1,0 +1,11 @@
+---
+// TEMPORARY visual harness for /impeccable critique — delete after.
+import DashboardPreview from "@/shells/app/__preview__/dashboard-preview";
+import AppLayout from "@/kernel/layouts/layout.astro";
+
+export const prerender = true;
+---
+
+<AppLayout>
+  <DashboardPreview client:load />
+</AppLayout>

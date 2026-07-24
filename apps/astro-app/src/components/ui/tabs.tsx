@@ -58,6 +58,9 @@ function TabsContent({
       data-slot="tabs-content"
       className={cn(
         "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        // `forceMount` keeps inactive panels mounted (so their state survives a
+        // tab switch); Radix leaves them visible in that mode, so hide them here.
+        "data-[state=inactive]:hidden",
         className,
       )}
       {...props}

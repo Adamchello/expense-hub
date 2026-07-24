@@ -43,24 +43,7 @@ export function projectOccurrences(
 export const expectedTotal = (occurrences: ProjectedOccurrence[]): number =>
   occurrences.reduce((sum, occurrence) => sum + occurrence.recurring.amount, 0);
 
-/** First and last day (YYYY-MM-DD) of a YYYY-MM month. */
-export function monthBounds(month: string): { from: string; to: string } {
-  const [year, m] = month.split("-").map(Number);
-  const lastDay = new Date(Date.UTC(year, m, 0)).getUTCDate();
-  return {
-    from: `${month}-01`,
-    to: `${month}-${String(lastDay).padStart(2, "0")}`,
-  };
-}
-
-/** Shifts a YYYY-MM month by a number of months. */
-export function shiftMonth(month: string, offset: number): string {
-  const [year, m] = month.split("-").map(Number);
-  return new Date(Date.UTC(year, m - 1 + offset, 1)).toISOString().slice(0, 7);
-}
-
-/** Adds days to a YYYY-MM-DD date. */
-export function addDays(date: string, days: number): string {
-  const [year, m, d] = date.split("-").map(Number);
-  return new Date(Date.UTC(year, m - 1, d + days)).toISOString().slice(0, 10);
-}
+// Calendar arithmetic is not a recurring-payments concern — the History
+// calendar plots logged expenses on the same grid. It lives in shared/domain
+// and is re-exported here so this module's callers keep one import.
+export { addDays, monthBounds, shiftMonth } from "@/shared/domain/calendar";

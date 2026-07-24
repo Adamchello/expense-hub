@@ -27,7 +27,10 @@ interface FormState {
   category: string | undefined;
 }
 
-const getInitialFormState = (expense?: Expense | null): FormState =>
+const getInitialFormState = (
+  expense?: Expense | null,
+  initialDate?: string | null,
+): FormState =>
   expense
     ? {
         amount: String(expense.amount),
@@ -38,7 +41,7 @@ const getInitialFormState = (expense?: Expense | null): FormState =>
       }
     : {
         amount: "",
-        date: new Date().toISOString().split("T")[0],
+        date: initialDate || new Date().toISOString().split("T")[0],
         providerName: "",
         description: "",
         category: undefined,
@@ -59,6 +62,8 @@ interface ExpenseFormBodyProps {
   onSubmit: (data: ExpenseSubmitData) => void;
   /** Prefills the form and expands the details section (edit mode). */
   initialExpense?: Expense | null;
+  /** Seeds the date when creating — the calendar day the user clicked. */
+  initialDate?: string | null;
   error: unknown;
   isPending: boolean;
   successMessage?: string | null;
@@ -77,6 +82,7 @@ export function ExpenseFormBody({
   onCancel,
   onSubmit,
   initialExpense,
+  initialDate,
   error,
   isPending,
   successMessage,
@@ -87,7 +93,7 @@ export function ExpenseFormBody({
 }: ExpenseFormBodyProps) {
   const isEdit = !!initialExpense;
   const [formState, setFormState] = useState<FormState>(() =>
-    getInitialFormState(initialExpense),
+    getInitialFormState(initialExpense, initialDate),
   );
   const [showMore, setShowMore] = useState(isEdit);
   // Once the user picks a category themselves, payee typing stops overriding it.
@@ -98,11 +104,13 @@ export function ExpenseFormBody({
 
   useEffect(() => {
     if (active) {
-      setFormState(getInitialFormState(initialExpense));
-      setShowMore(isEdit);
+      setFormState(getInitialFormState(initialExpense, initialDate));
+      // A seeded date is a detail the user just chose — show it rather than
+      // hiding their own input behind "Add details".
+      setShowMore(isEdit || !!initialDate);
       setCategoryTouched(isEdit);
     }
-  }, [active, initialExpense, isEdit]);
+  }, [active, initialExpense, initialDate, isEdit]);
 
   const handleProviderChange = (value: string) => {
     setFormState((prev) => {
@@ -303,11 +311,14 @@ interface ExpenseEntryFormBodyProps {
   /** When false the form resets (mirrors the old close-resets-form behavior). */
   active: boolean;
   onCancel: () => void;
+  /** Seeds the date — set when the entry started from a calendar day. */
+  initialDate?: string | null;
 }
 
 export function ExpenseEntryFormBody({
   active,
   onCancel,
+  initialDate,
 }: ExpenseEntryFormBodyProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formEpoch, setFormEpoch] = useState(0);
@@ -349,6 +360,7 @@ export function ExpenseEntryFormBody({
       active={active}
       onCancel={onCancel}
       onSubmit={handleSubmit}
+      initialDate={initialDate}
       error={error}
       isPending={isPending}
       successMessage={successMessage}
