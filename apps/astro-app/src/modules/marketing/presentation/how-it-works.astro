@@ -1,0 +1,59 @@
+---
+import PageSection from "./page-section.astro"
+
+/**
+ * The only numbered thing on the page.
+ *
+ * The numerals aren't section scaffolding — this genuinely is an order: record
+ * first, reconcile monthly, search later. They're set in the mono face the app
+ * reserves for figures, sized large enough to act as the row's anchor on a wide
+ * screen where a small marker would just float.
+ *
+ * Heading left, steps right: the section reads as one composition across the
+ * page rather than a stack of centred blocks.
+ */
+const steps = [
+  {
+    title: "Record what you just paid",
+    body: "Amount, category, back to your day.",
+  },
+  {
+    title: "Import the rest monthly",
+    body: "Your bank's export, duplicates flagged.",
+  },
+  {
+    title: "Find it whenever you're asked",
+    body: "History, calendar, or CSV out.",
+  },
+] as const
+---
+
+<PageSection id="how" class="bg-card/50">
+  <div class="grid gap-10 lg:grid-cols-12 lg:gap-12">
+    <h2
+      class="text-balance text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl lg:col-span-5 lg:text-5xl"
+    >
+      Three habits, no spreadsheet.
+    </h2>
+
+    <ol
+      class="divide-y divide-border border-t border-border lg:col-span-6 lg:col-start-7 lg:border-t-0"
+    >
+      {
+        steps.map((step, index) => (
+          <li class="flex items-baseline gap-6 py-6 first:lg:pt-0 sm:gap-10">
+            <span class="shrink-0 font-mono text-lg tabular-nums text-primary sm:text-xl">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div class="min-w-0">
+              <h3 class="text-lg font-semibold tracking-tight text-foreground">
+                {step.title}
+              </h3>
+              <p class="mt-1.5 text-base text-muted-foreground">{step.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</PageSection>

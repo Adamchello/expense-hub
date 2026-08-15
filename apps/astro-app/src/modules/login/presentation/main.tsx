@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { AppRouter } from "@/kernel/routing/app-router";
 
 export function LoginForm() {
   useAppRedirectionWhenLoggedIn();
@@ -54,6 +55,17 @@ export function LoginForm() {
             </FieldGroup>
           </form>
         </div>
+        {/* Sign-in is no longer the site's front door, so it needs a way back
+            out to it — otherwise the only exit from this page is the browser's
+            Back button. */}
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          <a
+            href={AppRouter.getPath("home")}
+            className="underline-offset-4 hover:underline"
+          >
+            Back to ExpenseHub
+          </a>
+        </p>
       </div>
     </div>
   );

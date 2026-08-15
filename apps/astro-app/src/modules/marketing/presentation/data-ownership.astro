@@ -1,0 +1,74 @@
+---
+import PageSection from "./page-section.astro"
+
+/**
+ * The closing argument before the sign-up band.
+ *
+ * Every claim here is a feature that exists in the app — file-based import
+ * rather than a bank connection, CSV and Excel export, per-profile isolation,
+ * single and bulk delete. Nothing aspirational: a page for a records tool
+ * cannot promise custody it doesn't keep.
+ *
+ * Four statements across one row, split by vertical rules on desktop. It reads
+ * as a footnote to the product rather than another feature pitch, which is why
+ * it earns the last word before the CTA.
+ */
+const guarantees = [
+  {
+    title: "No bank login",
+    body: "Import a file you exported yourself. ExpenseHub never asks for your bank credentials.",
+  },
+  {
+    title: "Export any time",
+    body: "The whole ledger leaves as CSV or Excel, in the shape you'd expect.",
+  },
+  {
+    title: "Profiles stay apart",
+    body: "Business and personal never mix, and switching between them is one click.",
+  },
+  {
+    title: "Delete means delete",
+    body: "One expense or a whole selection. What you remove is gone from the record.",
+  },
+] as const
+---
+
+<PageSection id="data">
+  <div class="max-w-3xl">
+    <h2
+      class="text-balance text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl lg:text-5xl"
+    >
+      Your ledger, your data.
+    </h2>
+    <p class="mt-4 max-w-[52ch] text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
+      It's a record you keep, not an account someone keeps on you.
+    </p>
+  </div>
+
+  {/* Deliberately not the same shape as the capability list above it: on a
+      phone those are tight single lines, so these are four generous blocks at
+      a larger size, ruled apart. Two "bold title, grey line" stacks in a row
+      is what made the mobile page feel repetitive. */}
+  <dl
+    class="mt-12 grid divide-y divide-border border-t border-border sm:grid-cols-2 sm:gap-x-10 sm:divide-y-0 lg:mt-16 lg:grid-cols-4 lg:gap-x-0 lg:divide-x lg:divide-border"
+  >
+    {
+      guarantees.map((guarantee, index) => (
+        <div
+          class:list={[
+            "py-6 sm:py-8 lg:px-8",
+            index === 0 && "lg:pl-0",
+            index === guarantees.length - 1 && "lg:pr-0",
+          ]}
+        >
+          <dt class="text-xl font-semibold tracking-tight text-foreground sm:text-lg lg:text-base">
+            {guarantee.title}
+          </dt>
+          <dd class="mt-2 max-w-[38ch] text-pretty text-base leading-relaxed text-muted-foreground lg:text-sm">
+            {guarantee.body}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</PageSection>

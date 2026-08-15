@@ -9,7 +9,11 @@ const createRoute = <
 };
 
 const appRoutes = [
-  createRoute("login", "/"),
+  // `/` is the marketing homepage, so signing in has its own address. Every
+  // link goes through `getPath` for exactly this reason — the auth entry point
+  // moved without a single hardcoded "/" needing to be hunted down.
+  createRoute("home", "/"),
+  createRoute("login", "/login"),
   createRoute("register", "/register"),
   createRoute("logout", "/logout"),
   createRoute("dashboard", "/app"),

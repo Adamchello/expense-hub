@@ -1,0 +1,206 @@
+---
+import PageSection from "./page-section.astro"
+
+/**
+ * Everything the app does, in two tiers.
+ *
+ * The two things a spreadsheet genuinely cannot do — swallow a bank export and
+ * describe a year back to you — get a full-width row each, with a real piece of
+ * the app beside them and the sides alternating so the eye crosses the page
+ * instead of running down one gutter. The other eight are a ruled table, two
+ * columns wide on desktop: a list of names and one line each, the way the app
+ * itself lists an expense.
+ *
+ * No icons. Eight tiles of glyph-plus-heading-plus-sentence is the most
+ * recognisable AI landing-page shape there is, and not one of those glyphs told
+ * you anything the name didn't.
+ */
+const capabilities = [
+  { title: "Ten-second entry", body: "Amount, category, done." },
+  { title: "Categories", body: "Twelve built in, plus your own." },
+  { title: "Recurring payments", body: "Set once, projected ahead." },
+  { title: "History and calendar", body: "A list, or the month grid." },
+  { title: "Separate profiles", body: "Personal and business, one login." },
+  { title: "Merchants", body: "Rename once, every expense follows." },
+  { title: "CSV export", body: "Nothing is locked in." },
+  { title: "Light and dark", body: "Follows your system." },
+] as const
+
+const trend = [
+  { month: "Mar", height: 46 },
+  { month: "Apr", height: 62 },
+  { month: "May", height: 54 },
+  { month: "Jun", height: 78 },
+  { month: "Jul", height: 88 },
+  { month: "Aug", height: 71 },
+] as const
+---
+
+<PageSection id="features">
+  {/* Lead directly under the heading, both on the left. Parking it in a
+      far-right column at the same baseline looked placed rather than
+      composed — a paragraph belongs to the heading it explains. */}
+  <div class="max-w-3xl">
+    <h2
+      class="text-balance text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl lg:text-5xl"
+    >
+      One place for the whole record.
+    </h2>
+    <p class="mt-4 max-w-[52ch] text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
+      Ten features, all about getting an expense in — and back out.
+    </p>
+  </div>
+
+  <div class="mt-12 divide-y divide-border border-y border-border lg:mt-16">
+    {/* Import — the reason a statement stops being an evening. */}
+    <div class="grid items-center gap-8 py-10 lg:grid-cols-12 lg:gap-12 lg:py-14">
+      <div class="lg:col-span-5">
+        <h3
+          class="text-xl font-semibold tracking-tight text-foreground lg:text-2xl"
+        >
+          Import a whole month at once
+        </h3>
+        <p class="mt-3 max-w-[46ch] text-pretty text-base leading-relaxed text-muted-foreground">
+          Drop in a CSV or Excel export. Columns mapped, duplicates flagged,
+          nothing saved until you say so.
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-card p-5 ring-1 ring-foreground/10 lg:col-span-6 lg:col-start-7">
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-4"
+            >
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
+              ></path>
+              <path d="M14 3v5h5"></path>
+            </svg>
+          </span>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-medium text-foreground">
+              july-statement.csv
+            </p>
+            <p class="text-xs text-muted-foreground">42 rows read</p>
+          </div>
+          <span
+            class="ml-auto shrink-0 font-mono text-xs text-muted-foreground"
+            >2.1 s</span
+          >
+        </div>
+        {/* The column mapping is the part people don't believe until they see
+            it, and it gives this card the same body as the chart beside it. */}
+        <dl class="mt-4 divide-y divide-border border-t border-border font-mono text-xs">
+          {
+            [
+              ["Transaction Date", "Date"],
+              ["Debit Amount", "Amount"],
+              ["Description", "Merchant"],
+            ].map(([column, field]) => (
+              <div class="flex items-center gap-3 py-2">
+                <dt class="min-w-0 flex-1 truncate text-muted-foreground">
+                  {column}
+                </dt>
+                <span aria-hidden="true" class="text-muted-foreground">
+                  →
+                </span>
+                <dd class="min-w-0 flex-1 truncate text-foreground">{field}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <span
+            class="rounded-full border border-success/25 bg-success/10 px-2.5 py-1 text-xs font-medium text-success-text"
+            >39 ready to import</span
+          >
+          <span
+            class="rounded-full border border-warning/25 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning-text"
+            >3 look like duplicates</span
+          >
+        </div>
+      </div>
+    </div>
+
+    {/* Analytics — descriptive, never predictive. Sides swap so the page reads
+        across rather than down a single column. */}
+    <div class="grid items-center gap-8 py-10 lg:grid-cols-12 lg:gap-12 lg:py-14">
+      <div class="lg:col-span-5 lg:col-start-8 lg:order-2">
+        <h3
+          class="text-xl font-semibold tracking-tight text-foreground lg:text-2xl"
+        >
+          See where it went
+        </h3>
+        <p class="mt-3 max-w-[46ch] text-pretty text-base leading-relaxed text-muted-foreground">
+          Monthly trend, category breakdown, biggest categories ranked. What you
+          recorded — never a forecast.
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-card p-5 ring-1 ring-foreground/10 lg:order-1 lg:col-span-6">
+        {/* The bars need a parent with a definite height, or a percentage
+            height resolves against nothing and every bar collapses to zero.
+            Hence the fixed track, with the month labels as a sibling row. */}
+        <div class="flex h-28 items-end gap-2.5" aria-hidden="true">
+          {
+            trend.map((bar) => (
+              <div
+                class="min-w-0 flex-1 rounded-t-sm bg-chart-1"
+                style={`height: ${bar.height}%`}
+              />
+            ))
+          }
+        </div>
+        <div class="mt-2 flex gap-2.5" aria-hidden="true">
+          {
+            trend.map((bar) => (
+              <span class="min-w-0 flex-1 text-center font-mono text-[11px] text-muted-foreground">
+                {bar.month}
+              </span>
+            ))
+          }
+        </div>
+        <p class="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+          Biggest category this month:
+          <span class="font-medium text-foreground">Rent, 34%</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* The remaining eight. Two columns on desktop so the list fills the row
+      instead of running 800px down the left edge. */}
+  {/* On a phone these were eight stacked two-line pairs — correct, and a
+      monotonous scroll. Each entry runs as one flowing line instead, name in
+      ink and detail in grey, so the list reads as a list. From `sm` up there's
+      room for the two-column table again. */}
+  <dl
+    class="mt-4 grid border-border lg:mt-6 lg:grid-cols-2 lg:gap-x-16 [&>div]:border-b [&>div]:border-border"
+  >
+    {
+      capabilities.map((capability) => (
+        <div class="py-3.5 text-sm sm:grid sm:grid-cols-[minmax(0,13rem)_1fr] sm:gap-6 sm:py-4">
+          <dt class="inline font-medium text-foreground sm:block">
+            {capability.title}
+          </dt>
+          <span aria-hidden="true" class="text-muted-foreground sm:hidden">
+            {" — "}
+          </span>
+          <dd class="inline text-muted-foreground sm:block">
+            {capability.body}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</PageSection>

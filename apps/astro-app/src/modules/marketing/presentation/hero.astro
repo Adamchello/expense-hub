@@ -1,0 +1,101 @@
+---
+import { buttonVariants } from "@/components/ui/button"
+import { AppRouter } from "@/kernel/routing/app-router"
+import AppPreview from "./app-preview.astro"
+
+/**
+ * One promise, one picture, one way in.
+ *
+ * The tinted radial wash that used to sit behind this fold is gone: a glow
+ * behind a headline is decoration standing in for composition, and this brand
+ * earns its calm through restraint. What separates the fold from the page now
+ * is a hairline — the same one every section below uses.
+ *
+ * The preview runs past the container's right edge on wide screens. A product
+ * shot centred in its own column reads as a stock landing page; letting the
+ * record run off the page says there is more of it than fits, which is the
+ * point of a ledger.
+ */
+---
+
+<section class="overflow-hidden">
+  <div
+    class="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:px-8 lg:pb-28 lg:pt-24"
+  >
+    <div class="lg:col-span-6">
+      <h1
+        class="rise text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[3.5rem] xl:text-[3.9rem]"
+      >
+        A clean record of what you paid.
+      </h1>
+
+      <p
+        class="rise rise-1 mt-5 max-w-[38ch] text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
+      >
+        Log an expense in seconds, import the rest from your bank, and find any
+        of it later.
+      </p>
+
+      <div class="rise rise-2 mt-8 flex flex-wrap items-center gap-5">
+        <a
+          href={AppRouter.getPath("register")}
+          class={buttonVariants({ size: "lg" })}
+        >
+          Create your account
+        </a>
+        {/* One button, one link. Two filled buttons side by side is the
+            landing-page reflex and it makes the page ask twice. */}
+        <a
+          href={AppRouter.getPath("login")}
+          class="text-sm font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          Sign in
+        </a>
+      </div>
+
+    </div>
+
+    {/* Capped rather than left to fill the column: at full width the preview
+        out-shouted the headline, and a record shown at arm's length reads
+        calmer than one pressed against the glass. */}
+    <div class="rise rise-2 lg:col-span-5 lg:col-start-8 lg:ml-auto lg:max-w-[28rem]">
+      <AppPreview />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The fold arrives in order — headline, then the sentence that explains it,
+     then the way in. Content is animated, never gated on it: the keyframe
+     starts on load rather than on a scroll observer, so a headless render or a
+     background tab still paints the finished state. Reduced-motion users get
+     the same page at ~0ms, via the global rule in global.css. */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .rise {
+    /* `@theme inline` resolves the curve into utilities rather than
+       guaranteeing the custom property at runtime, so the literal is the
+       fallback — same curve, spelled twice on purpose. */
+    animation: rise 600ms var(--ease-out-quart, cubic-bezier(0.25, 1, 0.5, 1))
+      both;
+  }
+
+  .rise-1 {
+    animation-delay: 70ms;
+  }
+  .rise-2 {
+    animation-delay: 140ms;
+  }
+  .rise-3 {
+    animation-delay: 210ms;
+  }
+</style>
