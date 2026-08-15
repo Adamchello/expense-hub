@@ -2,6 +2,7 @@ import { Router } from "./router";
 import { withAuth } from "@/kernel/auth/with-auth";
 import { Button } from "@/components/ui/button";
 import { Skeleton, SkeletonDashboard } from "@/components/ui/skeleton";
+import { AppRouter } from "@/kernel/routing/app-router";
 import { LogIn } from "lucide-react";
 
 const AppShell = () => {
@@ -61,7 +62,7 @@ const SessionExpired = () => {
           to pick up where you left off.
         </p>
         <Button asChild className="mt-5 w-full">
-          <a href="/">Sign in again</a>
+          <a href={AppRouter.getPath("login")}>Sign in again</a>
         </Button>
       </div>
     </div>

@@ -1,0 +1,23 @@
+---
+import MainLayout from "../layouts/main.astro"
+import { LoginShell } from "@/shells/login/shell"
+import { createSupabaseServerClient } from "@/kernel/db/supabase-server"
+import { AppRouter } from "@/kernel/routing/app-router"
+
+const supabase = createSupabaseServerClient({
+  request: Astro.request,
+  cookies: Astro.cookies,
+})
+
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+
+if (user) {
+  return Astro.redirect(AppRouter.getPath("dashboard"))
+}
+---
+
+<MainLayout title="Sign in">
+  <LoginShell client:load />
+</MainLayout>

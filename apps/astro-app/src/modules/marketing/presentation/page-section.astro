@@ -1,0 +1,25 @@
+---
+/**
+ * The page's section shell: a hairline, and the full-width container.
+ *
+ * It used to reserve a three-column left margin for the section's own name —
+ * "features", "how it works" — which cost a quarter of every desktop row to
+ * label things the heading right beside it already said, and squeezed the
+ * content into a column narrow enough that the page read like a phone layout
+ * stretched wide. The width is the content's now.
+ */
+interface Props {
+  id?: string
+  class?: string
+}
+
+const { id, class: className } = Astro.props
+---
+
+<section id={id} class:list={["scroll-mt-16 border-t border-border", className]}>
+  <div
+    class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28"
+  >
+    <slot />
+  </div>
+</section>

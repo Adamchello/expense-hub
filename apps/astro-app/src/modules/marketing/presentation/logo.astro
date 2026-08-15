@@ -1,0 +1,40 @@
+---
+/**
+ * The wordmark, mark included.
+ *
+ * The glyph is a receipt rather than a coin, a chart or a wallet: the product
+ * records what you paid, it doesn't hold your money or forecast it, and the
+ * mark is the first place that promise gets made.
+ */
+interface Props {
+  class?: string
+  /** Hide the word on very narrow headers; the mark still carries the name. */
+  labelClass?: string
+}
+
+const { class: className, labelClass } = Astro.props
+---
+
+<span
+  class:list={[
+    "inline-flex items-center gap-2 text-base font-semibold tracking-tight text-foreground",
+    className,
+  ]}
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+    class="size-5 shrink-0 text-primary"
+  >
+    <path d="M6 3h12v18l-3-1.8-3 1.8-3-1.8L6 21V3Z"></path>
+    <path d="M9.5 8.5h5"></path>
+    <path d="M9.5 12.5h5"></path>
+  </svg>
+  <span class:list={labelClass}>ExpenseHub</span>
+</span>

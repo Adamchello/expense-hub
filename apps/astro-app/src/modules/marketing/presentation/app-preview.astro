@@ -1,0 +1,131 @@
+---
+import { CATEGORY_COLORS } from "@/shared/configuration/category"
+import { formatCurrency } from "@/shared/format"
+
+/**
+ * The product itself, rebuilt in static markup.
+ *
+ * A marketing page for a records tool has exactly one honest image: the record.
+ * This is drawn from the same tokens and the same card, badge and money
+ * treatments the app ships, so it theme-switches with the page and can never
+ * drift into showing a UI that doesn't exist. A raster screenshot would go
+ * stale, ship one theme, and blur on a retina panel.
+ *
+ * The whole block is one labelled image to assistive tech: reading a decorative
+ * mock row by row tells a screen-reader user nothing they can act on.
+ */
+const recent = [
+  { merchant: "Whole Foods", category: "Groceries", amount: 86.4, day: "Aug 14" },
+  { merchant: "ConEdison", category: "Electricity", amount: 112.0, day: "Aug 12" },
+  { merchant: "Netflix", category: "Streaming", amount: 15.49, day: "Aug 10" },
+  { merchant: "Shell", category: "Fuel", amount: 54.2, day: "Aug 9" },
+] as const
+
+const total = 1284.6
+---
+
+<div
+  role="img"
+  aria-label="The ExpenseHub dashboard: an August total of $1,284.60, down 8% on July, above a list of recent expenses — Whole Foods, ConEdison, Netflix and Shell — each tagged with its category."
+  class="rounded-2xl bg-card p-2.5 ring-1 ring-foreground/10 shadow-[0_30px_60px_-40px_oklch(0.22_0.02_155/0.55)] sm:p-3"
+>
+  <div aria-hidden="true" class="flex flex-col gap-2.5">
+    {/* App chrome, reduced to the two controls that matter: whose ledger, which month. */}
+    <div class="flex items-center gap-2 px-1.5 pt-1">
+      <span
+        class="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground"
+      >
+        <span class="size-1.5 rounded-full bg-primary"></span>
+        Personal
+      </span>
+      <span class="ml-auto text-xs font-medium text-muted-foreground">
+        August 2026
+      </span>
+    </div>
+
+    {/* The headline figure, in the app's own hero card. */}
+    <div class="relative overflow-hidden rounded-xl bg-background px-5 py-6 ring-1 ring-foreground/10">
+      <svg
+        viewBox="0 0 240 120"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="xMaxYMax meet"
+        class="pointer-events-none absolute bottom-0 right-0 h-24 w-52 text-primary [mask-image:linear-gradient(to_right,transparent,#000_45%)] sm:h-28 sm:w-64"
+      >
+        <circle cx="176" cy="30" r="16" fill="currentColor" opacity="0.26"></circle>
+        <path
+          d="M0 84c30 0 48-16 74-22s44 6 66 12 44 2 66-8h34v54H0V84Z"
+          fill="currentColor"
+          opacity="0.1"></path>
+        <path
+          d="M0 102c34-2 56-20 84-24s46 12 70 16 56-6 86-14v40H0v-18Z"
+          fill="currentColor"
+          opacity="0.17"></path>
+        <g fill="currentColor" opacity="0.3">
+          <path d="M74 62 62 84h24L74 62Zm0 16-16 22h32L74 78Z"></path>
+          <path d="M158 70l-10 18h20l-10-18Zm0 13-13 19h26l-13-19Z"></path>
+        </g>
+      </svg>
+
+      <div class="relative pr-24 sm:pr-36">
+        <p class="text-sm font-medium text-muted-foreground">This month</p>
+        <p
+          class="mt-1 font-mono text-3xl font-semibold tracking-tight tabular-nums text-foreground sm:text-4xl"
+        >
+          {formatCurrency(total)}
+        </p>
+        <p class="mt-1.5 flex items-center gap-1 text-xs font-medium text-success-text">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.25"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            class="size-3.5"
+          >
+            <path d="M12 5v14"></path>
+            <path d="m19 12-7 7-7-7"></path>
+          </svg>
+          8% vs Jul 2026
+        </p>
+      </div>
+    </div>
+
+    {/* Recent expenses, in the app's list spelling. */}
+    <div class="rounded-xl bg-background ring-1 ring-foreground/10">
+      <p class="px-4 pb-2 pt-3.5 text-sm font-medium text-foreground">Recent</p>
+      <ul class="divide-y divide-border">
+        {
+          recent.map((entry) => (
+            <li class="flex items-center gap-3 px-4 py-2.5">
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-foreground">
+                  {entry.merchant}
+                </p>
+                <p class="mt-1">
+                  <span
+                    class:list={[
+                      "inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                      CATEGORY_COLORS[entry.category],
+                    ]}
+                  >
+                    {entry.category}
+                  </span>
+                </p>
+              </div>
+              <div class="shrink-0 text-right">
+                <p class="font-mono text-sm font-semibold tabular-nums tracking-tight text-foreground">
+                  {formatCurrency(entry.amount)}
+                </p>
+                <p class="mt-0.5 text-xs text-muted-foreground">{entry.day}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>

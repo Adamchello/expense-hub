@@ -1,0 +1,51 @@
+---
+import { AppRouter } from "@/kernel/routing/app-router"
+
+/**
+ * The one place colour is spent, and the last row of the page's ledger.
+ *
+ * It used to be a rounded green card floating in a padded section — the
+ * closing-CTA shape every generated landing page ships. Full-bleed and
+ * left-aligned instead: the band is the edge of the page, not an object
+ * sitting on it, and the ask sits on the same left margin every section above
+ * it has used.
+ *
+ * The button is hand-rolled rather than `buttonVariants`: on a primary ground
+ * the app's primary button would disappear, so the roles invert.
+ */
+---
+
+<section class="bg-primary">
+  <div
+    class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 sm:py-16 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-8 lg:py-20"
+  >
+    <div>
+      <h2
+        class="max-w-[18ch] text-balance text-3xl font-semibold tracking-[-0.025em] text-primary-foreground sm:text-4xl lg:text-5xl"
+      >
+        Stop updating the spreadsheet.
+      </h2>
+      {/* Full strength, not `/85`. Fading the supporting line for "hierarchy"
+          put it at 3.86:1 on the primary ground — under AA for body text.
+          Hierarchy here comes from size and weight instead. */}
+      <p class="mt-3 text-base text-primary-foreground">
+        Start with what you paid today.
+      </p>
+    </div>
+
+    <div class="flex shrink-0 flex-wrap items-center gap-5">
+      <a
+        href={AppRouter.getPath("register")}
+        class="inline-flex h-11 items-center justify-center rounded-md bg-background px-6 text-sm font-medium text-foreground outline-none transition-colors hover:bg-background/90 focus-visible:ring-[3px] focus-visible:ring-background/60"
+      >
+        Create your account
+      </a>
+      <a
+        href={AppRouter.getPath("login")}
+        class="rounded-sm text-sm font-medium text-primary-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-background/60"
+      >
+        Sign in
+      </a>
+    </div>
+  </div>
+</section>

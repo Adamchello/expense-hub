@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { AppRouter } from "@/kernel/routing/app-router";
 
 export function RegisterForm() {
   useAppRedirectionWhenLoggedIn();
@@ -25,7 +26,8 @@ export function RegisterForm() {
                   Start tracking your expenses
                 </h1>
                 <FieldDescription>
-                  Already have an account? <a href="/">Sign in</a>
+                  Already have an account?{" "}
+                  <a href={AppRouter.getPath("login")}>Sign in</a>
                 </FieldDescription>
               </div>
               <Field>
