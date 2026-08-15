@@ -27,7 +27,34 @@ const PADDING = 3;
 export function Sparkline({ values, color, label, className }: SparklineProps) {
   const gradientId = useId();
 
-  if (values.length < 2) return null;
+  // Not `null`. Returning nothing left a hole in a tile whose siblings had a
+  // chart, and a blank slot beside four identical boxes reads as "the chart
+  // failed to load", not "there wasn't enough data". A flat rule occupies the
+  // slot and says the honest thing: no trend to draw.
+  if (values.length < 2) {
+    return (
+      <svg
+        viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={`${label}: too few spending days to show a trend`}
+        className={cn("h-8 w-full", className)}
+      >
+        <line
+          x1="0"
+          y1={VIEW_HEIGHT / 2}
+          x2={VIEW_WIDTH}
+          y2={VIEW_HEIGHT / 2}
+          stroke={color}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray="3 5"
+          opacity="0.35"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    );
+  }
 
   const max = Math.max(...values);
   const min = Math.min(...values);

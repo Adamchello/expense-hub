@@ -60,7 +60,7 @@ export function EditExpenseDialog({
           initialExpense={expense}
           error={error}
           isPending={isPending}
-          submitLabel="Save Changes"
+          submitLabel="Save changes"
           pendingLabel="Saving..."
           errorFallback="Failed to update expense"
           footerAction={

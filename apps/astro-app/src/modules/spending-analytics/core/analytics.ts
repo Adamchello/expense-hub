@@ -13,6 +13,12 @@ export interface MonthlyTotal {
   total: number;
 }
 
+export interface YearlyTotal {
+  /** YYYY */
+  year: string;
+  total: number;
+}
+
 export interface CategoryComparison {
   category: string;
   current: number;
@@ -62,6 +68,45 @@ export function monthlyTotals(expenses: Expense[]): MonthlyTotal[] {
   return [...totals.entries()]
     .map(([month, total]) => ({ month, total }))
     .sort((a, b) => a.month.localeCompare(b.month));
+}
+
+/**
+ * January through `endMonth` of that month's calendar year, empty months
+ * included.
+ *
+ * `monthlyTotals` returns only months that have expenses, which is right for an
+ * average but wrong for an axis: a chart drawn from it puts February next to
+ * July at an even spacing and silently claims the gap never happened. A trend
+ * needs a continuous time axis, so the quiet months are stated as zero.
+ */
+export function monthsOfYearTo(
+  expenses: Expense[],
+  endMonth: string,
+): MonthlyTotal[] {
+  const year = endMonth.slice(0, 4);
+  const lastMonth = Number(endMonth.slice(5, 7));
+  const totals = new Map(
+    monthlyTotals(expenses).map((m) => [m.month, m.total]),
+  );
+
+  const series: MonthlyTotal[] = [];
+  for (let month = 1; month <= lastMonth; month++) {
+    const key = `${year}-${String(month).padStart(2, "0")}`;
+    series.push({ month: key, total: totals.get(key) ?? 0 });
+  }
+  return series;
+}
+
+/** Calendar-year totals, chronological; only years that have expenses. */
+export function yearlyTotals(expenses: Expense[]): YearlyTotal[] {
+  const totals = new Map<string, number>();
+  for (const expense of expenses) {
+    const year = expense.date.slice(0, 4);
+    totals.set(year, (totals.get(year) ?? 0) + expense.amount);
+  }
+  return [...totals.entries()]
+    .map(([year, total]) => ({ year, total }))
+    .sort((a, b) => a.year.localeCompare(b.year));
 }
 
 /** Average spend across months that have at least one expense. */

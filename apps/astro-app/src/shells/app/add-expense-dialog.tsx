@@ -43,7 +43,7 @@ export function AddExpenseDialog({
         )}
       >
         <DialogHeader>
-          <DialogTitle>Add Expenses</DialogTitle>
+          <DialogTitle>Add expenses</DialogTitle>
           <DialogDescription>
             Record a single expense, or import many at once from a CSV or Excel
             file.
@@ -56,10 +56,10 @@ export function AddExpenseDialog({
         >
           <TabsList className="w-full">
             <TabsTrigger value="single" className="flex-1">
-              Single Expense
+              Single expense
             </TabsTrigger>
             <TabsTrigger value="import" className="flex-1">
-              Import File
+              Import file
             </TabsTrigger>
           </TabsList>
           {/*

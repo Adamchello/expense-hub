@@ -46,8 +46,8 @@ export function ExpenseImportBody({ active, onDone }: ExpenseImportBodyProps) {
         data-e2e="expense-import.title"
         className="text-base font-medium leading-snug"
       >
-        {store.step === "upload" && "Import Expenses"}
-        {store.step === "review" && "Review Import"}
+        {store.step === "upload" && "Import expenses"}
+        {store.step === "review" && "Review import"}
         {store.step === "importing" && "Importing..."}
       </h3>
 
@@ -141,8 +141,12 @@ export function ExpenseImport({ open, onOpenChange }: ExpenseImportProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        {/* Radix requires a title; the visible one is the step heading inside
+            the body. Worded differently on purpose — identical strings would
+            put the same text on screen twice for a screen reader, and would
+            make either one unaddressable by text in tests. */}
         <DialogHeader className="sr-only">
-          <DialogTitle>Import expenses</DialogTitle>
+          <DialogTitle>Import expenses from a file</DialogTitle>
         </DialogHeader>
         <ExpenseImportBody active={open} onDone={() => onOpenChange(false)} />
       </DialogContent>

@@ -65,10 +65,16 @@ export function RecentExpensesCard({
         <CardTitle>Recent expenses</CardTitle>
         {onViewAll && (
           <CardAction>
+            {/* The visible label is short because the card title sits beside
+                it; the accessible name is not, because a button rotor lists
+                names with no card around them — and there were two buttons
+                reading exactly "View all" on this page. The `py`/`-my` pair
+                buys a 44px hit area without moving the text. */}
             <button
               type="button"
               onClick={onViewAll}
-              className="flex items-center gap-1 rounded-md text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="View all expenses"
+              className="-my-3 flex items-center gap-1 rounded-md py-3 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               View all
               <ArrowRight className="size-3.5" aria-hidden />
@@ -120,7 +126,7 @@ export function RecentExpensesCard({
           <button
             type="button"
             onClick={onViewAll}
-            className="w-full rounded-lg border border-border py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="min-h-11 w-full rounded-lg border border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             View all {expenses.length} expenses
           </button>

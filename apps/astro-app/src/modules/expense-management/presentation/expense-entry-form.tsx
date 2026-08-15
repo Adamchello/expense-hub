@@ -364,7 +364,7 @@ export function ExpenseEntryFormBody({
       error={error}
       isPending={isPending}
       successMessage={successMessage}
-      submitLabel="Save Expense"
+      submitLabel="Save expense"
       pendingLabel="Saving..."
       errorFallback="Failed to save expense"
     />

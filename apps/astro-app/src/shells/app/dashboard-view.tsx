@@ -61,8 +61,11 @@ export function DashboardView({
         <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           {greeting}
         </h1>
+        {/* Was "Here's what's happening with your finances" — generic fintech
+            voice, and an over-promise: four cards is not everything happening
+            with your finances. This says what the page actually is. */}
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Here&rsquo;s what&rsquo;s happening with your finances.
+          Your spending so far, and what&rsquo;s due next.
         </p>
       </div>
 

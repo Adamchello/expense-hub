@@ -70,17 +70,21 @@ export function DashboardOverview({
   const yearNow = rangeTotal(expenses, yearStart, month);
   const yearThen = rangeTotal(expenses, previousYearStart, previousYearEnd);
 
+  // The period is named, not implied. These read "Spending this month" and
+  // "Spending this year", which left the actual month deducible only from the
+  // comparison label underneath — so the figure could not be verified, and a
+  // user returning after a week could not tell it wasn't stale.
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <SpendingHeroCard
-        label="Spending this month"
+        label={`Spending · ${formatMonth(month)}`}
         total={monthNow.total}
         changePct={changePct(monthNow.total, monthThen.total)}
         comparisonLabel={formatMonth(previousMonth)}
         art="hills"
       />
       <SpendingHeroCard
-        label="Spending this year"
+        label={`Spending · ${formatMonthRange(yearStart, month)}`}
         total={yearNow.total}
         changePct={changePct(yearNow.total, yearThen.total)}
         comparisonLabel={formatMonthRange(previousYearStart, previousYearEnd)}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Amount } from "@/components/shared";
 import { formatCurrency } from "@/shared/format";
 
 export interface DonutSlice {
@@ -40,7 +41,7 @@ export function CategoryDonut({ slices, total }: CategoryDonutProps) {
       role="img"
       aria-label="Spending share by category"
       viewBox="0 0 160 160"
-      className="size-40 shrink-0"
+      className="size-40 shrink-0 sm:size-44"
     >
       <g transform="rotate(-90 80 80)">
         {segments.map((segment) => (
@@ -77,5 +78,40 @@ export function CategoryDonut({ slices, total }: CategoryDonutProps) {
         total
       </text>
     </svg>
+  );
+}
+
+/**
+ * The donut's key: one row per slice, in the same order the ring draws them.
+ *
+ * A bar per row was the earlier spelling, but the ring already answers "how big
+ * a slice" — repeating it as a bar states the same fact twice in one card. The
+ * swatch only has to tie the row to its arc, so a dot does the job and the
+ * figures get the room the bars were using.
+ */
+export function DonutLegend({ slices }: { slices: DonutSlice[] }) {
+  if (slices.length === 0) return null;
+
+  return (
+    <ul className="flex w-full flex-col gap-2.5">
+      {slices.map((slice) => (
+        <li key={slice.name} className="flex items-center gap-2.5 text-sm">
+          <span
+            className="size-2.5 shrink-0 rounded-full"
+            style={{ backgroundColor: slice.hex }}
+            aria-hidden="true"
+          />
+          <span className="min-w-0 flex-1 truncate text-foreground">
+            {slice.name}
+          </span>
+          <span className="w-12 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+            {slice.share}%
+          </span>
+          <span className="w-20 shrink-0 text-right">
+            <Amount value={slice.value} size="sm" weight="normal" muted />
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

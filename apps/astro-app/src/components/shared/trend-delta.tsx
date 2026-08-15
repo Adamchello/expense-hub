@@ -51,12 +51,14 @@ export function TrendDelta({
         className={cn(
           "inline-flex items-center gap-0.5 text-sm font-semibold tabular-nums",
           isFlat && "text-muted-foreground",
-          isDown && "text-success",
-          // Not `text-warning`: that token is a surface fill at L 0.72 and
-          // fails contrast as small text on a light card. The amber steps are
-          // the same hue at a legible weight, and are what the category
-          // palette already uses for coloured text.
-          !isFlat && !isDown && "text-amber-600 dark:text-amber-400",
+          // The `-text` steps, not `--success` / `--warning`: those are surface
+          // fills, and the warning fill measured 3.15:1 as 14px text on a light
+          // card against a 4.5:1 requirement. This used to reach outside the
+          // token system for a raw Tailwind amber, which fixed the hue and left
+          // the lightness — so it still failed, and the warning state could no
+          // longer be retuned with the theme.
+          isDown && "text-success-text",
+          !isFlat && !isDown && "text-warning-text",
         )}
       >
         <Icon className="size-3.5" aria-hidden />

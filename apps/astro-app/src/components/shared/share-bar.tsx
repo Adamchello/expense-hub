@@ -6,34 +6,37 @@ import { cn } from "@/lib/utils";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 
 /**
- * How big a slice is, as a bar. Carries `role="progressbar"` so the share is
- * announced rather than living only in the pixels.
+ * How big a slice is, as a bar.
+ *
+ * Presentational, and deliberately so. It used to carry `role="progressbar"`
+ * with `aria-valuenow`, which announced "Rent, 61.3% of spending, progress bar,
+ * 61 percent" — a static proportion described as a task in flight, then said
+ * again by the percentage label sitting right beside it. A share is not
+ * progress. The number is already in the text; the bar only draws it.
  */
 interface ShareBarProps {
   /** 0–100. */
   share: number;
   color: string;
+  /** Kept for callers; used only if a bar is ever rendered without a label. */
   label: string;
   className?: string;
 }
 
-export function ShareBar({ share, color, label, className }: ShareBarProps) {
+export function ShareBar({ share, color, className }: ShareBarProps) {
   return (
     <div
-      role="progressbar"
-      aria-valuenow={Math.round(share)}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-label={`${label}: ${share}% of spending`}
+      aria-hidden="true"
       className={cn(
         "h-1.5 w-full overflow-hidden rounded-full bg-foreground/10",
         className,
       )}
     >
       {/* Width eases when the period or filter changes, so a bar re-reads as
-          the same bar moving rather than a new one appearing. */}
+          the same bar moving rather than a new one appearing. Inside the
+          product's 150–250ms budget; it was 500ms, which is choreography. */}
       <div
-        className="h-full rounded-full transition-[width] duration-500 ease-out-quart"
+        className="h-full rounded-full transition-[width] duration-200 ease-out-quart"
         style={{ width: `${share}%`, backgroundColor: color }}
       />
     </div>

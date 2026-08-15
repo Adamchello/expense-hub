@@ -4,8 +4,10 @@ import {
   averageMonthlySpending,
   categoryComparisons,
   monthlyTotals,
+  monthsOfYearTo,
   spendingSummaries,
   totalsByCategory,
+  yearlyTotals,
 } from "../core/analytics";
 
 let expenseId = 0;
@@ -62,6 +64,44 @@ describe("monthlyTotals", () => {
       { month: "2026-06", total: 170 },
       { month: "2026-07", total: 226 },
     ]);
+  });
+});
+
+describe("monthsOfYearTo", () => {
+  it("runs January through the given month, stating quiet months as zero", () => {
+    const result = monthsOfYearTo(FIXTURE, "2026-07");
+    expect(result).toHaveLength(7);
+    expect(result[0]).toEqual({ month: "2026-01", total: 0 });
+    expect(result[3]).toEqual({ month: "2026-04", total: 0 });
+    expect(result[6]).toEqual({ month: "2026-07", total: 226 });
+  });
+
+  it("ignores expenses from other years", () => {
+    const result = monthsOfYearTo(
+      [...FIXTURE, expense("2025-07-01", 999, "Rent")],
+      "2026-07",
+    );
+    expect(result.map((m) => m.month.slice(0, 4))).toEqual(
+      Array(7).fill("2026"),
+    );
+    expect(result[6].total).toBe(226);
+  });
+});
+
+describe("yearlyTotals", () => {
+  it("returns chronological calendar-year totals", () => {
+    const result = yearlyTotals([
+      ...FIXTURE,
+      expense("2025-03-01", 80, "Rent"),
+    ]);
+    expect(result).toEqual([
+      { year: "2025", total: 80 },
+      { year: "2026", total: 566 },
+    ]);
+  });
+
+  it("is empty without expenses", () => {
+    expect(yearlyTotals([])).toEqual([]);
   });
 });
 

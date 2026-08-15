@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
@@ -26,6 +26,7 @@ import {
   Plus,
   Receipt,
   Settings,
+  UserRound,
   X,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -83,6 +84,17 @@ const displayNameFrom = (email: string | undefined): string => {
   return first[0].toUpperCase() + first.slice(1).toLowerCase();
 };
 
+/**
+ * The avatar's letter. An account with no readable initial rendered "?" in a
+ * green circle where a person's initial goes, which reads as an error state
+ * rather than as an absence. The leaf mark is the app's own, and says nothing
+ * false about who is signed in.
+ */
+const avatarInitial = (email: string | undefined): string | null => {
+  const letter = email?.trim()[0];
+  return letter && /[a-zA-Z]/.test(letter) ? letter.toUpperCase() : null;
+};
+
 export function DashboardContent() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addTab, setAddTab] = useState<"single" | "import">("single");
@@ -108,6 +120,13 @@ export function DashboardContent() {
   const greeting = `${timeOfDayGreeting(new Date().getHours())}${name ? `, ${name}` : ""}`;
 
   const query = useExpenses();
+
+  // The tab is the page, so the tab is the document title. It used to read
+  // "ExpenseHub" on all four, which leaves a screen-reader user, a tab strip
+  // and a browser-history entry with no idea which view they are on.
+  useEffect(() => {
+    document.title = `${TAB_TITLES[activeTab] ?? "Dashboard"} · ExpenseHub`;
+  }, [activeTab]);
 
   const handleTabChange = (value: string, view?: HistoryViewMode) => {
     // `replace` so Back leaves the app instead of walking every tab the user
@@ -178,7 +197,9 @@ export function DashboardContent() {
       <div className="mt-auto border-t border-sidebar-border p-3">
         <div className="flex items-center gap-3 rounded-xl bg-sidebar-accent/50 p-2.5">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-            {(email?.[0] ?? "?").toUpperCase()}
+            {avatarInitial(email) ?? (
+              <UserRound className="size-4" aria-hidden />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-sidebar-foreground">
@@ -207,6 +228,17 @@ export function DashboardContent() {
       orientation="vertical"
       className="flex min-h-screen w-full flex-row gap-0 bg-background"
     >
+      {/* First focusable element on the page. Without it a keyboard user tabs
+          the profile switcher, the whole nav, Add expense and Sign out — an
+          unconfirmed session-ending control — before reaching a single
+          expense, on every visit. */}
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+
       {/* Desktop sidebar — pinned to the viewport, scrolls internally if needed */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar lg:flex">
         {sidebarContent}
@@ -243,22 +275,32 @@ export function DashboardContent() {
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Leaf className="size-4.5" />
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-foreground">
+          <span className="text-sm font-semibold tracking-tight text-foreground">
             ExpenseHub
           </span>
+          {/* The avatar is 36px, so the button pads out to a 44px hit area
+              around it rather than making the circle itself bigger. */}
           <button
             type="button"
             aria-label="Open account menu"
             onClick={() => setIsNavOpen(true)}
-            className="ml-auto flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="-mr-1 ml-auto flex size-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            {(email?.[0] ?? "?").toUpperCase()}
+            <span className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+              {avatarInitial(email) ?? (
+                <UserRound className="size-4" aria-hidden />
+              )}
+            </span>
           </button>
         </header>
 
         {/* Bottom padding clears the fixed thumb bar; without it the last card
             sits under the nav and reads as cut off. */}
-        <main className="flex-1 px-4 pb-28 pt-5 sm:px-6 lg:px-8 lg:pb-10 lg:pt-8">
+        <main
+          id="main"
+          tabIndex={-1}
+          className="flex-1 px-4 pb-28 pt-5 outline-none sm:px-6 lg:px-8 lg:pb-10 lg:pt-8"
+        >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:gap-6">
             {query.error && (
               <Callout variant="error">
@@ -315,7 +357,10 @@ export function DashboardContent() {
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
       >
-        <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2">
+        {/* The FAB column is explicitly wider than the button plus its ring.
+            On a 320px screen the ring bled ~2px into both neighbours and
+            clipped the "History" and "Analytics" labels. */}
+        <div className="mx-auto grid max-w-md grid-cols-[1fr_1fr_4.5rem_1fr_1fr] items-end px-2">
           {BOTTOM_NAV.slice(0, 2).map((item) => (
             <BottomNavItem
               key={item.value}

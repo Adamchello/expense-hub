@@ -16,20 +16,34 @@ function SkeletonStatCard() {
   );
 }
 
-/** Placeholder for the analytics tab: stat row + chart block, so the
- * skeleton previews the real layout instead of expense rows. */
+/** Placeholder for the analytics tab: stat row then two panel rows on the same
+ * column template the real view uses, so nothing jumps when the data lands. */
 export function SkeletonAnalytics() {
   return (
-    <div className="flex flex-col gap-6" aria-hidden="true">
+    <div className="flex flex-col gap-4 sm:gap-6" aria-hidden="true">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         {Array.from({ length: 3 }, (_, index) => (
           <SkeletonStatCard key={index} />
         ))}
       </div>
-      <div className="rounded-xl bg-card p-6 ring-1 ring-foreground/10">
-        <Skeleton className="h-4 w-40" />
-        <Skeleton className="mt-4 h-48 w-full" />
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1.15fr_1fr]">
+        <SkeletonChartPanel />
+        <SkeletonChartPanel />
       </div>
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1.15fr_1fr]">
+        <SkeletonPanel rows={2} />
+        <SkeletonPanel rows={2} />
+      </div>
+    </div>
+  );
+}
+
+/** A titled panel whose body is one large chart block. */
+function SkeletonChartPanel() {
+  return (
+    <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="mt-4 h-52 w-full" />
     </div>
   );
 }
@@ -47,7 +61,8 @@ function SkeletonHeroCard() {
   );
 }
 
-function SkeletonPanel({ rows = 4 }: { rows?: number }) {
+/** A titled card's body while its own query is in flight. */
+export function SkeletonPanel({ rows = 4 }: { rows?: number }) {
   return (
     <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
       <Skeleton className="h-4 w-40" />
@@ -67,29 +82,40 @@ function SkeletonPanel({ rows = 4 }: { rows?: number }) {
  */
 export function SkeletonDashboard() {
   return (
-    <div className="flex flex-col gap-4 sm:gap-6" aria-hidden="true">
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-6 w-52" />
-        <Skeleton className="h-3.5 w-64" />
-      </div>
+    <div className="flex flex-col gap-4 sm:gap-6">
+      {/* The silhouette itself is decoration and stays hidden, but something
+          has to say the page is loading — and then say it finished. Without
+          this the whole load is silent to a screen reader. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        Loading your dashboard
+      </p>
+      <div className="flex flex-col gap-4 sm:gap-6" aria-hidden="true">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-6 w-52" />
+          <Skeleton className="h-3.5 w-64" />
+        </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {Array.from({ length: 2 }, (_, index) => (
-          <SkeletonHeroCard key={index} />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <SkeletonPanel rows={5} />
-        <SkeletonPanel rows={5} />
-      </div>
-
-      <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-        <Skeleton className="h-4 w-48" />
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} className="h-32 w-full" />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {Array.from({ length: 2 }, (_, index) => (
+            <SkeletonHeroCard key={index} />
           ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <SkeletonPanel rows={5} />
+          <SkeletonPanel rows={5} />
+        </div>
+
+        <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+          <Skeleton className="h-4 w-48" />
+          {/* Tracks `TopCategoriesCard` exactly — four tiles, and the same
+              breakpoints. It was three at `lg:grid-cols-3`, so the layout
+              visibly reflowed the moment the data landed. */}
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Skeleton key={index} className="h-32 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -52,11 +52,24 @@ export function SpendingHeroCard({
   return (
     <Card className={cn("gap-0 overflow-hidden py-0", className)}>
       <div className="relative flex min-h-36 flex-col justify-center px-5 py-6 sm:min-h-40 sm:px-6">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
+        {/* The illustration is the first thing to go when space runs out.
+            Below `xs` there is no width for both a six-figure total and a
+            decoration, and the total is why anyone opened the card. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden min-[360px]:block"
+        >
           {ART[art]}
         </div>
 
-        <div className="relative max-w-[62%] sm:max-w-[65%]">
+        {/* Padding, not a percentage cap. `max-w-[62%]` resolved to 154px at
+            320px wide while "$12,306.29" renders 173px, so the number
+            overflowed onto the illustration it was supposed to be kept clear
+            of — a percentage knows nothing about the font's advance width.
+            Reserving the art's actual width means the text column can only
+            ever be what is genuinely left, and below `xs` there is no art to
+            reserve for. */}
+        <div className="relative min-[360px]:pr-24 sm:pr-40">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
           <p className="mt-1 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             <Amount value={total} size="inherit" />

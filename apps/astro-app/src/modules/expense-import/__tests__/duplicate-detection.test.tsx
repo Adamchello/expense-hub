@@ -50,7 +50,7 @@ async function uploadCSVAndWaitForReview(csvContent: string) {
   const file = new File([csvContent], "expenses.csv", { type: "text/csv" });
   await user.upload(input, file);
 
-  await screen.findByText("Review Import", {}, { timeout: 3000 });
+  await screen.findByText("Review import", {}, { timeout: 3000 });
   return user;
 }
 

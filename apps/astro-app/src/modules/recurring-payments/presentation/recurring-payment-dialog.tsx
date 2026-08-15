@@ -249,7 +249,7 @@ export function RecurringPaymentDialog({
               {mutation.isPending
                 ? "Saving..."
                 : editing
-                  ? "Save Changes"
+                  ? "Save changes"
                   : "Create Recurring Payment"}
             </Button>
           </div>

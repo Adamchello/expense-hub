@@ -22,8 +22,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-text: var(--success-text);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-text: var(--warning-text);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -77,10 +79,21 @@
   --accent-foreground: oklch(0.38 0.07 154);
   --destructive: oklch(0.58 0.2 25);
   --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.54 0.12 154);
+  /* Success is its own value rather than an alias of primary. They used to be
+     byte-identical, so green meant both "interactive" and "spending fell", and
+     neither could be retuned without moving the other. Cooler hue, same
+     family: still unmistakably good news, distinguishable from an action. */
+  --success: oklch(0.52 0.12 148);
   --success-foreground: oklch(0.99 0.01 150);
   --warning: oklch(0.72 0.13 70);
   --warning-foreground: oklch(0.28 0.05 70);
+  /* `--success` / `--warning` are surface fills. As small text on a light card
+     the warning fill measures 3.15:1 against a 4.5:1 requirement, which is why
+     the trend delta previously reached outside the token system for a raw
+     amber. These are the on-surface text steps: same hues, lightness pulled
+     down until they clear AA on `--card`. */
+  --success-text: oklch(0.5 0.12 148);
+  --warning-text: oklch(0.5 0.12 70);
   --border: oklch(0.905 0.01 152);
   --input: oklch(0.905 0.01 152);
   --ring: oklch(0.54 0.12 154);
@@ -117,10 +130,13 @@
   --accent-foreground: oklch(0.9 0.04 154);
   --destructive: oklch(0.7 0.19 22);
   --destructive-foreground: oklch(0.17 0.02 155);
-  --success: oklch(0.72 0.14 154);
+  --success: oklch(0.74 0.14 148);
   --success-foreground: oklch(0.17 0.02 155);
   --warning: oklch(0.78 0.13 72);
   --warning-foreground: oklch(0.24 0.05 70);
+  /* On dark surfaces the text steps go lighter, not darker. */
+  --success-text: oklch(0.78 0.13 148);
+  --warning-text: oklch(0.82 0.12 75);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 13%);
   --ring: oklch(0.72 0.14 154);
