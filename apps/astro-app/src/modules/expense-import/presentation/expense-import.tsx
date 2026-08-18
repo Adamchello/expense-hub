@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/libs/ui/dialog";
-import { Callout, errorMessage } from "@/components/shared";
+import { Callout, errorMessage } from "@/libs/ui/callout";
 import { FileDropZone } from "./import/file-drop-zone";
 import { ImportStats } from "./import/import-stats";
 import { ImportTable } from "./import/import-table";

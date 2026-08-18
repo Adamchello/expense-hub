@@ -1,7 +1,7 @@
 "use client";
 
-import { Amount } from "./amount";
-import { CategoryBadge } from "./category-badge";
+import { Amount } from "@/shared/money/amount";
+import { CategoryBadge } from "@/shared/categories/category-badge";
 import { cn } from "@/libs/ui/utils";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 

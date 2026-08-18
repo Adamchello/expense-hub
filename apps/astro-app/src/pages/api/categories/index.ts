@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
 import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
-import { CATEGORIES } from "@/shared/configuration/category";
+import { CATEGORIES } from "@/shared/categories/configuration";
 
 const customCategorySchema = z.object({
   name: z

@@ -1,20 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Amount } from "@/shared/money/amount";
 import {
-  Amount,
   CalendarLegend,
-  ConfirmDialog,
-  ListGroupHeader,
   MonthCalendar,
-  RecordCard,
   type CalendarEntry,
-} from "@/components/shared";
+} from "@/shared/calendar/month-calendar";
+import { ConfirmDialog } from "@/libs/ui/confirm-dialog";
+import { ListGroupHeader } from "@/libs/ui/list-group-header";
+import { RecordCard } from "@/shared/records/record-card";
 import { SkeletonList } from "@/libs/ui/skeleton";
 import { cn } from "@/libs/ui/utils";
 import { formatCurrency, formatDate } from "@/shared/format";
-import { monthBounds, todayIso } from "@/shared/domain/calendar";
-import { FREQUENCY_LABELS } from "@/shared/domain/recurrence";
+import { monthBounds, todayIso } from "@/shared/calendar/calendar";
+import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useDeleteExpense } from "@/modules/expense-management/core/store";
 import { EditExpenseDialog } from "@/modules/expense-management/presentation/edit-expense-dialog";

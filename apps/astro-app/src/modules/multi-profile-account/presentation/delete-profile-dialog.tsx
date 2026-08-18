@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ConfirmDialog } from "@/components/shared";
+import { ConfirmDialog } from "@/libs/ui/confirm-dialog";
 import type { Profile } from "../domain/profile";
 import { useDeleteProfile } from "../core/store";
 

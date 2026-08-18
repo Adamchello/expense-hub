@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Button } from "@/libs/ui/button";
-import { SegmentedControl } from "@/components/shared";
+import { SegmentedControl } from "@/libs/ui/segmented-control";
 import { SkeletonList } from "@/libs/ui/skeleton";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import {
@@ -13,7 +13,7 @@ import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { useRecurringPaymentActions } from "@/modules/recurring-payments/core/use-recurring-payment-actions";
 import { RecurringPaymentDialogs } from "@/modules/recurring-payments/presentation/recurring-payment-dialogs";
 import { formatDate } from "@/shared/format";
-import { FREQUENCY_LABELS } from "@/shared/domain/recurrence";
+import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
 import { HistoryCalendar } from "./history-calendar";
 import { CalendarDays, List, Plus } from "lucide-react";
 

@@ -11,8 +11,8 @@ import {
   DEFAULT_CATEGORY_WASH,
   DEFAULT_CATEGORY_TEXT,
   getCategoryColor,
-} from "@/shared/configuration/category";
-import type { Category } from "@/shared/domain/category";
+} from "@/shared/categories/configuration";
+import type { Category } from "@/shared/categories/category";
 import { useCustomCategories } from "./store";
 
 export interface CategoryOptionGroup {

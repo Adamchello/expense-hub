@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionLabel } from "./section-label";
+import { SectionLabel } from "@/libs/ui/section-label";
 import { cn } from "@/libs/ui/utils";
 
 /**

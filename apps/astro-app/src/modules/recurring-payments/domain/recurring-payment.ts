@@ -1,5 +1,5 @@
-import type { Category } from "@/shared/domain/category";
-import type { Frequency } from "@/shared/domain/recurrence";
+import type { Category } from "@/shared/categories/category";
+import type { Frequency } from "@/shared/recurring/recurrence";
 
 export interface RecurringPayment {
   id: string;

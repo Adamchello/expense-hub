@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/libs/ui/button";
 import { Skeleton } from "@/libs/ui/skeleton";
-import { Callout, errorMessage } from "@/components/shared";
+import { Callout, errorMessage } from "@/libs/ui/callout";
 import {
   useActiveProfile,
   useCanCreateProfile,

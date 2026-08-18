@@ -11,17 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/libs/ui/select";
-import {
-  Callout,
-  CategoryBadge,
-  DataList,
-  errorMessage,
-} from "@/components/shared";
+import { Callout, errorMessage } from "@/libs/ui/callout";
+import { CategoryBadge } from "@/shared/categories/category-badge";
+import { DataList } from "@/shared/money/data-list";
 import {
   COLOR_PRESETS,
   PRESET_COLOR_CLASSES,
   PRESET_COLOR_HEX,
-} from "@/shared/configuration/category";
+} from "@/shared/categories/configuration";
 import {
   useCustomCategories,
   useCreateCustomCategory,

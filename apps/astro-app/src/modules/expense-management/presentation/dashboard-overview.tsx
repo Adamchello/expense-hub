@@ -2,7 +2,7 @@
 
 import type { Expense } from "../domain/expense";
 import { Button } from "@/libs/ui/button";
-import { EmptyState } from "@/components/shared";
+import { EmptyState } from "@/libs/ui/empty-state";
 import { SpendingHeroCard } from "./spending-hero-card";
 import { formatMonth, formatMonthRange } from "@/shared/format";
 import {

@@ -1,4 +1,4 @@
-import type { Category } from "@/shared/domain/category";
+import type { Category } from "@/shared/categories/category";
 
 export const CATEGORY_KEYWORDS: Record<Category, string[]> = {
   Rent: [
