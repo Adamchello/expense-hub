@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import { supabaseBrowserClient } from "../db/supabase-browser";
+import { supabaseBrowserClient } from "@/shared/data-sources/supabase-browser";
 
 type ClientAuthState =
   | {

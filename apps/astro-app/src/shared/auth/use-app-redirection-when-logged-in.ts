@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "./use-auth";
-import { AppRouter } from "../routing/app-router";
+import { AppRouter } from "@/kernel/routing/app-router";
 
 const useAppRedirectionWhenLoggedIn = () => {
   const auth = useAuth();

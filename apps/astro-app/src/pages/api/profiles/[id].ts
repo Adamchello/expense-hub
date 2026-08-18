@@ -1,8 +1,8 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "@/lib/api-response";
-import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
-import { renameProfileSchema } from "@/lib/schemas/profile";
+import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
+import { renameProfileSchema } from "@/shared/server-contracts/schemas/profile";
 
 export const PATCH: APIRoute = async (context) => {
   const supabase = createSupabaseServerClient(context);

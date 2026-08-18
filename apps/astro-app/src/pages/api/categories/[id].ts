@@ -1,7 +1,7 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
-import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
+import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
 
 export const DELETE: APIRoute = async (context) => {
   const supabase = createSupabaseServerClient(context);

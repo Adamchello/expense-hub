@@ -2,7 +2,7 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
-import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
+import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
 
 const renameSchema = z.object({
   from: z.string().trim().min(1, "Current merchant name is required"),
