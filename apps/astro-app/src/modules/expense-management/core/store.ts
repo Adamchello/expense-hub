@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
+import { toast } from "@/libs/ui/toast";
 import type { ExpenseFormData } from "../integration/repository";
 import {
   getExpenses,

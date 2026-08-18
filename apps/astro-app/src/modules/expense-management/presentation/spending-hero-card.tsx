@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/libs/ui/card";
 import { Amount, HillsArt, PlantArt, TrendDelta } from "@/components/shared";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 /**
  * A period's total, given the most room on the page.

@@ -1,8 +1,8 @@
 "use client";
 
 import { useStore } from "@nanostores/react";
-import { $toasts, dismissToast } from "@/lib/toast";
-import { cn } from "@/lib/utils";
+import { $toasts, dismissToast } from "@/libs/ui/toast";
+import { cn } from "@/libs/ui/utils";
 import { CheckCircle2, CircleAlert, X } from "lucide-react";
 
 /** Global toast stack; mount once in the app shell. */

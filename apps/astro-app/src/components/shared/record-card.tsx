@@ -2,7 +2,7 @@
 
 import { Amount } from "./amount";
 import { CategoryBadge } from "./category-badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { DataE2E } from "@/__e2e__/data-e2e";
 

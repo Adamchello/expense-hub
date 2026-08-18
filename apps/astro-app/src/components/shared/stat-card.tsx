@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/libs/ui/card";
+import { cn } from "@/libs/ui/utils";
 import type { ReactNode } from "react";
 
 /**

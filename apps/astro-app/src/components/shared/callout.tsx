@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 import { AlertCircle, CheckCircle2, Info, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import type { DataE2E } from "@/__e2e__/data-e2e";

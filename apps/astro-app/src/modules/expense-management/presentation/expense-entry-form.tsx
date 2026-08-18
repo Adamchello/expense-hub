@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
+import { Textarea } from "@/libs/ui/textarea";
 import type { Expense } from "../domain/expense";
 import type { Category } from "../domain/category";
 import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 import {
   Callout,
   errorMessage,

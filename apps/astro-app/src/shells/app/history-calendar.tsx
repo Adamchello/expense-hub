@@ -10,8 +10,8 @@ import {
   RecordCard,
   type CalendarEntry,
 } from "@/components/shared";
-import { SkeletonList } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { SkeletonList } from "@/libs/ui/skeleton";
+import { cn } from "@/libs/ui/utils";
 import { formatCurrency, formatDate } from "@/shared/format";
 import { monthBounds, todayIso } from "@/shared/domain/calendar";
 import { FREQUENCY_LABELS } from "@/shared/domain/recurrence";

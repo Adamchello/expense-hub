@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/libs/ui/button";
 import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
 import { CategoriesSection } from "@/modules/category-management/presentation/categories-section";
 import { MerchantsSection } from "@/modules/merchant-management/presentation/merchants-section";
@@ -12,12 +12,11 @@ import { ProfilesSection } from "@/modules/multi-profile-account/presentation/pr
 import { AddExpenseDialog } from "./add-expense-dialog";
 import { DashboardView } from "./dashboard-view";
 import { HistoryView, type HistoryViewMode } from "./history-view";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Toaster } from "@/components/ui/toaster";
-import { SkeletonAnalytics, SkeletonDashboard } from "@/components/ui/skeleton";
+import { Toaster } from "@/libs/ui/toaster";
+import { SkeletonAnalytics, SkeletonDashboard } from "@/libs/ui/skeleton";
 import { Callout, SectionLabel, errorMessage } from "@/components/shared";
 import { useAuth } from "@/kernel/auth/use-auth";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 import {
   ChartColumn,
   LayoutDashboard,
@@ -29,7 +28,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/libs/ui/tabs";
 
 const NAV_GROUPS = [
   {
@@ -215,7 +214,6 @@ export function DashboardContent() {
               </button>
             </form>
           </div>
-          <ThemeToggle />
         </div>
       </div>
     </>

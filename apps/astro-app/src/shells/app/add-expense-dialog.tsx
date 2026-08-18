@@ -7,11 +7,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+} from "@/libs/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/libs/ui/tabs";
 import { ExpenseEntryFormBody } from "@/modules/expense-management/presentation/expense-entry-form";
 import { ExpenseImportBody } from "@/modules/expense-import/presentation/expense-import";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 interface AddExpenseDialogProps {
   open: boolean;

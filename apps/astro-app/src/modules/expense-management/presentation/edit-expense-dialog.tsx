@@ -5,8 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/libs/ui/dialog";
+import { Button } from "@/libs/ui/button";
 import { Trash2 } from "lucide-react";
 import type { Expense } from "../domain/expense";
 import { useUpdateExpense } from "../core/store";

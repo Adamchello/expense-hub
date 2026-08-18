@@ -1,7 +1,7 @@
 "use client";
 
 import { SectionLabel } from "./section-label";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 /**
  * The big "how much?" input that opens both money-entry forms.

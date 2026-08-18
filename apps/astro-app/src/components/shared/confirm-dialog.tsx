@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/libs/ui/dialog";
+import { Button } from "@/libs/ui/button";
 import { Callout, errorMessage } from "./callout";
 
 /**

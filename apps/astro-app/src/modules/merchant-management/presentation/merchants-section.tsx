@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/libs/ui/card";
 import { Amount, Callout, EmptyState, errorMessage } from "@/components/shared";
 import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
+import { toast } from "@/libs/ui/toast";
 import { useExpenses } from "@/modules/expense-management/core/store";
 import { Check, Pencil, X } from "lucide-react";
 

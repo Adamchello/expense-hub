@@ -7,7 +7,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/libs/ui/card";
 import {
   Amount,
   EmptyState,
@@ -16,7 +16,7 @@ import {
 } from "@/components/shared";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 import { formatMonthShort } from "@/shared/format";
 import { CategoryDonut, DonutLegend } from "./category-donut";
 import { SpendingTrendChart, type TrendPoint } from "./spending-trend-chart";

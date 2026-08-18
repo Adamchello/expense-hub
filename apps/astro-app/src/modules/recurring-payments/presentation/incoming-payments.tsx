@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/libs/ui/card";
 import {
   Amount,
   Callout,
@@ -20,7 +20,7 @@ import {
   errorMessage,
   type CardTableColumn,
 } from "@/components/shared";
-import { SkeletonPanel } from "@/components/ui/skeleton";
+import { SkeletonPanel } from "@/libs/ui/skeleton";
 import { formatDate } from "@/shared/format";
 import { daysUntil } from "@/shared/domain/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";

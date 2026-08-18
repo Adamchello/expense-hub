@@ -1,14 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/libs/ui/select";
 import { Trash2 } from "lucide-react";
 import type { ParsedExpenseRow } from "../../domain/expense-import";
 import type { Category } from "../../domain/expense-import";

@@ -1,21 +1,16 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldContent,
-  FieldLabel,
-  FieldError,
-} from "@/components/ui/field";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
+import { Field, FieldContent, FieldLabel, FieldError } from "@/libs/ui/field";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/libs/ui/dialog";
 import type { Profile } from "../domain/profile";
 import { useRenameProfile } from "../core/store";
 
