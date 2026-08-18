@@ -24,11 +24,12 @@ import {
   useCreateCustomCategory,
   useDeleteCustomCategory,
 } from "../core/store";
+import type { CategoryColor } from "@/shared/server-contracts/schemas/category";
 import { Trash2 } from "lucide-react";
 
 export function CategoriesSection() {
   const [name, setName] = useState("");
-  const [color, setColor] = useState("gray");
+  const [color, setColor] = useState<CategoryColor>("gray");
 
   const query = useCustomCategories();
   const createMutation = useCreateCustomCategory();
@@ -82,7 +83,10 @@ export function CategoriesSection() {
             <label htmlFor="new-category-color" className="text-sm font-medium">
               Color
             </label>
-            <Select value={color} onValueChange={setColor}>
+            <Select
+              value={color}
+              onValueChange={(value) => setColor(value as CategoryColor)}
+            >
               <SelectTrigger id="new-category-color" className="w-32">
                 <SelectValue />
               </SelectTrigger>

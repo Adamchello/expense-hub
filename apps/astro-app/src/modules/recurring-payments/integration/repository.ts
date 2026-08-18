@@ -1,9 +1,19 @@
+import { apiRequest } from "@/libs/api/api-client";
+import type {
+  ListRecurringResult,
+  CreateRecurringInput,
+  CreateRecurringResult,
+  UpdateRecurringResult,
+  DeleteRecurringResult,
+} from "@/shared/server-contracts/schemas/recurring";
 import type {
   RecurringPayment,
   RecurringPaymentFormData,
 } from "../domain/recurring-payment";
 
-const toPayload = (formData: RecurringPaymentFormData) => ({
+const toPayload = (
+  formData: RecurringPaymentFormData,
+): CreateRecurringInput => ({
   amount: formData.amount,
   providerName: formData.providerName.trim(),
   description: formData.description?.trim() || null,
@@ -21,12 +31,14 @@ export interface RecurringPaymentsResult {
 export const getRecurringPayments = async (
   signal?: AbortSignal,
 ): Promise<RecurringPaymentsResult> => {
-  const response = await fetch("/api/recurring", { signal });
-  if (!response.ok) throw new Error("Failed to fetch recurring payments");
-  const data = await response.json();
+  const response = await apiRequest<ListRecurringResult>("/api/recurring", {
+    signal,
+    fallbackError: "Failed to fetch recurring payments",
+  });
   return {
-    expenses: data.data?.expenses || [],
-    materialized: data.data?.materialized ?? 0,
+    // Rows carry category/frequency as plain strings; the domain narrows them.
+    expenses: response.data.expenses as RecurringPayment[],
+    materialized: response.data.materialized,
   };
 };
 
@@ -34,16 +46,12 @@ export const createRecurringPayment = async (
   formData: RecurringPaymentFormData,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch("/api/recurring", {
+  return apiRequest<CreateRecurringResult>("/api/recurring", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(toPayload(formData)),
+    body: toPayload(formData),
     signal,
+    fallbackError: "Failed to save recurring payment",
   });
-  const data = await response.json();
-  if (!response.ok)
-    throw new Error(data.error || "Failed to save recurring payment");
-  return data;
 };
 
 export const updateRecurringPayment = async (
@@ -51,28 +59,21 @@ export const updateRecurringPayment = async (
   formData: RecurringPaymentFormData,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch(`/api/recurring/${id}`, {
+  return apiRequest<UpdateRecurringResult>(`/api/recurring/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(toPayload(formData)),
+    body: toPayload(formData),
     signal,
+    fallbackError: "Failed to update recurring payment",
   });
-  const data = await response.json();
-  if (!response.ok)
-    throw new Error(data.error || "Failed to update recurring payment");
-  return data;
 };
 
 export const deleteRecurringPayment = async (
   id: string,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch(`/api/recurring/${id}`, {
+  return apiRequest<DeleteRecurringResult>(`/api/recurring/${id}`, {
     method: "DELETE",
     signal,
+    fallbackError: "Failed to delete recurring payment",
   });
-  const data = await response.json();
-  if (!response.ok)
-    throw new Error(data.error || "Failed to delete recurring payment");
-  return data;
 };

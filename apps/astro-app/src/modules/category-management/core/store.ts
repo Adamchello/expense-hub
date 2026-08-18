@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/libs/api/query-client";
 import { toast } from "@/libs/ui/toast";
+import type { CreateCategoryInput } from "@/shared/server-contracts/schemas/category";
 import {
   getCustomCategories,
   createCustomCategory,
@@ -25,8 +26,7 @@ export function useCustomCategories(options?: { enabled?: boolean }) {
 export function useCreateCustomCategory() {
   return useMutation(
     {
-      mutationFn: (input: { name: string; color: string }) =>
-        createCustomCategory(input),
+      mutationFn: (input: CreateCategoryInput) => createCustomCategory(input),
       onSuccess: (_, input) => {
         invalidate();
         toast(`Category "${input.name}" added`);

@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { server } from "@/__tests__/mock-server";
 import { http, HttpResponse } from "msw";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/libs/api/query-client";
 import { ExpenseImport } from "../presentation/expense-import";
 
 // parseDate("2024-01-15") creates new Date(2024, 0, 15) then calls toISOString().

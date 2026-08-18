@@ -22,7 +22,7 @@ import { RecordCard } from "@/shared/records/record-card";
 import { SectionLabel } from "@/libs/ui/section-label";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/libs/ui/toast";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/libs/api/query-client";
 import { useDeleteExpense } from "../core/store";
 import { createExpense } from "../integration/repository";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";

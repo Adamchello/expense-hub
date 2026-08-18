@@ -1,3 +1,12 @@
+import { apiRequest } from "@/libs/api/api-client";
+import type {
+  CreateExpenseInput,
+  CreateExpenseResult,
+  ListExpensesResult,
+  UpdateExpenseResult,
+  DeleteExpenseResult,
+  SuggestCategoryResult,
+} from "@/shared/server-contracts/schemas/expense";
 import type { Expense } from "../domain/expense";
 import type { Category } from "../domain/category";
 
@@ -9,32 +18,33 @@ export interface ExpenseFormData {
   category: Category;
 }
 
+const toPayload = (formData: ExpenseFormData): CreateExpenseInput => ({
+  amount: formData.amount,
+  date: formData.date,
+  providerName: formData.providerName.trim(),
+  description: formData.description?.trim() || null,
+  category: formData.category,
+});
+
 export const getExpenses = async (signal?: AbortSignal): Promise<Expense[]> => {
-  const response = await fetch("/api/expenses/list", { signal });
-  if (!response.ok) throw new Error("Failed to fetch expenses");
-  const data = await response.json();
-  return data.data || [];
+  const response = await apiRequest<ListExpensesResult>("/api/expenses/list", {
+    signal,
+    fallbackError: "Failed to fetch expenses",
+  });
+  // Rows carry category as plain string; the domain narrows it to Category.
+  return response.data as Expense[];
 };
 
 export const createExpense = async (
   formData: ExpenseFormData,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch("/api/expenses/create", {
+  return apiRequest<CreateExpenseResult>("/api/expenses/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: formData.amount,
-      date: formData.date,
-      providerName: formData.providerName.trim(),
-      description: formData.description?.trim() || null,
-      category: formData.category,
-    }),
+    body: toPayload(formData),
     signal,
+    fallbackError: "Failed to save expense",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to save expense");
-  return data;
 };
 
 export const updateExpense = async (
@@ -42,43 +52,34 @@ export const updateExpense = async (
   formData: ExpenseFormData,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch(`/api/expenses/${id}`, {
+  return apiRequest<UpdateExpenseResult>(`/api/expenses/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: formData.amount,
-      date: formData.date,
-      providerName: formData.providerName.trim(),
-      description: formData.description?.trim() || null,
-      category: formData.category,
-    }),
+    body: toPayload(formData),
     signal,
+    fallbackError: "Failed to update expense",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to update expense");
-  return data;
 };
 
 export const deleteExpense = async (id: string, signal?: AbortSignal) => {
-  const response = await fetch(`/api/expenses/${id}`, {
+  return apiRequest<DeleteExpenseResult>(`/api/expenses/${id}`, {
     method: "DELETE",
     signal,
+    fallbackError: "Failed to delete expense",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to delete expense");
-  return data;
 };
 
 export const suggestCategoryApi = async (
   providerName: string,
   signal?: AbortSignal,
 ): Promise<{ category: Category }> => {
-  const response = await fetch("/api/expenses/suggest-category", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ providerName }),
-    signal,
-  });
-  if (!response.ok) throw new Error("Failed to suggest category");
-  return response.json();
+  const response = await apiRequest<SuggestCategoryResult>(
+    "/api/expenses/suggest-category",
+    {
+      method: "POST",
+      body: { providerName },
+      signal,
+      fallbackError: "Failed to suggest category",
+    },
+  );
+  return { category: response.category as Category };
 };

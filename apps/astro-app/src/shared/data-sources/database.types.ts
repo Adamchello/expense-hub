@@ -270,7 +270,18 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      advance_due_date: {
+        Args: { p_date: string; p_frequency: string };
+        Returns: string;
+      };
+      materialize_due_recurring_expenses: {
+        Args: { p_profile_id: string };
+        Returns: number;
+      };
+      rename_merchant: {
+        Args: { p_from: string; p_to: string };
+        Returns: Json;
+      };
     };
     Enums: {
       [_ in never]: never;

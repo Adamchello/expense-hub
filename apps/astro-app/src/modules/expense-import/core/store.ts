@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/libs/api/query-client";
 import type { ParsedExpenseRow } from "../domain/expense-import";
 import type { Category } from "../domain/expense-import";
 import type { Expense } from "@/modules/expense-management/domain/expense";

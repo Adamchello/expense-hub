@@ -1,38 +1,41 @@
+import { apiRequest } from "@/libs/api/api-client";
+import type {
+  ListCategoriesResult,
+  CreateCategoryInput,
+  CreateCategoryResult,
+  DeleteCategoryResult,
+} from "@/shared/server-contracts/schemas/category";
 import type { CustomCategory } from "../domain/custom-category";
 
 export const getCustomCategories = async (
   signal?: AbortSignal,
 ): Promise<CustomCategory[]> => {
-  const response = await fetch("/api/categories", { signal });
-  if (!response.ok) throw new Error("Failed to fetch categories");
-  const data = await response.json();
-  return data.data || [];
+  const response = await apiRequest<ListCategoriesResult>("/api/categories", {
+    signal,
+    fallbackError: "Failed to fetch categories",
+  });
+  return response.data;
 };
 
 export const createCustomCategory = async (
-  input: { name: string; color: string },
+  input: CreateCategoryInput,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch("/api/categories", {
+  return apiRequest<CreateCategoryResult>("/api/categories", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
+    body: input,
     signal,
+    fallbackError: "Failed to create category",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to create category");
-  return data;
 };
 
 export const deleteCustomCategory = async (
   id: string,
   signal?: AbortSignal,
 ) => {
-  const response = await fetch(`/api/categories/${id}`, {
+  return apiRequest<DeleteCategoryResult>(`/api/categories/${id}`, {
     method: "DELETE",
     signal,
+    fallbackError: "Failed to delete category",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to delete category");
-  return data;
 };
