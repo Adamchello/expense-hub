@@ -15,7 +15,7 @@ import { HistoryView, type HistoryViewMode } from "./history-view";
 import { Toaster } from "@/libs/ui/toaster";
 import { SkeletonAnalytics, SkeletonDashboard } from "@/libs/ui/skeleton";
 import { Callout, SectionLabel, errorMessage } from "@/components/shared";
-import { useAuth } from "@/kernel/auth/use-auth";
+import { useAuth } from "@/shared/auth/use-auth";
 import { cn } from "@/libs/ui/utils";
 import {
   ChartColumn,

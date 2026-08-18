@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/libs/ui/button";
-import { useAppRedirectionWhenLoggedIn } from "@/kernel/auth/use-app-redirection-when-logged-in";
+import { useAppRedirectionWhenLoggedIn } from "@/shared/auth/use-app-redirection-when-logged-in";
 import {
   Field,
   FieldDescription,

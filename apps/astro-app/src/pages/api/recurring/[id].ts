@@ -1,8 +1,8 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
-import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
-import { recurringPaymentSchema } from "@/lib/schemas/recurring-payment";
+import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
+import { recurringPaymentSchema } from "@/shared/server-contracts/schemas/recurring-payment";
 
 export const PUT: APIRoute = async (context) => {
   const supabase = createSupabaseServerClient(context);

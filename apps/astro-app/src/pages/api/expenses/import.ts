@@ -2,8 +2,8 @@ export const prerender = false;
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
-import { createSupabaseServerClient } from "@/kernel/db/supabase-server";
-import { expenseSchema } from "@/lib/schemas/expense";
+import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
+import { expenseSchema } from "@/shared/server-contracts/schemas/expense";
 
 const importExpensesSchema = z.object({
   expenses: z.array(expenseSchema).min(1, "At least one expense is required"),
