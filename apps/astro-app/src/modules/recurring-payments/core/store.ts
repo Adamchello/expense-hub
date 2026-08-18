@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/query-client";
+import { queryClient } from "@/libs/api/query-client";
 import { toast } from "@/libs/ui/toast";
 import type { RecurringPaymentFormData } from "../domain/recurring-payment";
 import {

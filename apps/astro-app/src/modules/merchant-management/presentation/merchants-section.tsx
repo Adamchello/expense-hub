@@ -8,20 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/libs/ui/card";
 import { Amount } from "@/shared/money/amount";
 import { Callout, errorMessage } from "@/libs/ui/callout";
 import { EmptyState } from "@/libs/ui/empty-state";
-import { queryClient } from "@/lib/query-client";
+import { apiRequest } from "@/libs/api/api-client";
+import type {
+  RenameMerchantInput,
+  RenameMerchantResult,
+} from "@/shared/server-contracts/schemas/merchant";
+import { queryClient } from "@/libs/api/query-client";
 import { toast } from "@/libs/ui/toast";
 import { useExpenses } from "@/modules/expense-management/core/store";
 import { Check, Pencil, X } from "lucide-react";
 
-const renameMerchant = async (input: { from: string; to: string }) => {
-  const response = await fetch("/api/merchants/rename", {
+const renameMerchant = async (input: RenameMerchantInput) => {
+  return apiRequest<RenameMerchantResult>("/api/merchants/rename", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
+    body: input,
+    fallbackError: "Failed to rename merchant",
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Failed to rename merchant");
-  return data;
 };
 
 /**
