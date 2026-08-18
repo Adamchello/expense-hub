@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/libs/ui/button";
 import { useAppRedirectionWhenLoggedIn } from "@/kernel/auth/use-app-redirection-when-logged-in";
 import {
   Field,
   FieldDescription,
   FieldLabel,
   FieldGroup,
-} from "@/components/ui/field";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+} from "@/libs/ui/field";
+import { cn } from "@/libs/ui/utils";
+import { Input } from "@/libs/ui/input";
 import { AppRouter } from "@/kernel/routing/app-router";
 
 export function LoginForm() {

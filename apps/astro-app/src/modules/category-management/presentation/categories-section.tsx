@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/libs/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/libs/ui/select";
 import {
   Callout,
   CategoryBadge,

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Expense } from "../domain/expense";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/libs/ui/button";
 import { EmptyState } from "@/components/shared";
 import { SpendingHeroCard } from "./spending-hero-card";
 import { formatMonth, formatMonthRange } from "@/shared/format";

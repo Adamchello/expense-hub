@@ -6,13 +6,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/libs/ui/select";
 import {
   Field,
   FieldContent,
   FieldLabel,
   FieldDescription,
-} from "@/components/ui/field";
+} from "@/libs/ui/field";
 import type { Category } from "@/shared/domain/category";
 import { CATEGORIES } from "@/shared/configuration/category";
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 /**
  * Edge treatments are a rule, not a preference, so the page doesn't read as

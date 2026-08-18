@@ -4,20 +4,16 @@ import { useMemo, useState } from "react";
 import type { Expense } from "../domain/expense";
 import type { Category } from "@/shared/domain/category";
 import type { DataE2E } from "@/__e2e__/data-e2e";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/libs/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/libs/ui/popover";
 import {
   Amount,
   ConfirmDialog,
@@ -27,7 +23,7 @@ import {
   SectionLabel,
 } from "@/components/shared";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
-import { toast } from "@/lib/toast";
+import { toast } from "@/libs/ui/toast";
 import { queryClient } from "@/lib/query-client";
 import { useDeleteExpense } from "../core/store";
 import { createExpense } from "../integration/repository";
@@ -45,11 +41,7 @@ import {
 const ALL = "all";
 
 type SortOrder =
-  | "date-desc"
-  | "date-asc"
-  | "amount-desc"
-  | "amount-asc"
-  | "name-asc";
+  "date-desc" | "date-asc" | "amount-desc" | "amount-asc" | "name-asc";
 
 const SORT_LABELS: Record<SortOrder, string> = {
   "date-desc": "Newest first",

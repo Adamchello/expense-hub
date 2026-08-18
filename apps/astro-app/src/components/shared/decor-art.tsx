@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 /**
  * The two illustrations behind the headline figures.

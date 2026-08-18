@@ -2,22 +2,22 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/libs/ui/button";
+import { Input } from "@/libs/ui/input";
+import { Textarea } from "@/libs/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/libs/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/libs/ui/select";
 import {
   Callout,
   HeroAmountField,

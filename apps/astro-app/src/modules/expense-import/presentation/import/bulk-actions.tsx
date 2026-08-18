@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/libs/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/libs/ui/select";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { Category } from "../../domain/expense-import";
 import { CopyX, Tags, Trash2 } from "lucide-react";

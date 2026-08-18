@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/ui/utils";
 
 /**
  * The columnar list used inside dashboard cards: a header naming each column,

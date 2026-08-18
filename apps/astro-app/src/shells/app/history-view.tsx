@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/libs/ui/button";
 import { SegmentedControl } from "@/components/shared";
-import { SkeletonList } from "@/components/ui/skeleton";
+import { SkeletonList } from "@/libs/ui/skeleton";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import {
   ExpenseHistory,

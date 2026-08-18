@@ -5,8 +5,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/libs/ui/select";
+import { Skeleton } from "@/libs/ui/skeleton";
 import {
   useActiveProfile,
   useProfiles,
