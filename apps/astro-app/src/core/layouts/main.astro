@@ -1,21 +1,23 @@
 ---
-import "../../styles/global.css"
+import "../style/global.css"
 
 const APP_NAME = "ExpenseHub"
 
 interface Props {
   title?: string
+  /** Only public pages need one; the app behind the login is not indexed. */
+  description?: string
 }
 
-const { title } = Astro.props
+const { title, description } = Astro.props
 const pageTitle = title ? `${title} · ${APP_NAME}` : APP_NAME
 ---
 
-<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
