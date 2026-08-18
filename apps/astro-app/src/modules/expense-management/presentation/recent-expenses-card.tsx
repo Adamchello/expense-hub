@@ -9,16 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/libs/ui/card";
+import { Amount } from "@/shared/money/amount";
 import {
-  Amount,
   CardTable,
   CardTableCell,
   CardTableRow,
   CARD_TABLE_GRID,
-  CategoryBadge,
-  EmptyState,
   type CardTableColumn,
-} from "@/components/shared";
+} from "@/libs/ui/card-table";
+import { CategoryBadge } from "@/shared/categories/category-badge";
+import { EmptyState } from "@/libs/ui/empty-state";
 import { formatDate } from "@/shared/format";
 import { ArrowRight } from "lucide-react";
 

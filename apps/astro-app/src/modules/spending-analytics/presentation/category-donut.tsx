@@ -1,6 +1,6 @@
 "use client";
 
-import { Amount } from "@/components/shared";
+import { Amount } from "@/shared/money/amount";
 import { formatCurrency } from "@/shared/format";
 
 export interface DonutSlice {

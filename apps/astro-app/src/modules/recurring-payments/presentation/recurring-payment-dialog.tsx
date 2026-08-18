@@ -18,19 +18,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/libs/ui/select";
-import {
-  Callout,
-  HeroAmountField,
-  SectionLabel,
-  errorMessage,
-} from "@/components/shared";
+import { Callout, errorMessage } from "@/libs/ui/callout";
+import { HeroAmountField } from "@/shared/money/hero-amount-field";
+import { SectionLabel } from "@/libs/ui/section-label";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
-import type { Category } from "@/shared/domain/category";
+import type { Category } from "@/shared/categories/category";
 import {
   FREQUENCIES,
   FREQUENCY_LABELS,
   type Frequency,
-} from "@/shared/domain/recurrence";
+} from "@/shared/recurring/recurrence";
 import type { RecurringPayment } from "../domain/recurring-payment";
 import {
   useCreateRecurringPayment,

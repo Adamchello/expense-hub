@@ -1,5 +1,5 @@
-export type { Category } from "@/shared/domain/category";
-import type { Category } from "@/shared/domain/category";
+export type { Category } from "@/shared/categories/category";
+import type { Category } from "@/shared/categories/category";
 
 export interface ParsedExpenseRow {
   id: string;

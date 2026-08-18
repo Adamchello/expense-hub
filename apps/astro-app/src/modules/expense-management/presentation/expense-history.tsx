@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Expense } from "../domain/expense";
-import type { Category } from "@/shared/domain/category";
+import type { Category } from "@/shared/categories/category";
 import type { DataE2E } from "@/__e2e__/data-e2e";
 import { Button } from "@/libs/ui/button";
 import { Input } from "@/libs/ui/input";
@@ -14,14 +14,12 @@ import {
   SelectValue,
 } from "@/libs/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/libs/ui/popover";
-import {
-  Amount,
-  ConfirmDialog,
-  EmptyState,
-  ListGroupHeader,
-  RecordCard,
-  SectionLabel,
-} from "@/components/shared";
+import { Amount } from "@/shared/money/amount";
+import { ConfirmDialog } from "@/libs/ui/confirm-dialog";
+import { EmptyState } from "@/libs/ui/empty-state";
+import { ListGroupHeader } from "@/libs/ui/list-group-header";
+import { RecordCard } from "@/shared/records/record-card";
+import { SectionLabel } from "@/libs/ui/section-label";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/libs/ui/toast";
 import { queryClient } from "@/lib/query-client";

@@ -1,5 +1,5 @@
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
-import { advanceDueDate } from "@/shared/domain/recurrence";
+import { advanceDueDate } from "@/shared/recurring/recurrence";
 
 export interface ProjectedOccurrence {
   /** YYYY-MM-DD the occurrence falls due. */
@@ -46,4 +46,4 @@ export const expectedTotal = (occurrences: ProjectedOccurrence[]): number =>
 // Calendar arithmetic is not a recurring-payments concern — the History
 // calendar plots logged expenses on the same grid. It lives in shared/domain
 // and is re-exported here so this module's callers keep one import.
-export { addDays, monthBounds, shiftMonth } from "@/shared/domain/calendar";
+export { addDays, monthBounds, shiftMonth } from "@/shared/calendar/calendar";

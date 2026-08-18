@@ -8,12 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/libs/ui/card";
-import {
-  Amount,
-  EmptyState,
-  SegmentedControl,
-  StatCard,
-} from "@/components/shared";
+import { Amount } from "@/shared/money/amount";
+import { EmptyState } from "@/libs/ui/empty-state";
+import { SegmentedControl } from "@/libs/ui/segmented-control";
+import { StatCard } from "@/shared/statistics/stat-card";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { cn } from "@/libs/ui/utils";

@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import { ApiError, ApiResponse } from "../../../lib/api-response";
 import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
 import { recurringPaymentSchema } from "@/shared/server-contracts/schemas/recurring-payment";
-import { advanceDueDate, type Frequency } from "@/shared/domain/recurrence";
+import { advanceDueDate, type Frequency } from "@/shared/recurring/recurrence";
 
 /** Safety cap: at most this many missed occurrences are back-filled per payment. */
 const MAX_CATCHUP = 24;

@@ -1,1 +1,1 @@
-export type { Category } from "@/shared/domain/category";
+export type { Category } from "@/shared/categories/category";

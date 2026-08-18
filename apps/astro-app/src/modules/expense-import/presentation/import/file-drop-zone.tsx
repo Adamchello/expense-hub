@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { Upload, Download } from "lucide-react";
-import { Callout } from "@/components/shared";
+import { Callout } from "@/libs/ui/callout";
 
 interface FileDropZoneProps {
   onFileSelect: (file: File) => void;

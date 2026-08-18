@@ -7,13 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/libs/ui/card";
-import {
-  Amount,
-  EmptyState,
-  ShareBar,
-  Sparkline,
-  TrendDelta,
-} from "@/components/shared";
+import { Amount } from "@/shared/money/amount";
+import { EmptyState } from "@/libs/ui/empty-state";
+import { ShareBar } from "@/shared/statistics/share-bar";
+import { Sparkline } from "@/shared/statistics/sparkline";
+import { TrendDelta } from "@/shared/money/trend-delta";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import { formatMonth } from "@/shared/format";

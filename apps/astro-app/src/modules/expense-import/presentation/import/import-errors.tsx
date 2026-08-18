@@ -1,6 +1,6 @@
 "use client";
 
-import { Callout } from "@/components/shared";
+import { Callout } from "@/libs/ui/callout";
 import type { ParsedExpenseRow } from "../../domain/expense-import";
 
 interface ImportErrorsProps {

@@ -8,12 +8,9 @@ import type { Expense } from "../domain/expense";
 import type { Category } from "../domain/category";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/libs/ui/utils";
-import {
-  Callout,
-  errorMessage,
-  HeroAmountField,
-  SectionLabel,
-} from "@/components/shared";
+import { Callout, errorMessage } from "@/libs/ui/callout";
+import { HeroAmountField } from "@/shared/money/hero-amount-field";
+import { SectionLabel } from "@/libs/ui/section-label";
 import { useCreateExpense } from "../core/store";
 import { suggestCategory } from "../core/category-suggestion";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";

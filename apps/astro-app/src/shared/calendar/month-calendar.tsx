@@ -7,7 +7,7 @@ import {
   daysInMonth,
   leadingBlanks,
   shiftMonth,
-} from "@/shared/domain/calendar";
+} from "@/shared/calendar/calendar";
 import { cn } from "@/libs/ui/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 

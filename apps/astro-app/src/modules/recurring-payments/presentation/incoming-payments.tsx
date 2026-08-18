@@ -7,22 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/libs/ui/card";
+import { Amount } from "@/shared/money/amount";
+import { Callout, errorMessage } from "@/libs/ui/callout";
 import {
-  Amount,
-  Callout,
   CardTable,
   CardTableCell,
   CardTableRow,
   CARD_TABLE_GRID,
-  CategoryBadge,
-  EmptyState,
-  ListTotal,
-  errorMessage,
   type CardTableColumn,
-} from "@/components/shared";
+} from "@/libs/ui/card-table";
+import { CategoryBadge } from "@/shared/categories/category-badge";
+import { EmptyState } from "@/libs/ui/empty-state";
+import { ListTotal } from "@/shared/money/data-list";
 import { SkeletonPanel } from "@/libs/ui/skeleton";
 import { formatDate } from "@/shared/format";
-import { daysUntil } from "@/shared/domain/recurrence";
+import { daysUntil } from "@/shared/recurring/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { addDays, expectedTotal, projectOccurrences } from "../core/projection";
 import { ArrowRight } from "lucide-react";

@@ -1,4 +1,4 @@
-import type { Category } from "../domain/category";
+import type { Category } from "./category";
 
 export const CATEGORY_GROUPS: { label: string; categories: Category[] }[] = [
   { label: "Home", categories: ["Rent", "Electricity", "Water", "Internet"] },

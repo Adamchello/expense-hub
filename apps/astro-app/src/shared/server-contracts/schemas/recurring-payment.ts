@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FREQUENCIES } from "@/shared/domain/recurrence";
+import { FREQUENCIES } from "@/shared/recurring/recurrence";
 
 export const recurringPaymentSchema = z.object({
   amount: z

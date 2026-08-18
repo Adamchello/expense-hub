@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/libs/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
-import { SectionLabel } from "@/components/shared";
+import { SectionLabel } from "@/libs/ui/section-label";
 import { cn } from "@/libs/ui/utils";
 import { useCategoryOptions } from "../core/use-category-options";
 
