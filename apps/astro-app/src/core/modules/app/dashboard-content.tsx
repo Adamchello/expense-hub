@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/libs/ui/button";
 import { SpendingAnalytics } from "@/modules/spending-analytics/presentation/spending-analytics";
 import { CategoriesSection } from "@/modules/category-management/presentation/categories-section";
@@ -95,16 +95,23 @@ const avatarInitial = (email: string | undefined): string | null => {
   return letter && /[a-zA-Z]/.test(letter) ? letter.toUpperCase() : null;
 };
 
-export function DashboardContent() {
+type TabValue = "dashboard" | "history" | "analytics" | "settings";
+
+export function DashboardContent({
+  activeTab,
+  historyView,
+}: {
+  activeTab: TabValue;
+  historyView: HistoryViewMode;
+}) {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addTab, setAddTab] = useState<"single" | "import">("single");
   const [addDate, setAddDate] = useState<string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  // Active tab lives in the URL (?tab=) so views deep-link and survive reload.
-  // History's sub-view rides along in ?view= for the same reason.
+  // Active tab and history sub-view come from the path (see router.tsx), so
+  // every view deep-links and survives reload.
   const navigate = useNavigate();
-  const { tab: activeTab, view: historyView } = useSearch({ from: "/app" });
 
   const openAddExpense = (
     tab: "single" | "import" = "single",
@@ -131,14 +138,17 @@ export function DashboardContent() {
   const handleTabChange = (value: string, view?: HistoryViewMode) => {
     // `replace` so Back leaves the app instead of walking every tab the user
     // has visited this session — tab switching is not navigation history.
-    navigate({
-      to: "/app",
-      search: {
-        tab: value as typeof activeTab,
-        view: view ?? (value === "history" ? historyView : "list"),
-      },
-      replace: true,
-    });
+    const to =
+      value === "history"
+        ? (view ?? historyView) === "calendar"
+          ? "/app/history/calendar"
+          : "/app/history"
+        : value === "analytics"
+          ? "/app/analytics"
+          : value === "settings"
+            ? "/app/settings"
+            : "/app/dashboard";
+    navigate({ to, replace: true });
     setIsNavOpen(false);
   };
 

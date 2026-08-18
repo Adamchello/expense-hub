@@ -4,8 +4,17 @@ import AppLayout from "@/core/layouts/layout.astro"
 
 export const prerender = true
 
+// Every tab is its own path; each prerenders the same shell and the client
+// router takes over. `/app` itself redirects to `/app/dashboard`.
 export const getStaticPaths = () => {
-  return [{ params: { slug: undefined } }]
+  return [
+    { params: { slug: undefined } },
+    { params: { slug: "dashboard" } },
+    { params: { slug: "history" } },
+    { params: { slug: "history/calendar" } },
+    { params: { slug: "analytics" } },
+    { params: { slug: "settings" } },
+  ]
 }
 ---
 
