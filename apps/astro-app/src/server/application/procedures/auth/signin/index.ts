@@ -1,4 +1,4 @@
-import { AppRouter } from "@/kernel/routing/app-router";
+import { AppRouter } from "@/shared/routing/app-router";
 import { InternalServer, Unauthorized } from "../../../core/error-handling";
 import { publicProcedure } from "../../../core/procedure";
 import { withZodSchema } from "../../../adapter/zod";

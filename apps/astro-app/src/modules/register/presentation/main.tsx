@@ -10,7 +10,7 @@ import {
 } from "@/libs/ui/field";
 import { cn } from "@/libs/ui/utils";
 import { Input } from "@/libs/ui/input";
-import { AppRouter } from "@/kernel/routing/app-router";
+import { AppRouter } from "@/shared/routing/app-router";
 
 export function RegisterForm() {
   useAppRedirectionWhenLoggedIn();

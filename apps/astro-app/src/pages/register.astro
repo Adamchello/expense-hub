@@ -1,8 +1,8 @@
 ---
 import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server"
-import MainLayout from "../layouts/main.astro"
-import { RegisterShell } from "@/shells/register/shell"
-import { AppRouter } from "@/kernel/routing/app-router"
+import MainLayout from "@/core/layouts/main.astro"
+import { RegisterShell } from "@/core/modules/register"
+import { AppRouter } from "@/shared/routing/app-router"
 
 const supabase = createSupabaseServerClient({
   request: Astro.request,

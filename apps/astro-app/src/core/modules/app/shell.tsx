@@ -2,7 +2,7 @@ import { Router } from "./router";
 import { withAuth } from "@/shared/auth/with-auth";
 import { Button } from "@/libs/ui/button";
 import { Skeleton, SkeletonDashboard } from "@/libs/ui/skeleton";
-import { AppRouter } from "@/kernel/routing/app-router";
+import { AppRouter } from "@/shared/routing/app-router";
 import { LogIn } from "lucide-react";
 
 const AppShell = () => {
