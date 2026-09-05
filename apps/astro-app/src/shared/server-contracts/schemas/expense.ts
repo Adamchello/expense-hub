@@ -18,6 +18,7 @@ import {
   conflict,
   internalServer,
   notFound,
+  tooManyRequests,
   unauthorized,
 } from "../errors";
 import type { ContractIn, ContractOut } from "../extraction";
@@ -144,6 +145,77 @@ export type ImportExpensesResult = ContractOut<
 >;
 export type SuggestCategoryResult = ContractOut<
   typeof suggestCategoryContract,
+  200
+>;
+
+/** Largest file the import accepts, enforced on both sides. */
+export const MAX_IMPORT_FILE_BYTES = 10 * 1024 * 1024;
+/** Base64 grows by 4/3 plus padding; anything longer is not a 10 MB file. */
+export const EXTRACT_PDF_BASE64_MAX_LENGTH =
+  Math.ceil(MAX_IMPORT_FILE_BYTES / 3) * 4;
+/** Upper bound on spreadsheet rows sent to the model in one request. */
+export const EXTRACT_ROWS_CAP = 500;
+/** Model-backed extractions one account may run per calendar day (UTC). */
+export const EXTRACT_DAILY_LIMIT = 20;
+
+/**
+ * Shape the model must return. Also drives the JSON schema sent to the model
+ * and the 200 response, so there is exactly one definition of it.
+ * `category` is a free string here; the per-request JSON schema narrows it to
+ * the user's own category list.
+ */
+export const extractionResultSchema = z.object({
+  rows: z.array(
+    z.object({
+      amount: z.number(),
+      date: z.string(),
+      providerName: z.string(),
+      description: z.string().nullable(),
+      category: z.string(),
+    }),
+  ),
+  warnings: z.array(z.string()),
+});
+
+export type ExtractionResult = z.infer<typeof extractionResultSchema>;
+
+export const extractExpensesContract = () =>
+  z.object({
+    in: z.discriminatedUnion("kind", [
+      z.object({
+        kind: z.literal("pdf"),
+        fileName: z.string().min(1),
+        base64: z
+          .string()
+          .min(1)
+          .max(EXTRACT_PDF_BASE64_MAX_LENGTH, "File exceeds the 10 MB limit"),
+      }),
+      z.object({
+        kind: z.literal("rows"),
+        fileName: z.string().min(1),
+        headers: z.array(z.string()),
+        rows: z
+          .array(z.array(z.string()))
+          .min(1, "At least one row is required")
+          .max(
+            EXTRACT_ROWS_CAP,
+            `At most ${EXTRACT_ROWS_CAP} rows per request`,
+          ),
+      }),
+    ]),
+    out: z.discriminatedUnion("code", [
+      extractionResultSchema.extend({ code: z.literal(200) }),
+      badRequest,
+      unauthorized,
+      conflict,
+      tooManyRequests,
+      internalServer,
+    ]),
+  });
+
+export type ExtractExpensesInput = ContractIn<typeof extractExpensesContract>;
+export type ExtractExpensesResult = ContractOut<
+  typeof extractExpensesContract,
   200
 >;
 

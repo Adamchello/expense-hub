@@ -1,12 +1,11 @@
 import * as XLSX from "xlsx";
-import type { ParseResult } from "../../domain/expense-import";
-import {
-  hasHeaderRow,
-  detectColumns,
-} from "../../core/file-import/column-detection";
-import { parseRow } from "../../core/file-import/row-parser";
+import type { GridResult } from "../../domain/expense-import";
+import { hasHeaderRow } from "../../core/file-import/column-detection";
 
-export async function parseExcel(file: File): Promise<ParseResult> {
+const toStrings = (row: unknown[]) => row.map((cell) => String(cell ?? ""));
+const isBlank = (row: string[]) => row.every((cell) => cell.trim() === "");
+
+export async function readExcelGrid(file: File): Promise<GridResult> {
   return new Promise((resolve) => {
     const reader = new FileReader();
 
@@ -19,60 +18,40 @@ export async function parseExcel(file: File): Promise<ParseResult> {
         if (!firstSheetName) {
           resolve({
             success: false,
-            rows: [],
             errors: ["Excel file contains no worksheets."],
           });
           return;
         }
 
         const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-          header: 1,
-        }) as unknown[][];
+        const jsonData = (
+          XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][]
+        )
+          .map(toStrings)
+          .filter((row) => !isBlank(row));
 
         if (jsonData.length < 2) {
           resolve({
             success: false,
-            rows: [],
             errors: ["File appears to be empty or has no data rows."],
           });
           return;
         }
 
-        const firstRow = jsonData[0].map((cell) => String(cell || ""));
+        const firstRow = jsonData[0];
         const hasHeaders = hasHeaderRow(firstRow);
 
-        const headers = hasHeaders
-          ? firstRow
-          : ["amount", "date", "provider", "description"];
-        const dataRows = hasHeaders
-          ? jsonData
-              .slice(1)
-              .map((row) => row.map((cell) => String(cell || "")))
-              .filter((row) => row.some((cell) => cell.trim() !== ""))
-          : jsonData
-              .map((row) => row.map((cell) => String(cell || "")))
-              .filter((row) => row.some((cell) => cell.trim() !== ""));
-
-        if (!hasHeaders && jsonData[0].length < 3) {
-          resolve({
-            success: false,
-            rows: [],
-            errors: [
-              "Could not identify required columns (amount, date, provider). Please use the template format.",
-            ],
-          });
-          return;
-        }
-
-        const columns = detectColumns(headers, hasHeaders);
-        const parsedRows = dataRows.map((row) => parseRow(row, columns));
-
-        resolve({ success: true, rows: parsedRows, errors: [] });
+        resolve({
+          success: true,
+          grid: {
+            headers: hasHeaders ? firstRow : [],
+            hasHeaders,
+            rows: hasHeaders ? jsonData.slice(1) : jsonData,
+          },
+        });
       } catch (error) {
         resolve({
           success: false,
-          rows: [],
           errors: [
             `Failed to parse Excel file: ${error instanceof Error ? error.message : "Unknown error"}`,
           ],
@@ -83,7 +62,6 @@ export async function parseExcel(file: File): Promise<ParseResult> {
     reader.onerror = () => {
       resolve({
         success: false,
-        rows: [],
         errors: ["Failed to read file. Please try again."],
       });
     };

@@ -20,7 +20,9 @@ describe("Excel Import Flow", () => {
 
   it("shows the upload step with accepted formats including XLS/XLSX", () => {
     render(<ExpenseImport open={true} onOpenChange={() => {}} />);
-    expect(screen.getByText(/Supports CSV, XLS, and XLSX/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Supports CSV, XLS, XLSX, and PDF/),
+    ).toBeInTheDocument();
   });
 
   it("shows the file input accepts Excel extensions", () => {

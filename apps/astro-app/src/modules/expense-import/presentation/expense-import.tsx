@@ -56,6 +56,11 @@ export function ExpenseImportBody({ active, onDone }: ExpenseImportBodyProps) {
           <FileDropZone
             onFileSelect={store.processFile}
             isProcessing={store.importStatus.isProcessing}
+            processingLabel={
+              store.importStatus.phase === "extracting"
+                ? "Reading file with AI..."
+                : "Processing file..."
+            }
             errors={store.importStatus.errors}
           />
         )}
@@ -84,6 +89,19 @@ export function ExpenseImportBody({ active, onDone }: ExpenseImportBodyProps) {
               />
             </div>
             <ImportErrors rows={store.rows} />
+            {store.warnings.length > 0 && (
+              <Callout
+                variant="warning"
+                data-e2e="expense-import.state.warnings"
+                className="shrink-0"
+              >
+                <div className="space-y-1">
+                  {store.warnings.map((warning, idx) => (
+                    <p key={idx}>{warning}</p>
+                  ))}
+                </div>
+              </Callout>
+            )}
             {store.importError && (
               <Callout
                 variant="error"

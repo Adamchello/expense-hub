@@ -7,12 +7,15 @@ import { Callout } from "@/libs/ui/callout";
 interface FileDropZoneProps {
   onFileSelect: (file: File) => void;
   isProcessing: boolean;
+  /** Shown instead of the generic label while the model reads the file. */
+  processingLabel?: string;
   errors: string[];
 }
 
 export function FileDropZone({
   onFileSelect,
   isProcessing,
+  processingLabel = "Processing file...",
   errors,
 }: FileDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -50,7 +53,9 @@ export function FileDropZone({
     <div className="space-y-6">
       <div className="text-center space-y-2">
         <p className="text-muted-foreground">
-          Upload a CSV or Excel file containing your historical expense data.
+          Upload a CSV, Excel, or PDF file containing your historical expense
+          data. Bank statements and files with unfamiliar columns are read by
+          AI.
         </p>
         <a
           href="/templates/expenses-import-template.csv"
@@ -77,7 +82,7 @@ export function FileDropZone({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".csv,.xls,.xlsx"
+          accept=".csv,.xls,.xlsx,.pdf"
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -98,9 +103,7 @@ export function FileDropZone({
               }
               className="font-medium"
             >
-              {isProcessing
-                ? "Processing file..."
-                : "Drag and drop your file here"}
+              {isProcessing ? processingLabel : "Drag and drop your file here"}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
               or click to browse
@@ -108,7 +111,7 @@ export function FileDropZone({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Supports CSV, XLS, and XLSX files up to 10 MB
+            Supports CSV, XLS, XLSX, and PDF files up to 10 MB
           </p>
         </div>
       </div>

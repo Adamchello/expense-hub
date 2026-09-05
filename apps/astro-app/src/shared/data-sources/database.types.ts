@@ -95,6 +95,24 @@ export type Database = {
           },
         ];
       };
+      extraction_usage: {
+        Row: {
+          count: number;
+          day: string;
+          user_id: string;
+        };
+        Insert: {
+          count?: number;
+          day?: string;
+          user_id: string;
+        };
+        Update: {
+          count?: number;
+          day?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       expenses: {
         Row: {
           amount: number;
@@ -273,6 +291,10 @@ export type Database = {
       advance_due_date: {
         Args: { p_date: string; p_frequency: string };
         Returns: string;
+      };
+      consume_extraction_quota: {
+        Args: { p_limit: number };
+        Returns: number;
       };
       materialize_due_recurring_expenses: {
         Args: { p_profile_id: string };

@@ -1,5 +1,7 @@
 import { apiRequest } from "@/libs/api/api-client";
 import type {
+  ExtractExpensesInput,
+  ExtractExpensesResult,
   ImportExpensesInput,
   ImportExpensesResult,
 } from "@/shared/server-contracts/schemas/expense";
@@ -24,5 +26,17 @@ export const importExpenses = async (
     body,
     signal,
     fallbackError: "Failed to import expenses",
+  });
+};
+
+export const extractExpenses = async (
+  input: ExtractExpensesInput,
+  signal?: AbortSignal,
+): Promise<ExtractExpensesResult> => {
+  return apiRequest<ExtractExpensesResult>("/api/expenses/extract", {
+    method: "POST",
+    body: input,
+    signal,
+    fallbackError: "Could not read expenses from this file",
   });
 };

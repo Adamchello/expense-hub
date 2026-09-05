@@ -1,10 +1,10 @@
 import {
   MAX_FILE_SIZE,
-  VALID_SPREADSHEET_MIME_TYPES,
-  VALID_SPREADSHEET_EXTENSIONS,
+  VALID_IMPORT_MIME_TYPES,
+  VALID_IMPORT_EXTENSIONS,
 } from "./constraints";
 
-export function validateSpreadsheetType(file: File): {
+export function validateImportFileType(file: File): {
   valid: boolean;
   error?: string;
 } {
@@ -13,12 +13,13 @@ export function validateSpreadsheetType(file: File): {
     .substring(file.name.lastIndexOf("."));
 
   if (
-    !VALID_SPREADSHEET_MIME_TYPES.includes(file.type as any) &&
-    !VALID_SPREADSHEET_EXTENSIONS.includes(extension as any)
+    !VALID_IMPORT_MIME_TYPES.includes(file.type as any) &&
+    !VALID_IMPORT_EXTENSIONS.includes(extension as any)
   ) {
     return {
       valid: false,
-      error: "Unsupported file format. Please upload a CSV, XLS, or XLSX file.",
+      error:
+        "Unsupported file format. Please upload a CSV, XLS, XLSX, or PDF file.",
     };
   }
 

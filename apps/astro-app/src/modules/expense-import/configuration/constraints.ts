@@ -1,12 +1,20 @@
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+import { MAX_IMPORT_FILE_BYTES } from "@/shared/server-contracts/schemas/expense";
 
-export const VALID_SPREADSHEET_MIME_TYPES = [
+export const MAX_FILE_SIZE = MAX_IMPORT_FILE_BYTES;
+
+export const VALID_IMPORT_MIME_TYPES = [
   "text/csv",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/pdf",
 ] as const;
 
-export const VALID_SPREADSHEET_EXTENSIONS = [".csv", ".xls", ".xlsx"] as const;
+export const VALID_IMPORT_EXTENSIONS = [
+  ".csv",
+  ".xls",
+  ".xlsx",
+  ".pdf",
+] as const;
 
 export const COLUMN_MAPPINGS = {
   amount: ["amount", "amt", "total", "value", "price", "cost"],
