@@ -15,4 +15,5 @@ export const unauthorized = errorShape(401, "unauthorized");
 export const forbidden = errorShape(403, "forbidden");
 export const notFound = errorShape(404, "not-found");
 export const conflict = errorShape(409, "conflict");
+export const tooManyRequests = errorShape(429, "too-many-requests");
 export const internalServer = errorShape(500, "internal-server");

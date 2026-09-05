@@ -1,19 +1,20 @@
-import type { ParseResult } from "../../domain/expense-import";
-import { parseCSV } from "./csv";
-import { parseExcel } from "./excel";
+import type { GridResult } from "../../domain/expense-import";
+import { readCsvGrid } from "./csv";
+import { readExcelGrid } from "./excel";
 
-export async function parseSpreadsheetFile(file: File): Promise<ParseResult> {
-  const extension = file.name
-    .toLowerCase()
-    .substring(file.name.lastIndexOf("."));
+export { readFileAsBase64 } from "./pdf";
 
-  if (extension === ".csv" || file.type === "text/csv") {
-    return parseCSV(file);
-  }
+const extensionOf = (file: File) =>
+  file.name.toLowerCase().substring(file.name.lastIndexOf("."));
 
-  if (extension === ".xlsx" || extension === ".xls") {
-    return parseExcel(file);
-  }
+export const isPdf = (file: File) =>
+  extensionOf(file) === ".pdf" || file.type === "application/pdf";
 
-  return { success: false, rows: [], errors: ["Unsupported file format."] };
+/** Spreadsheet → string grid. No interpretation of columns happens here. */
+export async function readGrid(file: File): Promise<GridResult> {
+  const extension = extensionOf(file);
+  if (extension === ".csv" || file.type === "text/csv")
+    return readCsvGrid(file);
+  if (extension === ".xlsx" || extension === ".xls") return readExcelGrid(file);
+  return { success: false, errors: ["Unsupported file format."] };
 }

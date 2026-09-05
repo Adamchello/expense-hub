@@ -5,16 +5,8 @@ import { http, HttpResponse } from "msw";
 import { queryClient } from "@/libs/api/query-client";
 import { ExpenseImport } from "../presentation/expense-import";
 
-// parseDate("2024-01-15") creates new Date(2024, 0, 15) then calls toISOString().
-// In non-UTC timezones this can shift the date. We replicate the same logic here
-// so the existing expense's date matches what the parser produces.
-function parsedDateFor(isoInput: string): string {
-  const [y, m, d] = isoInput.split("-").map(Number);
-  return new Date(y, m - 1, d).toISOString().split("T")[0];
-}
-
 const CSV_DATE = "2024-01-15";
-const PARSED_DATE = parsedDateFor(CSV_DATE);
+const PARSED_DATE = CSV_DATE;
 
 const EXISTING_EXPENSE = {
   id: "existing-1",

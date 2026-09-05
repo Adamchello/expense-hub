@@ -44,6 +44,7 @@ export function ImportTable({
             <th className="text-left p-3 font-medium">Amount</th>
             <th className="text-left p-3 font-medium">Date</th>
             <th className="text-left p-3 font-medium">Provider</th>
+            <th className="text-left p-3 font-medium">Description</th>
             <th className="text-left p-3 font-medium">Category</th>
             <th className="text-left p-3 font-medium w-10"></th>
           </tr>
@@ -93,6 +94,18 @@ export function ImportTable({
                     onUpdateRow(row.id, "providerName", e.target.value)
                   }
                   className={`h-8 w-40 ${row.errors.some((e) => e.includes("Provider")) ? "border-destructive" : ""}`}
+                />
+              </td>
+              <td className="p-2">
+                <Input
+                  type="text"
+                  value={row.description}
+                  placeholder="Optional"
+                  maxLength={100}
+                  onChange={(e) =>
+                    onUpdateRow(row.id, "description", e.target.value)
+                  }
+                  className="h-8 w-44"
                 />
               </td>
               <td className="p-2">

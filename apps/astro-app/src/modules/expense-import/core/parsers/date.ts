@@ -75,6 +75,10 @@ export function parseDate(value: string, allowFuture = false): ParsedDate {
     }
   }
 
-  const formattedDate = parsedDate.toISOString().split("T")[0];
-  return { value: formattedDate, error: null };
+  // Local components, not toISOString(): the Date was built from local
+  // y/m/d, and ISO would shift it to the previous day east of UTC.
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  return { value: `${year}-${month}-${day}`, error: null };
 }

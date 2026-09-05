@@ -16,4 +16,5 @@ export const EXPENSE_IMPORT_E2E = [
   "expense-import.button.finalize",
   "expense-import.state.success",
   "expense-import.state.error",
+  "expense-import.state.warnings",
 ] as const;

@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/libs/api/query-client";
-import type { ParsedExpenseRow } from "../domain/expense-import";
-import type { Category } from "../domain/expense-import";
+import type {
+  Category,
+  ParsedExpenseRow,
+  ProcessingPhase,
+} from "../domain/expense-import";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { importExpenses } from "../integration/repository";
-import { parseSpreadsheetFile } from "../integration/file-parsers";
+import { importFile } from "./file-import/import-file";
 import {
-  validateSpreadsheetType,
+  validateImportFileType,
   validateFileSize,
 } from "../configuration/validation";
 import {
@@ -21,14 +24,24 @@ export type ImportStep = "upload" | "review" | "importing";
 interface ImportStatus {
   errors: string[];
   isProcessing: boolean;
+  /** Which stage is running while `isProcessing`; drives the upload label. */
+  phase: ProcessingPhase;
   successMessage: string | null;
 }
 
 const INITIAL_STATUS: ImportStatus = {
   errors: [],
   isProcessing: false,
+  phase: "idle",
   successMessage: null,
 };
+
+const failed = (errors: string[]): ImportStatus => ({
+  errors,
+  isProcessing: false,
+  phase: "idle",
+  successMessage: null,
+});
 
 export function useImportExpenses() {
   return useMutation(
@@ -45,8 +58,11 @@ export function useImportExpenses() {
 export function useImportStore(existingExpenses: Expense[] | undefined) {
   const [step, setStep] = useState<ImportStep>("upload");
   const [rows, setRows] = useState<ParsedExpenseRow[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [importStatus, setImportStatus] =
     useState<ImportStatus>(INITIAL_STATUS);
+  /** In-flight file read; aborted on reset so a closed dialog never gets a late result. */
+  const inFlight = useRef<AbortController | null>(null);
 
   const {
     mutate: mutateImportExpenses,
@@ -56,47 +72,57 @@ export function useImportStore(existingExpenses: Expense[] | undefined) {
   } = useImportExpenses();
 
   const resetState = useCallback(() => {
+    inFlight.current?.abort();
+    inFlight.current = null;
     setStep("upload");
     setRows([]);
+    setWarnings([]);
     setImportStatus(INITIAL_STATUS);
     resetMutation();
   }, [resetMutation]);
 
   const processFile = useCallback(
     async (file: File) => {
-      setImportStatus({ errors: [], isProcessing: true, successMessage: null });
+      setImportStatus({
+        errors: [],
+        isProcessing: true,
+        phase: "parsing",
+        successMessage: null,
+      });
 
-      const typeValidation = validateSpreadsheetType(file);
+      const typeValidation = validateImportFileType(file);
       if (!typeValidation.valid) {
-        setImportStatus({
-          errors: [typeValidation.error!],
-          isProcessing: false,
-          successMessage: null,
-        });
+        setImportStatus(failed([typeValidation.error!]));
         return;
       }
 
       const sizeValidation = validateFileSize(file);
       if (!sizeValidation.valid) {
-        setImportStatus({
-          errors: [sizeValidation.error!],
-          isProcessing: false,
-          successMessage: null,
-        });
+        setImportStatus(failed([sizeValidation.error!]));
         return;
       }
 
-      const result = await parseSpreadsheetFile(file);
+      inFlight.current?.abort();
+      const controller = new AbortController();
+      inFlight.current = controller;
 
-      if (!result.success || result.rows.length === 0) {
-        setImportStatus({
-          errors:
-            result.errors.length > 0
-              ? result.errors
-              : ["No valid expense data found."],
-          isProcessing: false,
-          successMessage: null,
-        });
+      const result = await importFile(file, {
+        signal: controller.signal,
+        onPhase: (phase) =>
+          setImportStatus((prev) => ({ ...prev, phase, isProcessing: true })),
+      });
+
+      // Reset (dialog closed) or a newer upload won this race: drop the result.
+      if (controller.signal.aborted) return;
+      inFlight.current = null;
+
+      if (!result.success) {
+        setImportStatus(failed(result.errors));
+        return;
+      }
+
+      if (result.rows.length === 0) {
+        setImportStatus(failed(["No valid expense data found."]));
         return;
       }
 
@@ -106,6 +132,7 @@ export function useImportStore(existingExpenses: Expense[] | undefined) {
       }
 
       setRows(processedRows);
+      setWarnings(result.warnings);
       setStep("review");
       setImportStatus(INITIAL_STATUS);
     },
@@ -171,6 +198,7 @@ export function useImportStore(existingExpenses: Expense[] | undefined) {
   return {
     step,
     rows,
+    warnings,
     importStatus,
     importError,
     isImporting,

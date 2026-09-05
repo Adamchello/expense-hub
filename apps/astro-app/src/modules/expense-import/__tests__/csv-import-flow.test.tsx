@@ -31,7 +31,9 @@ describe("CSV Import Flow", () => {
   // REQ2: Upload instructions visible
   it("displays upload instructions text", () => {
     render(<ExpenseImport open={true} onOpenChange={() => {}} />);
-    expect(screen.getByText(/Upload a CSV or Excel file/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Upload a CSV, Excel, or PDF file/),
+    ).toBeInTheDocument();
   });
 
   // REQ3: Template download link visible
@@ -43,7 +45,9 @@ describe("CSV Import Flow", () => {
   // REQ4: Drop zone shows accepted formats text
   it("shows supported file formats", () => {
     render(<ExpenseImport open={true} onOpenChange={() => {}} />);
-    expect(screen.getByText(/Supports CSV, XLS, and XLSX/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Supports CSV, XLS, XLSX, and PDF/),
+    ).toBeInTheDocument();
   });
 
   // REQ5: Valid CSV produces reviewable rows

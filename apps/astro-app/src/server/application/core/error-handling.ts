@@ -105,6 +105,25 @@ export class Conflict extends BaseError {
   });
 }
 
+export class TooManyRequests extends BaseError {
+  type = "too-many-requests" as const;
+  code = 429 as const;
+
+  constructor(public message = "Too Many Requests") {
+    super(message);
+  }
+
+  static is = (error: unknown): error is TooManyRequests => {
+    return error instanceof TooManyRequests;
+  };
+
+  json = () => ({
+    code: this.code,
+    type: this.type,
+    message: this.message,
+  });
+}
+
 export class InternalServer extends BaseError {
   type = "internal-server" as const;
   code = 500 as const;
@@ -125,7 +144,13 @@ export class InternalServer extends BaseError {
 }
 
 export type AllErrors =
-  BadRequest | Unauthorized | Forbidden | NotFound | Conflict | InternalServer;
+  | BadRequest
+  | Unauthorized
+  | Forbidden
+  | NotFound
+  | Conflict
+  | TooManyRequests
+  | InternalServer;
 
 export abstract class APIError {
   static is = (error: unknown): error is AllErrors => {
