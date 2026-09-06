@@ -13,6 +13,10 @@ import { Trash2 } from "lucide-react";
 import type { ParsedExpenseRow } from "../../domain/expense-import";
 import type { Category } from "../../domain/expense-import";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
+import {
+  formatAmountInput,
+  handleAmountInputChange,
+} from "@/shared/money/amount-input";
 
 interface ImportTableProps {
   rows: ParsedExpenseRow[];
@@ -67,14 +71,16 @@ export function ImportTable({
             >
               <td className="p-2">
                 <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={row.amount}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={formatAmountInput(row.amount)}
                   onChange={(e) =>
-                    onUpdateRow(row.id, "amount", e.target.value)
+                    handleAmountInputChange(e, (amount) =>
+                      onUpdateRow(row.id, "amount", amount),
+                    )
                   }
-                  className={`h-8 w-24 ${row.errors.some((e) => e.includes("Amount")) ? "border-destructive" : ""}`}
+                  className={`h-8 w-28 text-right font-mono tabular-nums ${row.errors.some((e) => e.includes("Amount")) ? "border-destructive" : ""}`}
                 />
               </td>
               <td className="p-2">

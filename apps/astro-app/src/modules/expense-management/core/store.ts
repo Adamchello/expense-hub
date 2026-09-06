@@ -16,7 +16,7 @@ import {
   suggestCategoryApi,
 } from "../integration/repository";
 
-const EXPENSES_KEY = ["expenses"];
+export const EXPENSES_KEY = ["expenses"];
 
 export function useExpenses(options?: { enabled?: boolean }) {
   return useQuery(

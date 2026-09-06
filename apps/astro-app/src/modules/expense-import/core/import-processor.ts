@@ -1,6 +1,7 @@
 import type { ParsedExpenseRow } from "../domain/expense-import";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { suggestCategory } from "@/modules/expense-management/core/category-suggestion";
+import { formatCurrency } from "@/shared/format";
 
 /** Lowercase alphanumerics only, so "PGE Obrót" and "pge-obrot" compare equal. */
 const normalizeProvider = (name: string) =>
@@ -46,7 +47,7 @@ export function checkDuplicates(
       return {
         ...row,
         isDuplicate: true,
-        duplicateOf: `${duplicate.provider_name} - $${duplicate.amount} on ${duplicate.date}`,
+        duplicateOf: `${duplicate.provider_name} - ${formatCurrency(Number(duplicate.amount))} on ${duplicate.date}`,
       };
     }
     return row;

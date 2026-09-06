@@ -34,4 +34,33 @@ class AppRouter {
   };
 }
 
-export { AppRouter };
+/**
+ * The signed-in app's destinations. Each tab is its own path so views
+ * deep-link, survive reload and honour browser Back; History's calendar is a
+ * nested path for the same reason. This is the one place that knows which
+ * path a tab lives at — the client router, the nav and the legacy `?tab=`
+ * redirect all ask here.
+ */
+const APP_TABS = ["dashboard", "history", "analytics", "settings"] as const;
+type AppTab = (typeof APP_TABS)[number];
+
+const HISTORY_VIEWS = ["list", "calendar"] as const;
+type HistoryView = (typeof HISTORY_VIEWS)[number];
+
+const isAppTab = (value: unknown): value is AppTab =>
+  typeof value === "string" && (APP_TABS as readonly string[]).includes(value);
+
+const appTabPath = (tab: AppTab, view: HistoryView = "list"): string =>
+  tab === "history" && view === "calendar"
+    ? "/app/history/calendar"
+    : `/app/${tab}`;
+
+export {
+  AppRouter,
+  APP_TABS,
+  HISTORY_VIEWS,
+  appTabPath,
+  isAppTab,
+  type AppTab,
+  type HistoryView,
+};

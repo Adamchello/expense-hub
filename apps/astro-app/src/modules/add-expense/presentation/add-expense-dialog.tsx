@@ -12,22 +12,32 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/libs/ui/tabs";
 import { ExpenseEntryFormBody } from "@/modules/expense-management/presentation/expense-entry-form";
 import { ExpenseImportBody } from "@/modules/expense-import/presentation/expense-import";
 import { cn } from "@/libs/ui/utils";
+import {
+  closeAddExpense,
+  useAddExpenseIntent,
+  type AddExpenseTab,
+} from "../core/intent";
 
-interface AddExpenseDialogProps {
+interface AddExpenseDialogViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Tab the dialog opens on; resets when closed. */
-  initialTab?: "single" | "import";
+  initialTab?: AddExpenseTab;
   /** Seeds the expense date — set when entry started from a calendar day. */
   initialDate?: string | null;
 }
 
-export function AddExpenseDialog({
+/**
+ * Controlled dialog: one place to add expenses, singly or in bulk. Both tab
+ * bodies stay mounted so switching tabs never discards a half-filled form or
+ * a reviewed import.
+ */
+export function AddExpenseDialogView({
   open,
   onOpenChange,
   initialTab = "single",
   initialDate,
-}: AddExpenseDialogProps) {
+}: AddExpenseDialogViewProps) {
   const [tab, setTab] = useState<string>(initialTab);
 
   useEffect(() => {
@@ -45,8 +55,8 @@ export function AddExpenseDialog({
         <DialogHeader>
           <DialogTitle>Add expenses</DialogTitle>
           <DialogDescription>
-            Record a single expense, or import many at once from a CSV or Excel
-            file.
+            Record a single expense, or import many at once from a CSV, Excel or
+            PDF file.
           </DialogDescription>
         </DialogHeader>
         <Tabs
@@ -91,5 +101,21 @@ export function AddExpenseDialog({
         </Tabs>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** The dialog wired to the intent store. Mount it once, in the shell. */
+export function AddExpenseDialog() {
+  const intent = useAddExpenseIntent();
+
+  return (
+    <AddExpenseDialogView
+      open={intent.open}
+      onOpenChange={(open) => {
+        if (!open) closeAddExpense();
+      }}
+      initialTab={intent.tab}
+      initialDate={intent.date}
+    />
   );
 }
