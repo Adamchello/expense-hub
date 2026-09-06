@@ -10,17 +10,10 @@ import type {
   RecurringPayment,
   RecurringPaymentFormData,
 } from "../domain/recurring-payment";
+import { normalizeRecurringPaymentForm } from "./mappers";
 
-const toPayload = (
-  formData: RecurringPaymentFormData,
-): CreateRecurringInput => ({
-  amount: formData.amount,
-  providerName: formData.providerName.trim(),
-  description: formData.description?.trim() || null,
-  category: formData.category,
-  frequency: formData.frequency,
-  nextDueDate: formData.nextDueDate,
-});
+const toPayload = (formData: RecurringPaymentFormData): CreateRecurringInput =>
+  normalizeRecurringPaymentForm(formData);
 
 export interface RecurringPaymentsResult {
   expenses: RecurringPayment[];
