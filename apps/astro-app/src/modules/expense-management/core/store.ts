@@ -1,7 +1,13 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/libs/api/query-client";
+import { withOptimisticList, temporaryId } from "@/libs/api/optimistic-list";
 import { toast } from "@/libs/ui/toast";
-import type { ExpenseFormData } from "../integration/repository";
+import {
+  compareExpensesNewestFirst,
+  type Expense,
+  type ExpenseFormData,
+} from "../domain/expense";
+import { expenseFromForm } from "../integration/mappers";
 import {
   getExpenses,
   createExpense,
@@ -10,10 +16,12 @@ import {
   suggestCategoryApi,
 } from "../integration/repository";
 
+const EXPENSES_KEY = ["expenses"];
+
 export function useExpenses(options?: { enabled?: boolean }) {
   return useQuery(
     {
-      queryKey: ["expenses"],
+      queryKey: EXPENSES_KEY,
       queryFn: ({ signal }) => getExpenses(signal),
       enabled: options?.enabled,
     },
@@ -23,38 +31,62 @@ export function useExpenses(options?: { enabled?: boolean }) {
 
 export function useCreateExpense() {
   return useMutation(
-    {
-      mutationFn: (formData: ExpenseFormData) => createExpense(formData),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    withOptimisticList(
+      { mutationFn: (formData: ExpenseFormData) => createExpense(formData) },
+      {
+        queryKey: EXPENSES_KEY,
+        apply: (expenses: Expense[], formData) =>
+          [
+            {
+              id: temporaryId(),
+              created_at: new Date().toISOString(),
+              ...expenseFromForm(formData),
+            },
+            ...expenses,
+          ].sort(compareExpensesNewestFirst),
       },
-    },
+    ),
     queryClient,
   );
 }
 
 export function useUpdateExpense() {
   return useMutation(
-    {
-      mutationFn: (input: { id: string; formData: ExpenseFormData }) =>
-        updateExpense(input.id, input.formData),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["expenses"] });
-        toast("Expense updated");
+    withOptimisticList(
+      {
+        mutationFn: (input: { id: string; formData: ExpenseFormData }) =>
+          updateExpense(input.id, input.formData),
+        onSuccess: () => {
+          toast("Expense updated");
+        },
       },
-    },
+      {
+        queryKey: EXPENSES_KEY,
+        apply: (expenses: Expense[], { id, formData }) =>
+          expenses
+            .map((expense) =>
+              expense.id === id
+                ? { ...expense, ...expenseFromForm(formData) }
+                : expense,
+            )
+            .sort(compareExpensesNewestFirst),
+      },
+    ),
     queryClient,
   );
 }
 
 export function useDeleteExpense() {
   return useMutation(
-    {
-      mutationFn: (id: string) => deleteExpense(id),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    withOptimisticList(
+      { mutationFn: (id: string) => deleteExpense(id) },
+      {
+        queryKey: EXPENSES_KEY,
+        apply: (expenses: Expense[], id) =>
+          expenses.filter((expense) => expense.id !== id),
+        errorMessage: "Failed to delete expense",
       },
-    },
+    ),
     queryClient,
   );
 }

@@ -7,24 +7,12 @@ import type {
   DeleteExpenseResult,
   SuggestCategoryResult,
 } from "@/shared/server-contracts/schemas/expense";
-import type { Expense } from "../domain/expense";
+import type { Expense, ExpenseFormData } from "../domain/expense";
 import type { Category } from "../domain/category";
+import { normalizeExpenseForm } from "./mappers";
 
-export interface ExpenseFormData {
-  amount: number;
-  date: string;
-  providerName: string;
-  description: string | null;
-  category: Category;
-}
-
-const toPayload = (formData: ExpenseFormData): CreateExpenseInput => ({
-  amount: formData.amount,
-  date: formData.date,
-  providerName: formData.providerName.trim(),
-  description: formData.description?.trim() || null,
-  category: formData.category,
-});
+const toPayload = (formData: ExpenseFormData): CreateExpenseInput =>
+  normalizeExpenseForm(formData);
 
 export const getExpenses = async (signal?: AbortSignal): Promise<Expense[]> => {
   const response = await apiRequest<ListExpensesResult>("/api/expenses/list", {

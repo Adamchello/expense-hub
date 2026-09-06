@@ -29,3 +29,9 @@ export interface RecurringPaymentFormData {
   frequency: Frequency;
   nextDueDate: string;
 }
+
+/** Soonest due first, which is how every schedule view reads. */
+export const compareRecurringSoonestFirst = (
+  a: RecurringPayment,
+  b: RecurringPayment,
+) => a.next_due_date.localeCompare(b.next_due_date);

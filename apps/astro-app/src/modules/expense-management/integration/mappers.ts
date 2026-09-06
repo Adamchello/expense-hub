@@ -1,4 +1,4 @@
-import type { Expense } from "../domain/expense";
+import type { Expense, ExpenseFormData } from "../domain/expense";
 import type { Category } from "../domain/category";
 
 interface ApiExpense {
@@ -26,3 +26,26 @@ export function mapExpense(raw: ApiExpense): Expense {
 export function mapExpenses(raw: ApiExpense[]): Expense[] {
   return raw.map(mapExpense);
 }
+
+/** The single place that decides what "clean" form input means. */
+export const normalizeExpenseForm = (
+  formData: ExpenseFormData,
+): ExpenseFormData => ({
+  ...formData,
+  providerName: formData.providerName.trim(),
+  description: formData.description?.trim() || null,
+});
+
+/** The domain row a form submission will become once the server accepts it. */
+export const expenseFromForm = (
+  formData: ExpenseFormData,
+): Omit<Expense, "id" | "created_at"> => {
+  const clean = normalizeExpenseForm(formData);
+  return {
+    amount: clean.amount,
+    date: clean.date,
+    provider_name: clean.providerName,
+    description: clean.description,
+    category: clean.category,
+  };
+};
