@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Expense } from "../domain/expense";
-import type { Category } from "@/shared/categories/category";
-import type { DataE2E } from "@/__e2e__/data-e2e";
+import type { IncomingRecord } from "@/shared/records/incoming-record";
 import { Button } from "@/libs/ui/button";
 import { Input } from "@/libs/ui/input";
 import {
@@ -14,19 +13,15 @@ import {
   SelectValue,
 } from "@/libs/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/libs/ui/popover";
-import { Amount } from "@/shared/money/amount";
-import { ConfirmDialog } from "@/libs/ui/confirm-dialog";
 import { EmptyState } from "@/libs/ui/empty-state";
 import { ListGroupHeader } from "@/libs/ui/list-group-header";
 import { RecordCard } from "@/shared/records/record-card";
 import { SectionLabel } from "@/libs/ui/section-label";
 import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
 import { toast } from "@/libs/ui/toast";
-import { queryClient } from "@/libs/api/query-client";
-import { useDeleteExpense } from "../core/store";
-import { createExpense } from "../integration/repository";
+import { useExpenseRecordActions } from "../core/use-expense-record-actions";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";
-import { EditExpenseDialog } from "./edit-expense-dialog";
+import { ExpenseRecordDialogs } from "./expense-record-dialogs";
 import {
   ArrowUpDown,
   ChevronDown,
@@ -81,30 +76,6 @@ const sortableExpense = (expense: Expense): SortableRecord => ({
   description: expense.description,
 });
 
-/**
- * A record that has not happened yet — a recurring payment, projected.
- *
- * The register renders it as a plain view model rather than importing the
- * recurring-payments module: this file owns "what a searchable list of records
- * looks like", not what a recurring payment is. Whoever composes the page maps
- * one into the other.
- */
-export interface IncomingRecord {
-  id: string;
-  name: string;
-  amount: number;
-  category: Category;
-  description: string | null;
-  /** Due date (YYYY-MM-DD) — filtered and sorted with the expense dates. */
-  date: string;
-  /** Trails the category chip, e.g. "· Monthly". */
-  categorySuffix?: string;
-  meta: string;
-  metaTestId?: DataE2E;
-  openLabel: string;
-  onOpen: () => void;
-}
-
 interface ExpenseHistoryProps {
   expenses: Expense[];
   /** Prepended as the "Incoming" group, under the same filters and sort. */
@@ -122,10 +93,7 @@ export function ExpenseHistory({
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("date-desc");
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
-
-  const deleteMutation = useDeleteExpense();
+  const recordActions = useExpenseRecordActions();
 
   // Incoming months belong in the picker too, or filtering to next August
   // silently drops the only records that exist there.
@@ -195,37 +163,6 @@ export function ExpenseHistory({
     return sortOrder === "date-asc" ? months.sort() : months.sort().reverse();
   }, [groupedExpenses, sortOrder]);
 
-  // Undo re-creates the deleted expense from its client-side snapshot.
-  const restoreExpense = async (removed: Expense) => {
-    try {
-      await createExpense({
-        amount: removed.amount,
-        date: removed.date,
-        providerName: removed.provider_name,
-        description: removed.description,
-        category: removed.category,
-      });
-      toast("Expense restored");
-    } catch {
-      toast("Failed to restore expense", { variant: "error" });
-    } finally {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deletingExpense) return;
-    const removed = deletingExpense;
-    deleteMutation.mutate(removed.id, {
-      onSuccess: () => {
-        setDeletingExpense(null);
-        toast(`Deleted ${removed.provider_name} expense`, {
-          undo: () => restoreExpense(removed),
-        });
-      },
-    });
-  };
-
   if (expenses.length === 0 && incoming.length === 0) {
     return (
       <EmptyState
@@ -248,7 +185,7 @@ export function ExpenseHistory({
       category={expense.category}
       meta={formatDate(expense.date)}
       note={expense.description}
-      onOpen={() => setEditingExpense(expense)}
+      onOpen={() => recordActions.openEdit(expense)}
       openLabel={`Edit expense from ${expense.provider_name}`}
     />
   );
@@ -492,45 +429,7 @@ export function ExpenseHistory({
         </div>
       )}
 
-      <EditExpenseDialog
-        expense={editingExpense}
-        onOpenChange={(open) => {
-          if (!open) setEditingExpense(null);
-        }}
-        onRequestDelete={(expense) => {
-          // Hand off from edit to the confirm step so only one dialog is open.
-          setEditingExpense(null);
-          setDeletingExpense(expense);
-        }}
-      />
-
-      {/* Single delete confirmation */}
-      <ConfirmDialog
-        open={!!deletingExpense}
-        onOpenChange={(open) => {
-          if (!open) setDeletingExpense(null);
-        }}
-        title="Delete expense?"
-        description={
-          deletingExpense && (
-            <>
-              This will permanently remove the{" "}
-              <Amount value={deletingExpense.amount} size="inherit" /> expense
-              from{" "}
-              <span className="font-medium text-foreground">
-                {deletingExpense.provider_name}
-              </span>
-              .
-            </>
-          )
-        }
-        confirmLabel="Delete"
-        pendingLabel="Deleting..."
-        onConfirm={handleConfirmDelete}
-        isPending={deleteMutation.isPending}
-        error={deleteMutation.error}
-        errorFallback="Failed to delete expense"
-      />
+      <ExpenseRecordDialogs actions={recordActions} />
     </div>
   );
 }

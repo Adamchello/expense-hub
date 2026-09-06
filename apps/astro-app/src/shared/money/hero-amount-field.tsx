@@ -2,6 +2,7 @@
 
 import { SectionLabel } from "@/libs/ui/section-label";
 import { cn } from "@/libs/ui/utils";
+import { formatAmountInput, handleAmountInputChange } from "./amount-input";
 
 /**
  * The big "how much?" input that opens both money-entry forms.
@@ -13,6 +14,10 @@ import { cn } from "@/libs/ui/utils";
  * The field scales itself down as digits accumulate so long values never clip,
  * and the input's width tracks its content so the figure stays optically
  * centred next to the currency glyph.
+ *
+ * `value` is the canonical amount ("332342.12"); the field renders it grouped
+ * ("332,342.12") and hands back canonical again, so callers keep parsing with
+ * `parseFloat` and never see a separator.
  */
 interface HeroAmountFieldProps {
   id: string;
@@ -34,7 +39,8 @@ export function HeroAmountField({
   autoFocus = false,
   invalid = false,
 }: HeroAmountFieldProps) {
-  const length = Math.max(value.length, 4);
+  const display = formatAmountInput(value);
+  const length = Math.max(display.length, 4);
   const valueSize =
     length <= 7 ? "text-5xl" : length <= 10 ? "text-4xl" : "text-3xl";
   const errorId = `${id}-error`;
@@ -56,14 +62,15 @@ export function HeroAmountField({
         </span>
         <input
           id={id}
-          type="number"
+          // Text, not number: a number input silently rejects the separators
+          // this field is here to normalise, and cannot show grouping at all.
+          type="text"
           inputMode="decimal"
-          step="0.01"
-          min="0"
+          autoComplete="off"
           placeholder="0.00"
           autoFocus={autoFocus}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
+          value={display}
+          onChange={(event) => handleAmountInputChange(event, onChange)}
           required
           aria-invalid={error != null || invalid ? "true" : "false"}
           aria-describedby={error ? errorId : undefined}

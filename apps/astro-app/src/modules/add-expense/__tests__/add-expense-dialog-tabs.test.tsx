@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { server } from "@/__tests__/mock-server";
 import { http, HttpResponse } from "msw";
 import { queryClient } from "@/libs/api/query-client";
-import { AddExpenseDialog } from "../add-expense-dialog";
+import { AddExpenseDialogView } from "../presentation/add-expense-dialog";
 
 beforeEach(() => {
   queryClient.clear();
@@ -22,24 +22,24 @@ const switchTo = async (
 const SINGLE_TAB = /single expense/i;
 const IMPORT_TAB = /import file/i;
 
-describe("AddExpenseDialog tab state", () => {
+describe("AddExpenseDialogView tab state", () => {
   it("keeps the single-expense form filled in after switching tabs", async () => {
     const user = userEvent.setup();
-    render(<AddExpenseDialog open onOpenChange={() => {}} />);
+    render(<AddExpenseDialogView open onOpenChange={() => {}} />);
 
     const amount = screen.getByLabelText(/how much/i);
     await user.type(amount, "42.50");
-    expect(amount).toHaveValue(42.5);
+    expect(amount).toHaveValue("42.50");
 
     await switchTo(user, IMPORT_TAB);
     await switchTo(user, SINGLE_TAB);
 
-    expect(screen.getByLabelText(/how much/i)).toHaveValue(42.5);
+    expect(screen.getByLabelText(/how much/i)).toHaveValue("42.50");
   });
 
   it("keeps the expanded details section and its values after switching tabs", async () => {
     const user = userEvent.setup();
-    render(<AddExpenseDialog open onOpenChange={() => {}} />);
+    render(<AddExpenseDialogView open onOpenChange={() => {}} />);
 
     await user.click(screen.getByRole("button", { name: /add details/i }));
     await user.type(screen.getByLabelText(/who did you pay/i), "Netflix");
@@ -53,7 +53,7 @@ describe("AddExpenseDialog tab state", () => {
   it("keeps a reviewed import on the review step after switching tabs", async () => {
     const user = userEvent.setup();
     render(
-      <AddExpenseDialog open onOpenChange={() => {}} initialTab="import" />,
+      <AddExpenseDialogView open onOpenChange={() => {}} initialTab="import" />,
     );
 
     const input = document.querySelector(
