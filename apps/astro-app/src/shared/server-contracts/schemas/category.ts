@@ -6,7 +6,7 @@ import {
   notFound,
   unauthorized,
 } from "../errors";
-import type { ContractIn, ContractOut } from "../extraction";
+import type { ContractIn, ContractOut } from "../infer";
 
 export const CATEGORY_COLORS = [
   "gray",

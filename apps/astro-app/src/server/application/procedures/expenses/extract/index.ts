@@ -4,12 +4,12 @@ import {
   TooManyRequests,
 } from "../../../core/error-handling";
 import { profileProcedure, type SupabaseServer } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import {
   LlmNotConfiguredError,
   LlmOutputTooLongError,
   LlmRefusedError,
-} from "../../../adapter/llm";
+} from "@/server/infrastructure/llm";
 import {
   EXTRACT_DAILY_LIMIT,
   extractExpensesContract,

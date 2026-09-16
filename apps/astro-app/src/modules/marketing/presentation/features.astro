@@ -93,13 +93,13 @@ const trend = [
             <p class="text-xs text-muted-foreground">42 rows read</p>
           </div>
           <span
-            class="ml-auto shrink-0 font-mono text-xs text-muted-foreground"
+            class="ml-auto shrink-0 text-xs text-muted-foreground"
             >2.1 s</span
           >
         </div>
         {/* The column mapping is the part people don't believe until they see
             it, and it gives this card the same body as the chart beside it. */}
-        <dl class="mt-4 divide-y divide-border border-t border-border font-mono text-xs">
+        <dl class="mt-4 divide-y divide-border border-t border-border text-xs">
           {
             [
               ["Transaction Date", "Date"],
@@ -164,7 +164,7 @@ const trend = [
         <div class="mt-2 flex gap-2.5" aria-hidden="true">
           {
             trend.map((bar) => (
-              <span class="min-w-0 flex-1 text-center font-mono text-[11px] text-muted-foreground">
+              <span class="min-w-0 flex-1 text-center text-[11px] text-muted-foreground">
                 {bar.month}
               </span>
             ))

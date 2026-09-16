@@ -1,7 +1,7 @@
 ---
 import MainLayout from "@/core/layouts/main.astro"
 import { LoginShell } from "@/core/modules/login"
-import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server"
+import { createSupabaseServerClient } from "@/libs/supabase/server"
 import { AppRouter } from "@/shared/routing/app-router"
 
 const supabase = createSupabaseServerClient({

@@ -1,6 +1,6 @@
 import { Forbidden, InternalServer } from "../../../core/error-handling";
 import { privateProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { updateAccountSettingsContract } from "@/shared/server-contracts/schemas/account-settings";
 
 export const updateAccountSettings = privateProcedure({

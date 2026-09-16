@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
-import { gatedResponse } from "@/__tests__/gated-response";
+import { gatedResponse } from "@/libs/api/__tests__/gated-response";
 import { server } from "@/__tests__/mock-server";
 import { queryClient } from "@/libs/api/query-client";
 import { $toasts } from "@/libs/ui/toast";

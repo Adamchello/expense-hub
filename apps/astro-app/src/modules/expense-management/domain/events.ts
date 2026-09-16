@@ -1,4 +1,4 @@
-import type { Category } from "./category";
+import type { Category } from "@/shared/categories/category";
 import type { Expense } from "./expense";
 
 export type ExpenseManagementEvent =

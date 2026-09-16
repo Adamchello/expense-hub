@@ -1,6 +1,6 @@
 import { zodToJsonSchema } from "zod-to-json-schema";
 import type { LlmContentPart } from "@/server/application/core/llm-client";
-import { generateJson } from "@/server/application/adapter/llm";
+import { generateJson } from "@/server/infrastructure/llm";
 import {
   extractionResultSchema,
   type ExtractExpensesInput,

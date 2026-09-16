@@ -41,7 +41,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   /* One deceleration curve for the whole app. Exponential ease-out settles
      naturally; no bounce, no elastic. */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);

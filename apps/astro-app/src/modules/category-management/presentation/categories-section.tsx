@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/libs/ui/select";
 import { Callout, errorMessage } from "@/libs/ui/callout";
-import { CategoryBadge } from "@/shared/categories/category-badge";
+import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
 import { DataList } from "@/shared/money/data-list";
 import {
   COLOR_PRESETS,

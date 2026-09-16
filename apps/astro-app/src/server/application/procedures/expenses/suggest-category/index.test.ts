@@ -1,12 +1,9 @@
-import {
-  buildContext,
-  buildSupabaseMock,
-} from "@/server/__tests__/supabase-mock";
+import { buildContext, buildSupabaseMock } from "@/libs/supabase/mock";
 import { suggestExpenseCategory } from "./index";
 
 const mock = vi.hoisted(() => ({ db: undefined as unknown }));
 
-vi.mock("@/shared/data-sources/supabase-server", () => ({
+vi.mock("@/libs/supabase/server", () => ({
   createSupabaseServerClient: () => mock.db,
 }));
 

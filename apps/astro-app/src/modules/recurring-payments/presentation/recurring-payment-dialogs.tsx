@@ -1,7 +1,7 @@
 "use client";
 
 import { ConfirmDialog } from "@/libs/ui/confirm-dialog";
-import { formatCurrency } from "@/shared/format";
+import { formatCurrency } from "@/shared/money/format";
 import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
 import type { RecurringPaymentActions } from "../core/use-recurring-payment-actions";
 import { RecurringPaymentDialog } from "./recurring-payment-dialog";

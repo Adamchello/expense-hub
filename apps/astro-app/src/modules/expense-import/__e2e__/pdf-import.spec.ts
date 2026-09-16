@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { interpreter } from "@/__e2e__/interpreter";
-import { loginAs } from "@/__e2e__/auth";
+import { loginAs } from "@/shared/auth/__e2e__/login";
 import { getById } from "@/__e2e__/data-e2e";
 import { extractReply, extractedRows } from "./mocks";
 

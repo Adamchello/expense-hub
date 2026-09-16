@@ -1,7 +1,7 @@
 import { AppRouter } from "@/shared/routing/app-router";
 import { InternalServer } from "../../../core/error-handling";
 import { publicProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { registerContract } from "@/shared/server-contracts/schemas/auth";
 
 export const registerUser = publicProcedure({

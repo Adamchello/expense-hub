@@ -1,7 +1,7 @@
 import type { ParsedExpenseRow } from "../domain/expense-import";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { suggestCategory } from "@/modules/expense-management/core/category-suggestion";
-import { formatCurrency } from "@/shared/format";
+import { formatCurrency } from "@/shared/money/format";
 
 /** Lowercase alphanumerics only, so "PGE Obrót" and "pge-obrot" compare equal. */
 const normalizeProvider = (name: string) =>

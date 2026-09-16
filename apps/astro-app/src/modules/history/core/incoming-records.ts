@@ -1,6 +1,6 @@
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
 import type { IncomingRecord } from "@/shared/records/incoming-record";
-import { formatDate } from "@/shared/format";
+import { formatDate } from "@/shared/calendar/format";
 import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
 
 /**

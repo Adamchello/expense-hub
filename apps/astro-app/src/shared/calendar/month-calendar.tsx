@@ -2,7 +2,8 @@
 
 import { Button } from "@/libs/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/libs/ui/card";
-import { formatCurrency, formatMonth } from "@/shared/format";
+import { formatMonth } from "@/shared/calendar/format";
+import { formatCurrency } from "@/shared/money/format";
 import {
   daysInMonth,
   leadingBlanks,

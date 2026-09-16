@@ -80,7 +80,7 @@ export function ImportTable({
                       onUpdateRow(row.id, "amount", amount),
                     )
                   }
-                  className={`h-8 w-28 text-right font-mono tabular-nums ${row.errors.some((e) => e.includes("Amount")) ? "border-destructive" : ""}`}
+                  className={`h-8 w-28 text-right tabular-nums ${row.errors.some((e) => e.includes("Amount")) ? "border-destructive" : ""}`}
                 />
               </td>
               <td className="p-2">

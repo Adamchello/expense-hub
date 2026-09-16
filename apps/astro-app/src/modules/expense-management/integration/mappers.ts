@@ -1,5 +1,5 @@
 import type { Expense, ExpenseFormData } from "../domain/expense";
-import type { Category } from "../domain/category";
+import type { Category } from "@/shared/categories/category";
 
 interface ApiExpense {
   id: string;

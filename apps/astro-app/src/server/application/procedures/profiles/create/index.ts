@@ -1,6 +1,6 @@
 import { Conflict, InternalServer } from "../../../core/error-handling";
 import { privateProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { createProfileContract } from "@/shared/server-contracts/schemas/profile";
 
 const MAX_PROFILES = 10;

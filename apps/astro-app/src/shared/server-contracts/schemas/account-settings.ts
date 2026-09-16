@@ -7,7 +7,7 @@ import {
   notFound,
   unauthorized,
 } from "../errors";
-import type { ContractIn, ContractOut } from "../extraction";
+import type { ContractIn, ContractOut } from "../infer";
 
 export const accountSettingsRowSchema = z.object({
   account_id: z.string(),

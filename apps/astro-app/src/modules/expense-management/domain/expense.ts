@@ -1,4 +1,4 @@
-import type { Category } from "./category";
+import type { Category } from "@/shared/categories/category";
 
 export interface Expense {
   id: string;

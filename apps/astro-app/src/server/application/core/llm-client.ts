@@ -1,6 +1,6 @@
 /**
  * Vendor-neutral request shape for "give the model some content, get JSON
- * back". `adapter/llm.ts` owns model choice, transport, and wire format;
+ * back". `infrastructure/llm` owns model choice, transport, and wire format;
  * callers own prompts, schemas, and validation of what comes back.
  */
 

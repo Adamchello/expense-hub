@@ -1,7 +1,7 @@
 "use client";
 
 import { Amount } from "@/shared/money/amount";
-import { CategoryBadge } from "@/shared/categories/category-badge";
+import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
 import { cn } from "@/libs/ui/utils";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
 import type { DataE2E } from "@/__e2e__/data-e2e";

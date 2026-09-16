@@ -2,7 +2,7 @@ import {
   buildContext,
   buildSupabaseMock,
   type SupabaseMockConfig,
-} from "@/server/__tests__/supabase-mock";
+} from "@/libs/supabase/mock";
 import type { LlmJsonRequest } from "@/server/application/core/llm-client";
 import {
   EXTRACT_DAILY_LIMIT,
@@ -15,14 +15,12 @@ const mock = vi.hoisted(() => ({
   generateJson: vi.fn<(request: LlmJsonRequest) => Promise<unknown>>(),
 }));
 
-vi.mock("@/shared/data-sources/supabase-server", () => ({
+vi.mock("@/libs/supabase/server", () => ({
   createSupabaseServerClient: () => mock.db,
 }));
 
-vi.mock("@/server/application/adapter/llm", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("@/server/application/adapter/llm")
-  >()),
+vi.mock("@/server/infrastructure/llm", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/server/infrastructure/llm")>()),
   generateJson: mock.generateJson,
 }));
 
@@ -204,7 +202,7 @@ describe("extractExpenses procedure", () => {
   it("returns 400 telling the user to split the file when the reply was cut short", async () => {
     mock.db = happyDb();
     const { LlmOutputTooLongError } =
-      await import("@/server/application/adapter/llm");
+      await import("@/server/infrastructure/llm");
     mock.generateJson.mockRejectedValue(new LlmOutputTooLongError());
 
     const result = await extractExpenses(pdfInput, buildContext());
@@ -215,8 +213,7 @@ describe("extractExpenses procedure", () => {
 
   it("returns 500 with a distinct message when the model refuses", async () => {
     mock.db = happyDb();
-    const { LlmRefusedError } =
-      await import("@/server/application/adapter/llm");
+    const { LlmRefusedError } = await import("@/server/infrastructure/llm");
     mock.generateJson.mockRejectedValue(new LlmRefusedError("nope"));
 
     const result = await extractExpenses(pdfInput, buildContext());

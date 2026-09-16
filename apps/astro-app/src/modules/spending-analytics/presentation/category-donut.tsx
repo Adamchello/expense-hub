@@ -1,7 +1,7 @@
 "use client";
 
 import { Amount } from "@/shared/money/amount";
-import { formatCurrency } from "@/shared/format";
+import { formatCurrency } from "@/shared/money/format";
 
 export interface DonutSlice {
   name: string;
@@ -65,7 +65,7 @@ export function CategoryDonut({ slices, total }: CategoryDonutProps) {
         x="80"
         y="76"
         textAnchor="middle"
-        className="fill-foreground font-mono text-[15px] font-semibold"
+        className="fill-foreground text-[15px] font-semibold"
       >
         {formatCurrency(total)}
       </text>

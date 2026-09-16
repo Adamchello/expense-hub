@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { badRequest, internalServer, unauthorized } from "../errors";
-import type { ContractIn, ContractOut } from "../extraction";
+import type { ContractIn, ContractOut } from "../infer";
 
 export const renameMerchantContract = () =>
   z.object({

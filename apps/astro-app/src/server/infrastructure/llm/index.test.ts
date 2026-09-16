@@ -3,7 +3,7 @@ import {
   LlmNotConfiguredError,
   LlmOutputTooLongError,
   LlmRefusedError,
-} from "./llm";
+} from "./index";
 
 type FetchCall = { url: string; init: RequestInit; body: any };
 

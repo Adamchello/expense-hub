@@ -5,7 +5,7 @@ import { Button } from "@/libs/ui/button";
 import { Input } from "@/libs/ui/input";
 import { Textarea } from "@/libs/ui/textarea";
 import type { Expense } from "../domain/expense";
-import type { Category } from "../domain/category";
+import type { Category } from "@/shared/categories/category";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/libs/ui/utils";
 import { Callout, errorMessage } from "@/libs/ui/callout";

@@ -1,6 +1,6 @@
 export const prerender = false;
 import type { APIRoute } from "astro";
-import { astroAdapter } from "@/server/application/adapter/astro";
+import { astroAdapter } from "@/server/infrastructure/astro";
 import { listProfiles } from "@/server/application/procedures/profiles/list";
 import { createProfile } from "@/server/application/procedures/profiles/create";
 

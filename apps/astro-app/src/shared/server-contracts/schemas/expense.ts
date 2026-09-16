@@ -21,7 +21,7 @@ import {
   tooManyRequests,
   unauthorized,
 } from "../errors";
-import type { ContractIn, ContractOut } from "../extraction";
+import type { ContractIn, ContractOut } from "../infer";
 
 export const createExpenseContract = () =>
   z.object({

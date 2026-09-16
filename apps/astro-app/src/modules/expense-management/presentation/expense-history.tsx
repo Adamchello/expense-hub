@@ -15,9 +15,10 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/libs/ui/popover";
 import { EmptyState } from "@/libs/ui/empty-state";
 import { ListGroupHeader } from "@/libs/ui/list-group-header";
-import { RecordCard } from "@/shared/records/record-card";
+import { RecordCard } from "@/modules/expense-management/presentation/record-card";
 import { SectionLabel } from "@/libs/ui/section-label";
-import { formatCurrency, formatDate, formatMonth } from "@/shared/format";
+import { formatDate, formatMonth } from "@/shared/calendar/format";
+import { formatCurrency } from "@/shared/money/format";
 import { toast } from "@/libs/ui/toast";
 import { useExpenseRecordActions } from "../core/use-expense-record-actions";
 import { exportExpensesToCsv, exportExpensesToExcel } from "../core/export";

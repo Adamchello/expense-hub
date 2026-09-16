@@ -1,6 +1,6 @@
-import { queryClient } from "./query-client";
+import { queryClient } from "../query-client";
 import { $toasts } from "@/libs/ui/toast";
-import { withOptimisticList } from "./optimistic-list";
+import { withOptimisticList } from "../optimistic-list";
 
 interface Item {
   id: string;

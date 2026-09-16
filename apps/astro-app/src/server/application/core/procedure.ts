@@ -1,5 +1,5 @@
 import type { APIContext } from "astro";
-import { createSupabaseServerClient } from "@/shared/data-sources/supabase-server";
+import { createSupabaseServerClient } from "@/libs/supabase/server";
 import type { AuthenticatedUser } from "../../domain/user";
 import {
   APIError,

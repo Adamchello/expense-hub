@@ -5,7 +5,7 @@ const llm = vi.hoisted(() => ({
   generateJson: vi.fn<(request: LlmJsonRequest) => Promise<unknown>>(),
 }));
 
-vi.mock("@/server/application/adapter/llm", () => ({
+vi.mock("@/server/infrastructure/llm", () => ({
   generateJson: llm.generateJson,
 }));
 

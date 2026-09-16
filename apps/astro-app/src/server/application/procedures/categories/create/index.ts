@@ -1,7 +1,7 @@
 import { CATEGORIES } from "@/shared/categories/configuration";
 import { Conflict, InternalServer } from "../../../core/error-handling";
 import { profileProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { createCategoryContract } from "@/shared/server-contracts/schemas/category";
 
 export const createCategory = profileProcedure({

@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCurrency, formatCurrencyRounded } from "@/shared/format";
+import { formatCurrency, formatCurrencyRounded } from "@/shared/money/format";
 
 export interface TrendPoint {
   /** Stable identity for the bar, e.g. "2026-07" or "2026". */

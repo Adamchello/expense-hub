@@ -1,6 +1,6 @@
 import { InternalServer, NotFound } from "../../../core/error-handling";
 import { privateProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { getAccountSettingsContract } from "@/shared/server-contracts/schemas/account-settings";
 
 export const getAccountSettings = privateProcedure({

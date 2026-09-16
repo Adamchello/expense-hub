@@ -1,10 +1,3 @@
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
-}
-
 export function formatMonth(monthKey: string): string {
   const [year, month] = monthKey.split("-");
   const date = new Date(parseInt(year), parseInt(month) - 1, 1);
@@ -19,18 +12,6 @@ export function formatMonthShort(monthKey: string): string {
   const [year, month] = monthKey.split("-");
   const date = new Date(parseInt(year), parseInt(month) - 1, 1);
   return date.toLocaleDateString("en-US", { month: "short" });
-}
-
-/**
- * "$450" — currency without cents, for axis ticks where the exact figure is
- * carried by the bar label and two decimal places only crowd the gutter.
- */
-export function formatCurrencyRounded(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 /**

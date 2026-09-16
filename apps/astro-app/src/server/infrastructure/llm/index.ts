@@ -2,7 +2,7 @@ import type {
   LlmContentPart,
   LlmJsonRequest,
 } from "@/server/application/core/llm-client";
-import { readSecret } from "./secrets";
+import { readSecret } from "../secrets";
 
 /**
  * The one place that knows which model provider we use. Swapping providers

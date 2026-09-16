@@ -9,12 +9,12 @@ import {
 } from "@/libs/ui/card";
 import { Amount } from "@/shared/money/amount";
 import { EmptyState } from "@/libs/ui/empty-state";
-import { ShareBar } from "@/shared/statistics/share-bar";
-import { Sparkline } from "@/shared/statistics/sparkline";
+import { ShareBar } from "@/modules/spending-analytics/presentation/share-bar";
+import { Sparkline } from "@/modules/spending-analytics/presentation/sparkline";
 import { TrendDelta } from "@/shared/money/trend-delta";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import { useCategoryOptions } from "@/modules/category-management/core/use-category-options";
-import { formatMonth } from "@/shared/format";
+import { formatMonth } from "@/shared/calendar/format";
 import {
   changePct,
   previousMonthOf,

@@ -1,6 +1,6 @@
 import { InternalServer } from "../../../core/error-handling";
 import { profileProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { listRecurringContract } from "@/shared/server-contracts/schemas/recurring";
 
 export const listRecurringPayments = profileProcedure({

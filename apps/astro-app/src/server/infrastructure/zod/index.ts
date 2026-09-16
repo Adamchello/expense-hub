@@ -1,6 +1,9 @@
 import { ZodError, type z } from "zod";
-import { BadRequest, InternalServer } from "../core/error-handling";
-import type { ProcedureSchema } from "../core/procedure";
+import {
+  BadRequest,
+  InternalServer,
+} from "@/server/application/core/error-handling";
+import type { ProcedureSchema } from "@/server/application/core/procedure";
 
 type InOutSchema = z.ZodObject<{
   in: z.ZodTypeAny;

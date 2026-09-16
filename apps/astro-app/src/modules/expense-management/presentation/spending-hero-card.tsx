@@ -3,7 +3,10 @@
 import type { ReactNode } from "react";
 import { Card } from "@/libs/ui/card";
 import { Amount } from "@/shared/money/amount";
-import { HillsArt, PlantArt } from "@/libs/ui/decor-art";
+import {
+  HillsArt,
+  PlantArt,
+} from "@/modules/expense-management/presentation/decor-art";
 import { TrendDelta } from "@/shared/money/trend-delta";
 import { cn } from "@/libs/ui/utils";
 

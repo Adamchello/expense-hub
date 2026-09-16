@@ -17,9 +17,9 @@ import {
   CARD_TABLE_GRID,
   type CardTableColumn,
 } from "@/libs/ui/card-table";
-import { CategoryBadge } from "@/shared/categories/category-badge";
+import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
 import { EmptyState } from "@/libs/ui/empty-state";
-import { formatDate } from "@/shared/format";
+import { formatDate } from "@/shared/calendar/format";
 import { ArrowRight } from "lucide-react";
 
 const MAX_ROWS = 5;

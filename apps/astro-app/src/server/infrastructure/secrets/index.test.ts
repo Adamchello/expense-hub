@@ -1,4 +1,4 @@
-import { readSecret } from "./secrets";
+import { readSecret } from "./index";
 
 const NAME = "SECRETS_TEST_KEY";
 

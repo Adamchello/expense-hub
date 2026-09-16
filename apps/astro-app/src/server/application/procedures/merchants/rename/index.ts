@@ -1,6 +1,6 @@
 import { InternalServer } from "../../../core/error-handling";
 import { privateProcedure } from "../../../core/procedure";
-import { withZodSchema } from "../../../adapter/zod";
+import { withZodSchema } from "@/server/infrastructure/zod";
 import { renameMerchantContract } from "@/shared/server-contracts/schemas/merchant";
 
 export const renameMerchant = privateProcedure({

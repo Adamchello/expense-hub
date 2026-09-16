@@ -1,5 +1,5 @@
 import { cn } from "@/libs/ui/utils";
-import { formatCurrency } from "@/shared/format";
+import { formatCurrency } from "@/shared/money/format";
 
 /**
  * The single money treatment. Mono + tabular figures so columns of amounts
@@ -38,7 +38,7 @@ export function Amount({
   return (
     <span
       className={cn(
-        "font-mono tabular-nums tracking-tight",
+        "tabular-nums tracking-tight",
         SIZE_CLASSES[size],
         weight === "semibold" ? "font-semibold" : "font-normal",
         muted && "text-muted-foreground",

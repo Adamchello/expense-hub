@@ -3,8 +3,9 @@
 import { Plus } from "lucide-react";
 import { ListGroupHeader } from "@/libs/ui/list-group-header";
 import { cn } from "@/libs/ui/utils";
-import { RecordCard } from "@/shared/records/record-card";
-import { formatCurrency, formatDate } from "@/shared/format";
+import { RecordCard } from "@/modules/expense-management/presentation/record-card";
+import { formatDate } from "@/shared/calendar/format";
+import { formatCurrency } from "@/shared/money/format";
 import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";

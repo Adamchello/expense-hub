@@ -16,11 +16,11 @@ import {
   CARD_TABLE_GRID,
   type CardTableColumn,
 } from "@/libs/ui/card-table";
-import { CategoryBadge } from "@/shared/categories/category-badge";
+import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
 import { EmptyState } from "@/libs/ui/empty-state";
 import { ListTotal } from "@/shared/money/data-list";
 import { SkeletonPanel } from "@/libs/ui/skeleton";
-import { formatDate } from "@/shared/format";
+import { formatDate } from "@/shared/calendar/format";
 import { daysUntil } from "@/shared/recurring/recurrence";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { addDays, expectedTotal, projectOccurrences } from "../core/projection";

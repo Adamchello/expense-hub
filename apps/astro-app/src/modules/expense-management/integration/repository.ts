@@ -8,7 +8,7 @@ import type {
   SuggestCategoryResult,
 } from "@/shared/server-contracts/schemas/expense";
 import type { Expense, ExpenseFormData } from "../domain/expense";
-import type { Category } from "../domain/category";
+import type { Category } from "@/shared/categories/category";
 import { normalizeExpenseForm } from "./mappers";
 
 const toPayload = (formData: ExpenseFormData): CreateExpenseInput =>

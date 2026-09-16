@@ -1,4 +1,4 @@
-import type { Category } from "../domain/category";
+import type { Category } from "@/shared/categories/category";
 import { CATEGORY_KEYWORDS } from "../configuration/constraints";
 
 export function suggestCategory(providerName: string): Category {
