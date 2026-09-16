@@ -12,6 +12,7 @@ import { Callout, errorMessage } from "@/libs/ui/callout";
 import { HeroAmountField } from "@/shared/money/hero-amount-field";
 import { SectionLabel } from "@/libs/ui/section-label";
 import { useCreateExpense } from "../core/store";
+import { toast } from "@/libs/ui/toast";
 import { suggestCategory } from "../core/category-suggestion";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
 
@@ -63,7 +64,6 @@ interface ExpenseFormBodyProps {
   initialDate?: string | null;
   error: unknown;
   isPending: boolean;
-  successMessage?: string | null;
   submitLabel: string;
   pendingLabel: string;
   errorFallback: string;
@@ -82,7 +82,6 @@ export function ExpenseFormBody({
   initialDate,
   error,
   isPending,
-  successMessage,
   submitLabel,
   pendingLabel,
   errorFallback,
@@ -168,8 +167,6 @@ export function ExpenseFormBody({
       {error != null && (
         <Callout variant="error">{errorMessage(error, errorFallback)}</Callout>
       )}
-
-      {successMessage && <Callout variant="success">{successMessage}</Callout>}
 
       {/* Hero amount */}
       <HeroAmountField
@@ -308,6 +305,13 @@ interface ExpenseEntryFormBodyProps {
   /** When false the form resets (mirrors the old close-resets-form behavior). */
   active: boolean;
   onCancel: () => void;
+  /**
+   * Fired once the expense is saved. The dialog closes on it: the saved
+   * record is already at the top of the list behind the dialog, so keeping
+   * the form open only asks "now what?" — and the toast carries the
+   * confirmation the inline banner used to.
+   */
+  onSaved: () => void;
   /** Seeds the date — set when the entry started from a calendar day. */
   initialDate?: string | null;
 }
@@ -315,9 +319,9 @@ interface ExpenseEntryFormBodyProps {
 export function ExpenseEntryFormBody({
   active,
   onCancel,
+  onSaved,
   initialDate,
 }: ExpenseEntryFormBodyProps) {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formEpoch, setFormEpoch] = useState(0);
 
   const {
@@ -328,22 +332,16 @@ export function ExpenseEntryFormBody({
   } = useCreateExpense();
 
   useEffect(() => {
-    if (!active) {
-      setSuccessMessage(null);
-      reset();
-    }
+    if (!active) reset();
   }, [active, reset]);
 
   const handleSubmit = (data: ExpenseSubmitData) => {
     mutateCreateExpense(data, {
       onSuccess: () => {
-        setSuccessMessage("Expense saved successfully!");
-        // Remount the form body so it returns to a pristine state.
+        toast("Expense saved");
+        // Remount the form body so the next open starts pristine.
         setFormEpoch((prev) => prev + 1);
-
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 3000);
+        onSaved();
       },
       onError: (error) => {
         console.error("Error submitting form:", error);
@@ -360,7 +358,6 @@ export function ExpenseEntryFormBody({
       initialDate={initialDate}
       error={error}
       isPending={isPending}
-      successMessage={successMessage}
       submitLabel="Save expense"
       pendingLabel="Saving..."
       errorFallback="Failed to save expense"

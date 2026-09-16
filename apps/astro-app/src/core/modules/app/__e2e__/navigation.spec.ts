@@ -26,6 +26,13 @@ const commands = {
       .click();
   },
 
+  "switch settings section": async (page: Page, name: string) => {
+    await page
+      .getByRole("group", { name: "Settings section" })
+      .getByRole("button", { name })
+      .click();
+  },
+
   "land on": async (page: Page, path: string, title: string) => {
     await expect(page).toHaveURL(path);
     await expect(page).toHaveTitle(`${title} · ExpenseHub`);
@@ -84,8 +91,24 @@ test.describe("App navigation", () => {
       ["land on", page, "/app/analytics", "Spending analytics"],
       ["sidebar marks current", page, "Analytics"],
       ["click sidebar destination", page, "Settings"],
-      ["land on", page, "/app/settings", "Settings"],
+      ["land on", page, "/app/settings/profiles", "Settings"],
       ["sidebar marks current", page, "Settings"],
+    );
+  });
+
+  test("settings sections are their own paths and keep Settings current", async ({
+    page,
+  }) => {
+    await run(
+      ["open the app", page],
+      ["click sidebar destination", page, "Settings"],
+      ["switch settings section", page, "Categories"],
+      ["land on", page, "/app/settings/categories", "Settings"],
+      ["sidebar marks current", page, "Settings"],
+      ["switch settings section", page, "Merchants"],
+      ["land on", page, "/app/settings/merchants", "Settings"],
+      ["switch settings section", page, "Profiles"],
+      ["land on", page, "/app/settings/profiles", "Settings"],
     );
   });
 

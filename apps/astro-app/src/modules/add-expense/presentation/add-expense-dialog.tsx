@@ -86,6 +86,7 @@ export function AddExpenseDialogView({
               active={open}
               initialDate={initialDate}
               onCancel={() => onOpenChange(false)}
+              onSaved={() => onOpenChange(false)}
             />
           </TabsContent>
           <TabsContent

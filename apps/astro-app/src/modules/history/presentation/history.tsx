@@ -52,9 +52,9 @@ export function History({ view, onViewChange }: HistoryProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Title and the view switch share one line — the switch belongs to the
-          page, not to the content under it. */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* The view switch sits under the title — it belongs to the page, not
+          to the content under it. */}
+      <div className="flex flex-col items-start gap-3">
         <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           History
         </h1>

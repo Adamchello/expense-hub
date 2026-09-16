@@ -55,12 +55,31 @@ const appTabPath = (tab: AppTab, view: HistoryView = "list"): string =>
     ? "/app/history/calendar"
     : `/app/${tab}`;
 
+/**
+ * Settings is three unrelated jobs — profiles, categories, merchants — and
+ * each is its own path for the same reason History's calendar is: a link to
+ * "the merchants screen" should land on the merchants screen.
+ */
+const SETTINGS_SECTIONS = ["profiles", "categories", "merchants"] as const;
+type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+
+const isSettingsSection = (value: unknown): value is SettingsSection =>
+  typeof value === "string" &&
+  (SETTINGS_SECTIONS as readonly string[]).includes(value);
+
+const settingsSectionPath = (section: SettingsSection): string =>
+  `/app/settings/${section}`;
+
 export {
   AppRouter,
   APP_TABS,
   HISTORY_VIEWS,
+  SETTINGS_SECTIONS,
   appTabPath,
   isAppTab,
+  isSettingsSection,
+  settingsSectionPath,
   type AppTab,
   type HistoryView,
+  type SettingsSection,
 };

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/libs/ui/button";
-import { Skeleton } from "@/libs/ui/skeleton";
+import { Card, CardContent } from "@/libs/ui/card";
+import { SkeletonList } from "@/libs/ui/skeleton";
 import { Callout, errorMessage } from "@/libs/ui/callout";
+import { DataList } from "@/shared/money/data-list";
 import {
   useActiveProfile,
   useCanCreateProfile,
@@ -15,6 +17,8 @@ import type { Profile } from "../domain/profile";
 import { CreateProfileDialog } from "./create-profile-dialog";
 import { RenameProfileDialog } from "./rename-profile-dialog";
 import { DeleteProfileDialog } from "./delete-profile-dialog";
+
+const PROFILE_LIMIT = 10;
 
 export function ProfilesSection() {
   const profilesQuery = useProfiles();
@@ -29,83 +33,94 @@ export function ProfilesSection() {
   const profiles = profilesQuery.data ?? [];
 
   return (
-    <section>
-      <header className="mb-6">
-        <h2 className="text-xl font-semibold">Profiles</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Split expenses across separate profiles (e.g. business, family,
-          personal).
-        </p>
-      </header>
+    <section
+      aria-labelledby="settings-profiles"
+      className="flex flex-col gap-4"
+    >
+      <h2 id="settings-profiles" className="sr-only">
+        Profiles
+      </h2>
+      <p className="max-w-prose text-sm text-muted-foreground">
+        Keep business, family and personal spending apart. Every list and total
+        shows one profile at a time; switch between them from the sidebar.
+      </p>
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {profiles.length} of 10 profiles
+          {profiles.length} of {PROFILE_LIMIT} profiles
         </p>
         <Button
           onClick={() => setCreateOpen(true)}
           disabled={!canCreate}
           aria-label="Create profile"
         >
-          <Plus className="size-4 mr-1" />
+          <Plus className="size-4" />
           New profile
         </Button>
       </div>
 
       {!canCreate && (
-        <div className="rounded-md bg-muted p-3 mb-4 text-sm text-muted-foreground">
-          Profile limit reached. Delete an existing profile to create a new one.
-        </div>
-      )}
-
-      {profilesQuery.isLoading && (
-        <Skeleton className="h-[68px] w-full rounded-xl" />
+        <Callout variant="info" showIcon={false}>
+          Profile limit reached. Delete a profile to make room for a new one.
+        </Callout>
       )}
 
       {profilesQuery.error && (
-        <Callout variant="error" className="mb-4">
+        <Callout variant="error">
           {errorMessage(profilesQuery.error, "Failed to load profiles")}
         </Callout>
       )}
 
-      <ul className="space-y-2">
-        {profiles.map((profile) => {
-          const isActive = profile.id === activeProfileId;
-          return (
-            <li
-              key={profile.id}
-              className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
-              data-testid={`profile-row-${profile.id}`}
-            >
-              <div>
-                <p className="font-medium">{profile.name}</p>
-                {isActive && (
-                  <p className="text-xs text-muted-foreground">Active</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setRenameTarget(profile)}
-                  aria-label={`Rename ${profile.name}`}
-                >
-                  <Pencil className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setDeleteTarget(profile)}
-                  disabled={!canDelete}
-                  aria-label={`Delete ${profile.name}`}
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {profilesQuery.isLoading ? (
+        <SkeletonList rows={3} />
+      ) : (
+        <Card>
+          <CardContent>
+            <DataList>
+              {profiles.map((profile) => {
+                const isActive = profile.id === activeProfileId;
+                return (
+                  <li
+                    key={profile.id}
+                    className="flex items-center gap-2 py-2.5 first:pt-0 last:pb-0"
+                    data-testid={`profile-row-${profile.id}`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {profile.name}
+                      </p>
+                      {isActive && (
+                        <p className="mt-0.5 text-xs font-medium text-primary">
+                          Active
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="text-muted-foreground hover:text-foreground"
+                      onClick={() => setRenameTarget(profile)}
+                      aria-label={`Rename ${profile.name}`}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="text-muted-foreground hover:text-foreground"
+                      onClick={() => setDeleteTarget(profile)}
+                      disabled={!canDelete}
+                      aria-label={`Delete ${profile.name}`}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </li>
+                );
+              })}
+            </DataList>
+          </CardContent>
+        </Card>
+      )}
 
       <CreateProfileDialog open={createOpen} onOpenChange={setCreateOpen} />
       <RenameProfileDialog

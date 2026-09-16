@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Check, Pencil, X } from "lucide-react";
 import { Button } from "@/libs/ui/button";
 import { Input } from "@/libs/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/libs/ui/card";
-import { Amount } from "@/shared/money/amount";
+import { Card, CardContent } from "@/libs/ui/card";
 import { Callout, errorMessage } from "@/libs/ui/callout";
 import { EmptyState } from "@/libs/ui/empty-state";
+import { SkeletonList } from "@/libs/ui/skeleton";
 import { apiRequest } from "@/libs/api/api-client";
 import type {
   RenameMerchantInput,
@@ -15,8 +16,8 @@ import type {
 } from "@/shared/server-contracts/schemas/merchant";
 import { queryClient } from "@/libs/api/query-client";
 import { toast } from "@/libs/ui/toast";
+import { DataList, ListRow } from "@/shared/money/data-list";
 import { useExpenses } from "@/modules/expense-management/core/store";
-import { Check, Pencil, X } from "lucide-react";
 
 const renameMerchant = async (input: RenameMerchantInput) => {
   return apiRequest<RenameMerchantResult>("/api/merchants/rename", {
@@ -28,11 +29,12 @@ const renameMerchant = async (input: RenameMerchantInput) => {
 
 /**
  * Keeps payee names consistent: lists every merchant with usage counts and
- * renames it across all expenses and recurring payments (renaming onto an existing
- * merchant merges them).
+ * renames it across all expenses and recurring payments (renaming onto an
+ * existing merchant merges them).
  */
 export function MerchantsSection() {
-  const { data: expenses } = useExpenses();
+  const expensesQuery = useExpenses();
+  const expenses = expensesQuery.data;
   const [editing, setEditing] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
 
@@ -77,37 +79,48 @@ export function MerchantsSection() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Merchants</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground">
-          Rename a merchant to fix inconsistent payee names — the change applies
-          to every expense and recurring payment. Renaming onto an existing
-          merchant merges them.
-        </p>
+    <section
+      aria-labelledby="settings-merchants"
+      className="flex flex-col gap-4"
+    >
+      <h2 id="settings-merchants" className="sr-only">
+        Merchants
+      </h2>
+      <p className="max-w-prose text-sm text-muted-foreground">
+        Fix inconsistent payee names. A rename applies to every expense and
+        recurring payment, and renaming onto an existing merchant merges the
+        two.
+      </p>
 
-        {mutation.error && (
-          <Callout variant="error">
-            {errorMessage(mutation.error, "Failed to rename merchant")}
-          </Callout>
-        )}
+      {mutation.error && (
+        <Callout variant="error">
+          {errorMessage(mutation.error, "Failed to rename merchant")}
+        </Callout>
+      )}
 
-        {merchants.length === 0 ? (
-          <EmptyState
-            variant="inline"
-            description="No merchants yet — they appear as you record expenses."
-          />
-        ) : (
-          <ul className="flex flex-col divide-y divide-border">
-            {merchants.map((merchant) => (
-              <li
-                key={merchant.name}
-                className="flex flex-wrap items-center gap-2 py-2 first:pt-0 last:pb-0"
-              >
-                {editing === merchant.name ? (
-                  <>
+      {expensesQuery.error && (
+        <Callout variant="error">
+          {errorMessage(expensesQuery.error, "Failed to load expenses")}
+        </Callout>
+      )}
+
+      {expensesQuery.isLoading ? (
+        <SkeletonList rows={4} />
+      ) : merchants.length === 0 ? (
+        <EmptyState
+          title="No merchants yet"
+          description="Merchants are the payees on your expenses. Record a few and they will be listed here, ready to tidy up."
+        />
+      ) : (
+        <Card>
+          <CardContent>
+            <DataList>
+              {merchants.map((merchant) =>
+                editing === merchant.name ? (
+                  <li
+                    key={merchant.name}
+                    className="flex flex-wrap items-center gap-2 py-2.5 first:pt-0 last:pb-0"
+                  >
                     <Input
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
@@ -119,7 +132,8 @@ export function MerchantsSection() {
                         if (e.key === "Escape") setEditing(null);
                       }}
                       autoFocus
-                      className="h-8 w-52"
+                      aria-label={`New name for ${merchant.name}`}
+                      className="h-8 min-w-0 flex-1 basis-40"
                     />
                     <Button
                       size="icon-sm"
@@ -141,35 +155,33 @@ export function MerchantsSection() {
                     >
                       <X className="size-4" />
                     </Button>
-                  </>
+                  </li>
                 ) : (
-                  <>
-                    <p className="text-sm font-medium">{merchant.name}</p>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`Rename merchant ${merchant.name}`}
-                      onClick={() => startEditing(merchant.name)}
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                  </>
-                )}
-                <p className="ml-auto text-xs text-muted-foreground">
-                  {merchant.count}{" "}
-                  {merchant.count === 1 ? "expense" : "expenses"} ·{" "}
-                  <Amount
-                    value={merchant.total}
-                    size="sm"
-                    weight="normal"
-                    muted
+                  <ListRow
+                    key={merchant.name}
+                    name={merchant.name}
+                    meta={`${merchant.count} ${
+                      merchant.count === 1 ? "expense" : "expenses"
+                    }`}
+                    amount={merchant.total}
+                    trailing={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label={`Rename merchant ${merchant.name}`}
+                        onClick={() => startEditing(merchant.name)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    }
                   />
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
+                ),
+              )}
+            </DataList>
+          </CardContent>
+        </Card>
+      )}
+    </section>
   );
 }

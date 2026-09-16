@@ -7,7 +7,11 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
-import { appTabPath, isAppTab } from "@/shared/routing/app-router";
+import {
+  appTabPath,
+  isAppTab,
+  settingsSectionPath,
+} from "@/shared/routing/app-router";
 import { AppLayout } from "./app-layout";
 import { AnalyticsPage } from "./pages/analytics-page";
 import { DashboardPage } from "./pages/dashboard-page";
@@ -81,11 +85,34 @@ const analyticsRoute = createRoute({
   component: AnalyticsPage,
 });
 
+/** `/app/settings` has no content of its own — it lands you on Profiles. */
 const settingsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "settings",
+  beforeLoad: () => {
+    throw redirect({ to: settingsSectionPath("profiles"), replace: true });
+  },
+});
+
+const settingsProfilesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "settings/profiles",
   head: titled("Settings"),
-  component: SettingsPage,
+  component: () => <SettingsPage section="profiles" />,
+});
+
+const settingsCategoriesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "settings/categories",
+  head: titled("Settings"),
+  component: () => <SettingsPage section="categories" />,
+});
+
+const settingsMerchantsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "settings/merchants",
+  head: titled("Settings"),
+  component: () => <SettingsPage section="merchants" />,
 });
 
 const routeTree = rootRoute.addChildren([
@@ -96,6 +123,9 @@ const routeTree = rootRoute.addChildren([
     historyCalendarRoute,
     analyticsRoute,
     settingsRoute,
+    settingsProfilesRoute,
+    settingsCategoriesRoute,
+    settingsMerchantsRoute,
   ]),
 ]);
 
