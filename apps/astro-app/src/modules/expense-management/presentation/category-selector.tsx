@@ -14,7 +14,7 @@ import {
   FieldDescription,
 } from "@/libs/ui/field";
 import type { Category } from "@/shared/categories/category";
-import { CATEGORIES } from "@/shared/categories/configuration";
+import { CATEGORIES } from "@/shared/categories/category";
 
 interface CategorySelectorProps {
   value?: Category;

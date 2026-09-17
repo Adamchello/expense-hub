@@ -16,7 +16,8 @@ import type {
 } from "@/shared/server-contracts/schemas/merchant";
 import { queryClient } from "@/libs/api/query-client";
 import { toast } from "@/libs/ui/toast";
-import { DataList, ListRow } from "@/shared/money/data-list";
+import { DataList, ListRow } from "@/libs/ui/data-list";
+import { Amount } from "@/shared/money/amount";
 import { useExpenses } from "@/modules/expense-management/core/store";
 
 const renameMerchant = async (input: RenameMerchantInput) => {
@@ -163,7 +164,7 @@ export function MerchantsSection() {
                     meta={`${merchant.count} ${
                       merchant.count === 1 ? "expense" : "expenses"
                     }`}
-                    amount={merchant.total}
+                    value={<Amount value={merchant.total} />}
                     trailing={
                       <Button
                         variant="ghost"

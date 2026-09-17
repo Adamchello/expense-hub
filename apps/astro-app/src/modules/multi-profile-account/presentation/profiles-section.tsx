@@ -6,7 +6,7 @@ import { Button } from "@/libs/ui/button";
 import { Card, CardContent } from "@/libs/ui/card";
 import { SkeletonList } from "@/libs/ui/skeleton";
 import { Callout, errorMessage } from "@/libs/ui/callout";
-import { DataList } from "@/shared/money/data-list";
+import { DataList } from "@/libs/ui/data-list";
 import {
   useActiveProfile,
   useCanCreateProfile,

@@ -16,12 +16,12 @@ import {
 } from "@/libs/ui/select";
 import { Callout, errorMessage } from "@/libs/ui/callout";
 import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
-import { DataList } from "@/shared/money/data-list";
+import { DataList } from "@/libs/ui/data-list";
 import {
   COLOR_PRESETS,
   PRESET_COLOR_CLASSES,
   PRESET_COLOR_HEX,
-} from "@/shared/categories/configuration";
+} from "@/shared/categories/colors";
 import {
   useCustomCategories,
   useCreateCustomCategory,

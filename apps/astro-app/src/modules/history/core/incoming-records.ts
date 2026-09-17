@@ -1,7 +1,7 @@
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
 import type { IncomingRecord } from "@/shared/records/incoming-record";
 import { formatDate } from "@/shared/calendar/format";
-import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
+import { FREQUENCY_LABELS } from "@/shared/recurring/frequency";
 
 /**
  * A recurring payment as the history register shows it: the Incoming group at

@@ -22,7 +22,6 @@ const withAuth = <TProps extends Record<string, unknown>>(
 
   const ProtectedComponent = (props: TProps) => {
     const auth = useAuth();
-    console.log(auth);
     const status = auth.status;
 
     switch (status) {

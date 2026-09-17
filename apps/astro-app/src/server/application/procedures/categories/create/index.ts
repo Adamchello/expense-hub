@@ -1,4 +1,4 @@
-import { CATEGORIES } from "@/shared/categories/configuration";
+import { CATEGORIES } from "@/shared/categories/category";
 import { Conflict, InternalServer } from "../../../core/error-handling";
 import { profileProcedure } from "../../../core/procedure";
 import { withZodSchema } from "@/server/infrastructure/zod";

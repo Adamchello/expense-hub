@@ -1,5 +1,4 @@
-import { Amount } from "./amount";
-import { cn } from "@/libs/ui/utils";
+import { cn } from "./utils";
 import type { ReactNode } from "react";
 
 /**
@@ -25,9 +24,10 @@ interface ListRowProps {
   name: ReactNode;
   /** Sits under the name — a category chip, a frequency. */
   secondary?: ReactNode;
-  /** Sits inline before the amount — a date, "in 3 days". */
+  /** Sits inline before the value — a date, "in 3 days". */
   meta?: ReactNode;
-  amount?: number;
+  /** Right-aligned figure — typically an `<Amount>`. */
+  value?: ReactNode;
   /** Row-level controls. */
   trailing?: ReactNode;
 }
@@ -36,7 +36,7 @@ export function ListRow({
   name,
   secondary,
   meta,
-  amount,
+  value,
   trailing,
 }: ListRowProps) {
   return (
@@ -45,7 +45,7 @@ export function ListRow({
         <p className="truncate text-sm font-medium text-foreground">{name}</p>
         {secondary && <div className="mt-0.5">{secondary}</div>}
         {/* Below sm the meta drops under the name instead of competing with
-            the amount for the same line — at 360px the two together truncate
+            the value for the same line — at 360px the two together truncate
             the payee to nothing. */}
         {meta && (
           <div className="mt-0.5 text-xs text-muted-foreground sm:hidden">
@@ -58,10 +58,8 @@ export function ListRow({
           {meta}
         </span>
       )}
-      {amount !== undefined && (
-        <span className="min-w-24 shrink-0 text-right">
-          <Amount value={amount} size="md" />
-        </span>
+      {value !== undefined && (
+        <span className="min-w-24 shrink-0 text-right">{value}</span>
       )}
       {trailing}
     </li>
@@ -76,7 +74,8 @@ export function ListTotal({
   className,
 }: {
   label: ReactNode;
-  value: number;
+  /** The figure — pass an `<Amount size="inherit">` so it takes this strip's scale. */
+  value: ReactNode;
   /**
    * Promotes the strip from a footnote to a figure. Used where the total is
    * the reason the card exists (what you owe in the next 30 days), not just
@@ -101,11 +100,11 @@ export function ListTotal({
       >
         {label}
       </span>
-      <Amount
-        value={value}
-        size={emphasis ? "lg" : "md"}
-        className={cn(emphasis && "text-lg text-primary sm:text-xl")}
-      />
+      <span
+        className={cn(emphasis ? "text-lg text-primary sm:text-xl" : "text-sm")}
+      >
+        {value}
+      </span>
     </div>
   );
 }

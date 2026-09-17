@@ -1,6 +1,4 @@
 import {
-  CATEGORY_GROUPS,
-  CATEGORIES,
   PRESET_COLOR_CLASSES,
   PRESET_COLOR_HEX,
   PRESET_COLOR_WASH,
@@ -11,8 +9,12 @@ import {
   DEFAULT_CATEGORY_WASH,
   DEFAULT_CATEGORY_TEXT,
   getCategoryColor,
-} from "@/shared/categories/configuration";
-import type { Category } from "@/shared/categories/category";
+} from "@/shared/categories/colors";
+import {
+  CATEGORY_GROUPS,
+  CATEGORIES,
+  type Category,
+} from "@/shared/categories/category";
 import { useCustomCategories } from "./store";
 
 export interface CategoryOptionGroup {

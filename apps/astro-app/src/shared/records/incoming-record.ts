@@ -4,10 +4,9 @@ import type { DataE2E } from "@/__e2e__/data-e2e";
 /**
  * A record that has not happened yet, shaped for a list of records.
  *
- * Lives beside `RecordCard` rather than inside any feature module: the history
- * register renders it without knowing what a recurring payment is, and the
- * recurring-payments side maps itself into it without knowing what a history
- * register is. Neither module imports the other.
+ * Shared because two modules meet on it: expense-management renders it
+ * (`RecordCard`, `ExpenseHistory`) and history maps recurring payments into it.
+ * Neither side learns the other's domain.
  */
 export interface IncomingRecord {
   id: string;

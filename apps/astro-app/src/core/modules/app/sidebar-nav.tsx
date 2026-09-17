@@ -12,7 +12,7 @@ import {
 import { Button } from "@/libs/ui/button";
 import { SectionLabel } from "@/libs/ui/section-label";
 import { cn } from "@/libs/ui/utils";
-import { AccountFooter } from "@/shared/auth/account-badge";
+import { AccountFooter } from "./account-footer";
 import { appTabPath, type AppTab } from "@/shared/routing/app-router";
 import { ProfileSwitcher } from "@/modules/multi-profile-account/presentation/profile-switcher";
 import { openAddExpense } from "@/modules/add-expense/core/intent";

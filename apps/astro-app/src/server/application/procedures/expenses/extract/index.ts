@@ -14,7 +14,7 @@ import {
   EXTRACT_DAILY_LIMIT,
   extractExpensesContract,
 } from "@/shared/server-contracts/schemas/expense";
-import { CATEGORIES } from "@/shared/categories/configuration";
+import { CATEGORIES } from "@/shared/categories/category";
 import { extractExpensesWith } from "./extraction";
 
 /** Atomic "take one from today's allowance"; -1 means none left. */

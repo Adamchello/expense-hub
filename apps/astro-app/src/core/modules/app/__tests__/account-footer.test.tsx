@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__tests__/mock-server";
 import { $toasts } from "@/libs/ui/toast";
-import { AccountFooter } from "../account-badge";
+import { AccountFooter } from "../account-footer";
 
 describe("AccountFooter sign out", () => {
   beforeEach(() => {

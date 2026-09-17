@@ -5,7 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Callout, errorMessage } from "@/libs/ui/callout";
 import { SkeletonDashboard } from "@/libs/ui/skeleton";
 import { useAuth } from "@/shared/auth/use-auth";
-import { greetingFor } from "@/shared/auth/user-display";
+import { greetingFor } from "@/shared/user/user-display";
 import { todayIso } from "@/shared/calendar/calendar";
 import { appTabPath } from "@/shared/routing/app-router";
 import { openAddExpense } from "@/modules/add-expense/core/intent";

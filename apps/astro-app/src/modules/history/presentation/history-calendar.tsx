@@ -5,7 +5,7 @@ import { Amount } from "@/shared/money/amount";
 import {
   CalendarLegend,
   MonthCalendar,
-} from "@/shared/calendar/month-calendar";
+} from "@/modules/history/presentation/month-calendar";
 import { SkeletonList } from "@/libs/ui/skeleton";
 import { todayIso } from "@/shared/calendar/calendar";
 import type { Expense } from "@/modules/expense-management/domain/expense";

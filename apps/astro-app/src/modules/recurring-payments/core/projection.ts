@@ -1,5 +1,5 @@
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
-import { advanceDueDate } from "@/shared/recurring/recurrence";
+import { advanceDueDate } from "@/modules/recurring-payments/domain/recurring-payment";
 
 export interface ProjectedOccurrence {
   /** YYYY-MM-DD the occurrence falls due. */

@@ -1,17 +1,5 @@
 import type { Category } from "./category";
 
-export const CATEGORY_GROUPS: { label: string; categories: Category[] }[] = [
-  { label: "Home", categories: ["Rent", "Electricity", "Water", "Internet"] },
-  { label: "Everyday", categories: ["Groceries", "Fuel"] },
-  { label: "Health & Finance", categories: ["Insurance", "Medical"] },
-  { label: "Leisure", categories: ["Streaming", "Dining", "Entertainment"] },
-  { label: "Other", categories: ["Uncategorized"] },
-];
-
-export const CATEGORIES: Category[] = CATEGORY_GROUPS.flatMap(
-  (group) => group.categories,
-);
-
 /*
  * Label text is the 700 step in light and 400 in dark — not 600/400.
  *

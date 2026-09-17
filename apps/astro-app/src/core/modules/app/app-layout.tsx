@@ -7,7 +7,7 @@ import { Button } from "@/libs/ui/button";
 import { Toaster } from "@/libs/ui/toaster";
 import { cn } from "@/libs/ui/utils";
 import { useAuth } from "@/shared/auth/use-auth";
-import { UserAvatar } from "@/shared/auth/account-badge";
+import { UserAvatar } from "@/shared/user/user-avatar";
 import { appTabPath } from "@/shared/routing/app-router";
 import { AddExpenseDialog } from "@/modules/add-expense/presentation/add-expense-dialog";
 import { openAddExpense } from "@/modules/add-expense/core/intent";

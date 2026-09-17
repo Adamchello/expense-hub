@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { FREQUENCIES } from "@/shared/recurring/recurrence";
+
+export const FREQUENCIES = [
+  "weekly",
+  "monthly",
+  "quarterly",
+  "yearly",
+] as const;
+
+export type Frequency = (typeof FREQUENCIES)[number];
 
 export const recurringPaymentSchema = z.object({
   amount: z

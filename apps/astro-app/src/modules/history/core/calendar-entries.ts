@@ -2,7 +2,7 @@ import type { Expense } from "@/modules/expense-management/domain/expense";
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
 import { projectOccurrences } from "@/modules/recurring-payments/core/projection";
 import { monthBounds } from "@/shared/calendar/calendar";
-import type { CalendarEntry } from "@/shared/calendar/month-calendar";
+import type { CalendarEntry } from "@/modules/history/presentation/month-calendar";
 
 /** Records keyed by YYYY-MM-DD. */
 export type ByDay<T> = Map<string, T[]>;

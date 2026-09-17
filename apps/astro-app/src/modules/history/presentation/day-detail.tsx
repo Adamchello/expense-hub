@@ -6,7 +6,7 @@ import { cn } from "@/libs/ui/utils";
 import { RecordCard } from "@/modules/expense-management/presentation/record-card";
 import { formatDate } from "@/shared/calendar/format";
 import { formatCurrency } from "@/shared/money/format";
-import { FREQUENCY_LABELS } from "@/shared/recurring/recurrence";
+import { FREQUENCY_LABELS } from "@/shared/recurring/frequency";
 import type { Expense } from "@/modules/expense-management/domain/expense";
 import type { RecurringPayment } from "@/modules/recurring-payments/domain/recurring-payment";
 

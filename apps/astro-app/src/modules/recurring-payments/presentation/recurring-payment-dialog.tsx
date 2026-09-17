@@ -23,11 +23,11 @@ import { HeroAmountField } from "@/shared/money/hero-amount-field";
 import { SectionLabel } from "@/libs/ui/section-label";
 import { CategoryPickerPopover } from "@/modules/category-management/presentation/category-picker-popover";
 import type { Category } from "@/shared/categories/category";
+import { FREQUENCY_LABELS } from "@/shared/recurring/frequency";
 import {
   FREQUENCIES,
-  FREQUENCY_LABELS,
   type Frequency,
-} from "@/shared/recurring/recurrence";
+} from "@/modules/recurring-payments/domain/recurring-payment";
 import type { RecurringPayment } from "../domain/recurring-payment";
 import {
   useCreateRecurringPayment,

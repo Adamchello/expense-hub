@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { advanceDueDate, daysUntil } from "@/shared/recurring/recurrence";
+import {
+  advanceDueDate,
+  daysUntil,
+} from "@/modules/recurring-payments/domain/recurring-payment";
 
 describe("advanceDueDate", () => {
   it("advances weekly by 7 days", () => {

@@ -18,10 +18,10 @@ import {
 } from "@/libs/ui/card-table";
 import { CategoryBadge } from "@/modules/category-management/presentation/category-badge";
 import { EmptyState } from "@/libs/ui/empty-state";
-import { ListTotal } from "@/shared/money/data-list";
+import { ListTotal } from "@/libs/ui/data-list";
 import { SkeletonPanel } from "@/libs/ui/skeleton";
 import { formatDate } from "@/shared/calendar/format";
-import { daysUntil } from "@/shared/recurring/recurrence";
+import { daysUntil } from "@/modules/recurring-payments/domain/recurring-payment";
 import { useRecurringPayments } from "@/modules/recurring-payments/core/store";
 import { addDays, expectedTotal, projectOccurrences } from "../core/projection";
 import { ArrowRight } from "lucide-react";
@@ -149,7 +149,7 @@ export function IncomingPayments({ onViewAll }: IncomingPaymentsProps) {
                     ` · ${occurrences.length - shown.length} more`}
                 </>
               }
-              value={total}
+              value={<Amount value={total} size="inherit" />}
               emphasis
             />
           </>
